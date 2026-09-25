@@ -24,7 +24,8 @@ async function loadCheckout() {
     return { error: error.message, identityError: true } as const;
   }
 }
-export default async function CheckoutPage() {
+export default async function CheckoutPage({ searchParams }: { searchParams: Promise<Record<string, string | string[] | undefined>> }) {
+  const cancelled = (await searchParams).payment === "cancelled";
   const result = await loadCheckout();
   if ("error" in result) return <Container className="space-y-5 py-12">
     <h1 className="text-3xl font-semibold">Checkout</h1>
@@ -37,6 +38,6 @@ export default async function CheckoutPage() {
   return <Container className="space-y-8 py-10 sm:py-16">
     <h1 className="text-3xl font-semibold">Checkout</h1>
     <Link href="/cart" className="inline-flex min-h-11 items-center underline underline-offset-4">Return to cart</Link>
-    <CheckoutForm initialQuote={result.quote} addresses={result.addresses} account={result.account} />
+    <CheckoutForm initialQuote={result.quote} addresses={result.addresses} account={result.account} cancelled={cancelled} />
   </Container>;
 }

@@ -11,7 +11,7 @@ The user has authorized bounded M07 implementation after verified M06. M07-P01 a
 ## Scope and stack
 
 - Implement only scope rows marked IN, in roadmap order. Non-goals and OUT rows are hard constraints. Do not invent features or future infrastructure.
-- Use Next.js App Router, strict TypeScript, Tailwind CSS, shadcn/ui, Supabase Postgres/Auth/Storage/RLS, Zod, React Hook Form where useful, Stripe, Resend, Vercel, and Sentry.
+- Use Next.js App Router, strict TypeScript, Tailwind CSS, shadcn/ui, Supabase Postgres/Auth/Storage/RLS, Zod, React Hook Form where useful, PayMongo (M08-P01; replaced Stripe), Resend, Vercel, and Sentry.
 - Do not substitute Prisma, Firebase, another database/auth/UI/styling provider, GraphQL, Redis, microservices, Kafka, or Kubernetes without explicit approval.
 - No reviews, wishlists, loyalty/referrals, recommendations, subscriptions, multi-vendor, multi-currency, native mobile apps, bulk import, warehouse/multi-location inventory, complex coupon stacking, advanced search infrastructure, or unnecessary CMS.
 - Inspect and reuse components/utilities before adding duplicates. Keep modules small, focused, and clearly named. Avoid any unless specifically justified, premature abstractions, and speculative frameworks.
@@ -24,8 +24,8 @@ The user has authorized bounded M07 implementation after verified M06. M07-P01 a
 - Never trust browser prices, totals, discounts, inventory, payment/order status, role, or ownership. Re-fetch and validate authoritative data on the server.
 - Enforce customer ownership with server checks and RLS. Require server-confirmed admin authorization and appropriate RLS for privileged mutations. Customers cannot edit their role. Hidden UI is never authorization.
 - Product media writes are admin-only with file-type and size validation.
-- Keep service-role, Stripe secret/webhook, and Resend keys out of client code and logs. Keep .env.example current with placeholders only. Scrub secrets and PII from monitoring.
-- Only a signature-verified, deduplicated Stripe webhook can finalize trusted paid state. Redirects cannot mark orders paid. Duplicate events must not duplicate orders, inventory deductions, or emails. Browser closure must not block finalization.
+- Keep service-role, PayMongo secret/webhook, and Resend keys out of client code and logs. Keep .env.example current with placeholders only. Scrub secrets and PII from monitoring.
+- Only a signature-verified, deduplicated PayMongo webhook can finalize trusted paid state. Redirects cannot mark orders paid. Duplicate events must not duplicate orders, inventory deductions, or emails. Browser closure must not block finalization.
 - Inventory is variant-level. Order items snapshot SKU, product/variant names, unit price, quantity, and line total. Prefer archive/inactive states for catalog history.
 
 ## Milestone workflow and verification

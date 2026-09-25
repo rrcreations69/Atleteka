@@ -18,10 +18,10 @@ Use Supabase Postgres. Supabase migrations are the schema source of truth and mu
 | carts | id, user_id?, guest_token?, status, updated_at | Shopping cart | 1:M cart_items | Guest or user ownership. guest_token stores only the secret hash. One active cart per user; guest and account carts remain separate. |
 | cart_items | id, cart_id, variant_id, quantity | Cart lines | M:1 cart, M:1 variant | Unique cart+variant; positive integer quantity, checked against current stock by server routines. Add increments atomically; explicit remove deletes the line. |
 | addresses | id, user_id, type?, name, line1, line2?, city, region, postal_code, country, phone? | Saved addresses | M:1 user | User owns rows. |
-| orders | id, user_id?, email, status, payment_status, subtotal, discount_total, shipping_total, tax_total, grand_total, currency, stripe refs, created_at | Commercial order | 1:M order_items | Store immutable price snapshot; totals server-generated. |
+| orders | id, user_id?, email, status, payment_status, subtotal, discount_total, shipping_total, tax_total, grand_total, currency, payment provider refs (PayMongo; column rename proposed in M09), created_at | Commercial order | 1:M order_items | Store immutable price snapshot; totals server-generated. |
 | order_items | id, order_id, variant_id?, sku, product_name, variant_name, unit_price, quantity, line_total | Immutable order line snapshot | M:1 order | Do not depend on mutable catalog data for historical display. |
 | discounts | id, code, type, value, active, starts_at?, ends_at?, usage_limit?, redemption_count | Simple coupon/discount | Applied during checkout | Server validation; no stacking in MVP unless added. |
-| webhook_events | provider_event_id, type, processed_at, payload_hash? | Webhook idempotency/audit | Stripe events | Unique provider_event_id to prevent double-processing. |
+| webhook_events | provider_event_id, type, processed_at, payload_hash? | Webhook idempotency/audit | PayMongo events | Unique provider_event_id to prevent double-processing. |
 
 ## Relationships and integrity
 
@@ -38,11 +38,11 @@ Use Supabase Postgres. Supabase migrations are the schema source of truth and mu
 
 ## Checkout integrity
 
-Client submits variant/item IDs and quantities. Server reloads prices, active state and inventory, validates the discount, calculates totals, and creates the Stripe payment resource with an internal reference. A verified and deduplicated webhook records trusted payment/order state and adjusts stock atomically where possible. One successful payment creates one correct order and one stock deduction. Only trusted paid state can trigger confirmation; browser closure cannot stop finalization.
+Client submits variant/item IDs and quantities. Server reloads prices, active state and inventory, validates the discount, calculates totals, and creates the PayMongo checkout session with an internal reference. A verified and deduplicated webhook records trusted payment/order state and adjusts stock atomically where possible. One successful payment creates one correct order and one stock deduction. Only trusted paid state can trigger confirmation; browser closure cannot stop finalization.
 
 ## Unresolved schema questions
 
-See DECISIONS.md before M02 and commerce milestones. The user's conceptual list includes payments, but the workbook lists no separate payments table; payment_status and Stripe references are on orders. Do not invent a payments table. Guest order access, checkout-address retention, coupon usage enforcement, stock concurrency and once-only email persistence need a concrete strategy that fits the model, or an approved minimal schema change. No strategy or additional entity/field is approved by this document.
+See DECISIONS.md before M02 and commerce milestones. The user's conceptual list includes payments, but the workbook lists no separate payments table; payment_status and payment provider references are on orders. Do not invent a payments table. Guest order access, checkout-address retention, coupon usage enforcement, stock concurrency and once-only email persistence need a concrete strategy that fits the model, or an approved minimal schema change. No strategy or additional entity/field is approved by this document.
 
 ## M02 concrete schema and configuration
 
@@ -51,7 +51,7 @@ Project: Atleteka (vaqkikxksbblgspdeiap), Supabase Postgres 17. Migration 202609
 - UUID primary keys use gen_random_uuid(), except profiles uses auth.users.id, inventory uses variant_id, product_categories uses its pair, and webhook_events uses provider_event_id. User references target auth.users. Foreign keys preserve referenced records; no destructive cascades are added.
 - Variant title represents the PRD title/options alternative, and price is the sole price source. Product media uses storage_path. No Storage objects/buckets are created. Optional base_price, compare_at_price, reservations, category description, address type/phone and webhook payload_hash are omitted. Address line2 and discount date/usage fields follow the model.
 - Money uses exact numeric values, rejects negative/non-finite values and has no currency/rounding default. orders.currency accepts a three-letter uppercase code; this does not implement a currency selector or approve a business currency. Status and discount type are required nonempty text because their business values/transitions are unspecified. Future consuming logic must validate them; no workflow uses them now.
-- Orders concretize the PRD Stripe references as unique nullable stripe_checkout_session_id and stripe_payment_intent_id. Totals must equal their stored parts. Order items retain all required snapshots, positive quantity and matching line total. A trigger prevents snapshot updates/deletes, including from trusted application roles.
+- Orders concretize the PRD payment references as unique nullable stripe_checkout_session_id and stripe_payment_intent_id (Stripe-era names; PayMongo per M08-P01, rename to be proposed in M09). Totals must equal their stored parts. Order items retain all required snapshots, positive quantity and matching line total. A trigger prevents snapshot updates/deletes, including from trusted application roles.
 - Unique product/category slugs, SKUs, cart/variant pairs, guest tokens, discount codes and webhook event IDs reject duplicates. Inventory has one nonnegative integer quantity per variant. A cart has exactly one of user_id or guest_token; token issuance and access are unimplemented. Timestamps default on insertion; future trusted mutations must maintain updated_at.
 - All 14 tables have RLS enabled and no policies. Public/anonymous/authenticated grants are revoked. Basic schema protection is M02; customer/admin permissions and Auth provisioning are M03. No separate payments entity or new business field was introduced.
 
