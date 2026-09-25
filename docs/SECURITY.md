@@ -34,9 +34,9 @@ Product uploads require admin authorization and file-type/size validation. The P
 1. Receive cart identifiers and quantities, not authoritative prices.
 2. Reload current product/variant prices and stock. Reject inactive/unavailable items and invalid quantities.
 3. Validate the single discount and compute authoritative totals server-side.
-4. Create the Stripe checkout/payment resource server-side with safe internal references.
+4. Create the PayMongo checkout session server-side with safe internal references.
 5. Treat the browser redirect as navigation only; it cannot mark an order paid.
-6. Verify the Stripe webhook signature and deduplicate the provider event.
+6. Verify the PayMongo webhook signature (Paymongo-Signature) and deduplicate the provider event.
 7. Finalize trusted order/payment state, immutable line snapshots and inventory adjustment, atomically where possible. Totals must match the charged amount.
 8. Trigger confirmation from trusted paid state, exactly once. Log email failure without corrupting the order.
 
@@ -44,7 +44,7 @@ Duplicate events and retries must not create duplicate orders, inventory deducti
 
 ## Environment and secrets
 
-.env.example contains placeholders only. Keep real environment files/secrets out of version control. SUPABASE_SERVICE_ROLE_KEY, STRIPE_SECRET_KEY, STRIPE_WEBHOOK_SECRET and RESEND_API_KEY are server-only and must never enter client bundles or logs. Public Supabase credentials depend on correct RLS. Use separate preview/production configuration on Vercel and scrub secrets/PII from Sentry and logs. Environment names are transcribed in ARCHITECTURE.md.
+.env.example contains placeholders only. Keep real environment files/secrets out of version control. SUPABASE_SERVICE_ROLE_KEY, PAYMONGO_SECRET_KEY, PAYMONGO_WEBHOOK_SECRET and RESEND_API_KEY are server-only and must never enter client bundles or logs. Public Supabase credentials depend on correct RLS. Use separate preview/production configuration on Vercel and scrub secrets/PII from Sentry and logs. Environment names are transcribed in ARCHITECTURE.md.
 
 ## Verification and launch gates
 
