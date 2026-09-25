@@ -1,0 +1,27 @@
+# Dependencies and package-manager cache
+/node_modules/
+/.npm-cache/
+
+# Next.js and TypeScript build outputs
+/.next/
+/out/
+/build/
+next-env.d.ts
+*.tsbuildinfo
+
+# Local credentials; only the example may be committed
+.env*
+!.env.example
+*.pem
+*.key
+
+# Hosting metadata and logs
+.vercel/
+*.log
+
+# Local verification artifacts
+/.verification/
+
+# OS metadata
+.DS_Store
+Thumbs.db
