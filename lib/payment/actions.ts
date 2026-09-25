@@ -10,6 +10,8 @@ import { checkoutLineItems, PaymentQuoteError, planPayment } from "./session";
 export async function startPayment(_state: CheckoutState, form: FormData): Promise<CheckoutState> {
   const input = parseCheckoutForm(form);
   if (!input.success) return { error: "Check the highlighted fields.", errors: input.errors };
+  const expected = form.getAll("expectedTotal");
+  if (expected.length !== 1 || typeof expected[0] !== "string") return { error: "Check the merchandise total again before paying." };
   let url: string;
   try {
     const { client, kind } = await createCartClient();
@@ -17,7 +19,7 @@ export async function startPayment(_state: CheckoutState, form: FormData): Promi
     const { data, error } = await client.rpc("checkout_quote", { coupon_code: input.data.couponCode || null });
     if (error) return { error: quoteError(error.code), ...(error.code === "P7003" ? { errors: { couponCode: quoteError(error.code) } } : {}) };
     const quote = quoteSchema.parse(data);
-    const plan = planPayment(quote);
+    const plan = planPayment(quote, expected[0]);
     const address = addressSchema.parse(input.data);
     const user = kind === "account" ? (await client.auth.getUser()).data.user : null;
     if (kind === "account" && !user) throw new CartAccessError("Your session could not be verified. Sign in again.");

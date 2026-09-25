@@ -19,8 +19,11 @@ export function toCentavos(value: string) {
 export type PaymentLine = { variantId: string; name: string; unitAmount: number; quantity: number };
 export type PaymentPlan = { lines: PaymentLine[]; subtotal: number; discount: number; total: number; couponCode: string | null };
 
-/** Turns a server quote into PayMongo amounts (centavos), re-checking every total the quote reports. */
-export function planPayment(quote: Quote): PaymentPlan {
+/**
+ * Turns a server quote into PayMongo amounts (centavos), re-checking every total the quote reports.
+ * expectedTotal is the amount shown on the Pay button; it is only compared, never charged.
+ */
+export function planPayment(quote: Quote, expectedTotal?: string): PaymentPlan {
   if (!quote.cart.id || quote.cart.items.length === 0) throw new PaymentQuoteError("Cart is empty.");
   const lines = quote.cart.items.map((item) => {
     if (!item.available || !item.quantityValid || item.unitPrice === null || item.lineTotal === null) {
@@ -38,6 +41,9 @@ export function planPayment(quote: Quote): PaymentPlan {
   }
   if (discount > subtotal || subtotal - discount !== total) throw new PaymentQuoteError("Discount does not match.");
   if (total < MINIMUM_CHARGE) throw new PaymentQuoteError("Total is below the minimum charge.");
+  if (expectedTotal !== undefined && (!/^\d+(?:\.\d{1,2})?$/.test(expectedTotal) || toCentavos(expectedTotal) !== total)) {
+    throw new PaymentQuoteError("Total changed since it was checked.");
+  }
   return { lines, subtotal, discount, total, couponCode: quote.couponCode };
 }
 

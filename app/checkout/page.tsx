@@ -38,6 +38,7 @@ export default async function CheckoutPage({ searchParams }: { searchParams: Pro
   return <Container className="space-y-8 py-10 sm:py-16">
     <h1 className="text-3xl font-semibold">Checkout</h1>
     <Link href="/cart" className="inline-flex min-h-11 items-center underline underline-offset-4">Return to cart</Link>
-    <CheckoutForm initialQuote={result.quote} addresses={result.addresses} account={result.account} cancelled={cancelled} />
+    {cancelled && <p role="status" className="rounded-md border border-border p-4">Payment cancelled. You have not been charged, and your cart is unchanged.</p>}
+    <CheckoutForm initialQuote={result.quote} addresses={result.addresses} account={result.account} />
   </Container>;
 }

@@ -48,3 +48,8 @@ test("a discount becomes one exact line, never a negative or rounded line", () =
  const long = checkoutLineItems(planPayment(quote({ cart: many, subtotal: "10020.00", couponCode: "X", discountTotal: "20.00", merchandiseTotal: "10000.00" })));
  assert.ok(long[0].description.length <= 255); assert.equal(long[0].amount, 1000000);
 });
+test("the amount shown on the Pay button must equal the re-quoted total", () => {
+ assert.equal(planPayment(quote(), "501.00").total, 50100);
+ assert.equal(planPayment(quote(), "501").total, 50100);
+ for (const shown of ["25.00", "501.01", "", "501.000", "abc", "-501"]) assert.throws(() => planPayment(quote(), shown), PaymentQuoteError);
+});

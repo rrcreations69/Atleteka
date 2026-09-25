@@ -17,17 +17,24 @@ const fields = [
   ["postal_code", "Postal code", "postal-code", 4],
 ] as const;
 
-export function CheckoutForm({ initialQuote, addresses, account, cancelled }: { initialQuote: Quote; addresses: SavedAddress[]; account: boolean; cancelled: boolean }) {
+export function CheckoutForm({ initialQuote, addresses, account }: { initialQuote: Quote; addresses: SavedAddress[]; account: boolean }) {
   const [address, setAddress] = useState<Address>(addresses[0] ?? blank);
   const [selected, setSelected] = useState(addresses[0]?.id ?? "");
   const [coupon, setCoupon] = useState("");
   const [dirty, setDirty] = useState(false);
+  // A payment error belongs to the Pay attempt that produced it; a new total check clears it.
+  const [paymentError, setPaymentError] = useState<string | null>(null);
   const [state, action, pending] = useActionState<CheckoutState, FormData>(async (previous, form) => {
+    setPaymentError(null);
     const result = await calculateCheckout(previous, form);
     setDirty(false);
     return result;
   }, {});
-  const [payment, payAction, paying] = useActionState<CheckoutState, FormData>(startPayment, {});
+  const [, payAction, paying] = useActionState<CheckoutState, FormData>(async (previous, form) => {
+    const result = await startPayment(previous, form);
+    setPaymentError(result.error ?? null);
+    return result;
+  }, {});
   const quote = !dirty && state.quote ? state.quote : initialQuote;
   // Paying requires a total checked with the current form; the server re-quotes regardless.
   const canPay = Boolean(state.quote) && !dirty && !pending;
@@ -63,14 +70,14 @@ export function CheckoutForm({ initialQuote, addresses, account, cancelled }: { 
         onChange={(event) => { setCoupon(event.target.value); setDirty(true); }} />
       <div className="flex flex-wrap gap-3">
         <Button type="submit" variant={canPay ? "outline" : "default"}>{pending ? "Checking…" : "Check merchandise total"}</Button>
+        {canPay && <input type="hidden" name="expectedTotal" value={quote.merchandiseTotal} />}
         {canPay && <Button type="submit" formAction={payAction}>{paying ? "Opening secure payment…" : "Pay " + formatPrice(quote.merchandiseTotal)}</Button>}
       </div>
       <div id="checkout-status" role="status" aria-live="polite" className="space-y-2 text-sm">
         {pending ? <p>Checking prices, availability and coupon…</p> : paying ? <p>Rechecking your cart and opening PayMongo…</p> : <>
-          {payment.error && <p className="text-destructive">{payment.error}</p>}
-          {!payment.error && cancelled && !state.quote && <p>Payment cancelled. You have not been charged, and your cart is unchanged.</p>}
+          {paymentError && <p className="text-destructive">{paymentError}</p>}
           {state.error && <p className="text-destructive">{state.error}</p>}
-          {!dirty && state.message && <p>{state.message}</p>}
+          {!dirty && !paymentError && state.message && <p>{state.message}</p>}
           {dirty && <p>Check the total again to apply your changes.</p>}
         </>}
       </div>
