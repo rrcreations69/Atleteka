@@ -69,7 +69,9 @@ Limits: portable PostgreSQL 17 replay uses platform stubs; actual hosted SQL/bro
 
 ## PRD and documentation
 
-PRD records M07-P01, approved merchant rules, saved account addresses, the coupon counter/security requirements and actual In Progress status. Dashboard: 17 total, 1 Done, 1 In Progress, 0 Blocked, 15 Not Started. M01-M06 content and M08+ requirements are preserved except directly related address/coupon clarifications approved for M07. Historical workbook milestone statuses other than M06/M07 remain unchanged.
+PRD records M07-P01, approved merchant rules, saved account addresses, the coupon counter/security requirements and actual In Progress status. Dashboard: 17 total, 6 Done, 2 In Progress, 0 Blocked, 9 Not Started. M01-M06 content and M08+ requirements are preserved except directly related address/coupon clarifications approved for M07.
+
+Status correction (2026-09-25, user-authorized): 07_ROADMAP!E4:E9 changed from Not Started to match recorded execution history: M00/M01/M02/M04/M05 Done (verified per ROADMAP.md history and M04/M05 checkpoints), M03 In Progress (implemented; verification incomplete per M03_CHECKPOINT.md). Only those six Status cells and the dependent 15_DASHBOARD cached values changed; formulas, styles, validation and all other workbook parts are byte-identical. No requirement changed. Fresh re-check on 2026-09-25 after `npm ci`: lint, typecheck, 28/28 tests and production build pass. The earlier .verification evidence folder is not present in this checkout.
 
 Approved changes to the original PRD: shipping/final total pending instead of a final quote; PHP/PH/tax policy; account address reuse; coupon semantics and redemption_count. **Unapproved deviations: None.**
 
@@ -79,5 +81,5 @@ All changed files are listed in HANDOFF.md.
 
 - Completed: approved M07 implementation, feature verification, retry correction, PRD update/preservation, cleanup and documentation.
 - Current position: M07 features verified; milestone In Progress solely for the unverified M03 dependency.
-- Exact next action: resume the remaining existing M03 authentication verification; a user-controlled test mailbox is needed before confirmation/recovery delivery tests. Do not redo completed M07 work.
+- Exact next action: finish the single remaining M03 check (recovery link → same-browser code exchange → new password); see the resume steps in M03_CHECKPOINT.md "Follow-up verification (2026-09-25)". All other M03 checks passed on 2026-09-25. Do not redo completed M07 work.
 - Remaining: M03 dependency checks, then reconcile M03/M07 completion status from actual evidence. Do not start M08.

@@ -6,16 +6,16 @@ Derived from PRD.xlsx 07_ROADMAP!A3:I20. Read 08_USER_STORIES and 11_TEST_MATRIX
 
 M00-M02 are verified. M03 is implemented but its browser auth verification remains incomplete (see M03_CHECKPOINT.md). M04 is verified (see M04_CHECKPOINT.md). The user authorized M05 on 2026-09-21; M05 search and filters are complete and verified (see M05_CHECKPOINT.md). M06 is complete and verified following approval of M06-P01; see M06_CHECKPOINT.md. The user authorized M07 on 2026-09-23; M07-P01 and merchant rules are approved. Checkout implementation is present and final verification is recorded in CURRENT.md. The M03 dependency remains incompletely verified; M08+ is unstarted.
 
-The table below reflects workbook statuses after the approved M06 progress update. M06 is Done and M07 is In Progress; all other historical workbook statuses remain unchanged. Verified execution history is recorded above and in milestone checkpoints.
+The table below reflects workbook statuses after the user-authorized 2026-09-25 status correction: M00, M01, M02, M04, M05 and M06 are Done (verified per their checkpoints); M03 and M07 are In Progress (M03 browser/email verification incomplete; M07 open only for that dependency). Verified execution history is recorded above and in milestone checkpoints.
 
 | ID | Milestone | Priority | Dependency | Workbook status | Deliverables | Definition of Done / Acceptance Criteria | Owner | Estimate |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| M00 | Repository & engineering baseline | P0 | None | Not Started | Next.js TS app; Tailwind; shadcn; lint/typecheck; env example; AGENTS.md/AI rules | App runs locally; lint/typecheck pass; secrets excluded; conventions documented. | Eng | S |
-| M01 | Design system & shell | P0 | M00 | Not Started | Typography, spacing, header/footer, buttons/cards/forms, responsive container | Consistent layout on mobile/desktop; reusable primitives; no feature business logic yet. | Frontend | S |
-| M02 | Supabase & schema | P0 | M00 | Not Started | Supabase project config, migrations, data model, seed script | Schema matches PRD; migrations reproducible; seed creates usable catalog data. | Backend | M |
-| M03 | Authentication & authorization | P0 | M02 | Not Started | Login/register/session, profiles, customer/admin roles, RLS | Customer/admin access tests pass; privilege escalation blocked. | Backend | M |
-| M04 | Catalog | P0 | M01,M02 | Not Started | Shop, category, product detail, images, variants, availability | Active catalog renders from DB; invalid/inactive routes handled; responsive. | Full Stack | M |
-| M05 | Search & filters | P1 | M04 | Not Started | Basic search/category/availability filtering | URL/state predictable; no overbuilt search service. | Full Stack | S |
+| M00 | Repository & engineering baseline | P0 | None | Done | Next.js TS app; Tailwind; shadcn; lint/typecheck; env example; AGENTS.md/AI rules | App runs locally; lint/typecheck pass; secrets excluded; conventions documented. | Eng | S |
+| M01 | Design system & shell | P0 | M00 | Done | Typography, spacing, header/footer, buttons/cards/forms, responsive container | Consistent layout on mobile/desktop; reusable primitives; no feature business logic yet. | Frontend | S |
+| M02 | Supabase & schema | P0 | M00 | Done | Supabase project config, migrations, data model, seed script | Schema matches PRD; migrations reproducible; seed creates usable catalog data. | Backend | M |
+| M03 | Authentication & authorization | P0 | M02 | In Progress | Login/register/session, profiles, customer/admin roles, RLS | Customer/admin access tests pass; privilege escalation blocked. | Backend | M |
+| M04 | Catalog | P0 | M01,M02 | Done | Shop, category, product detail, images, variants, availability | Active catalog renders from DB; invalid/inactive routes handled; responsive. | Full Stack | M |
+| M05 | Search & filters | P1 | M04 | Done | Basic search/category/availability filtering | URL/state predictable; no overbuilt search service. | Full Stack | S |
 | M06 | Cart | P0 | M04 | Done | Add/update/remove, persistence, subtotal display, empty/error/loading states. Database/RLS, cookie, Server Actions, UI and guest/account browser flows verified on 2026-09-23. | Variant-aware; positive integer quantity within stock; current server prices/subtotal. Secure 30-day hashed guest identity; separate account carts, no merge. Complete only after end-to-end verification. | Full Stack | M |
 | M07 | Checkout foundation | P0 | M03,M06 | In Progress | PH address/account reuse, authoritative PHP merchandise quote, discount validation; M03 dependency verification incomplete | Current prices/stock and single coupon validated server-side; tax included; shipping/final payable total pending; account addresses isolated. | Backend | M |
 | M08 | Stripe payment | P0 | M07 | Not Started | Stripe session/payment integration and safe metadata | Client cannot choose price/total; test payment can complete. | Backend | M |
@@ -43,7 +43,7 @@ A plan or created files alone do not establish completion. Required functionalit
 
 ## Dashboard and status preservation
 
-15_DASHBOARD formulas were recalculated for the 2026-09-24 M07 update: 17 total, 1 Done, 1 In Progress, 0 Blocked, 15 Not Started (5.88% complete, displayed as 6%). M06 remains Done and M07 is In Progress. Other historical statuses are preserved; read milestone checkpoints for actual execution history. Native Excel recalculation was not exercised.
+15_DASHBOARD cached results after the 2026-09-25 status correction: 17 total, 6 Done, 2 In Progress, 0 Blocked, 9 Not Started (35.29% complete). Formulas are unchanged and the workbook recalculates fully on load. Read milestone checkpoints for actual execution history. Native Excel recalculation was not exercised.
 
 ## User-story traceability
 
