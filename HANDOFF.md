@@ -8,7 +8,7 @@ Do not restart M06 or reimplement M07. Read AGENTS.md, CURRENT.md, relevant PRD 
 
 The last unfinished M07 feature check was error recovery. It failed because resetting the error boundary did not fetch checkout again. app/checkout/error.tsx now reloads the page on Try again. Final lint/typecheck/28 tests/build and all 5 recovery browser cases pass after that fix.
 
-**Exact next action:** resume the remaining existing M03 authentication verification (admin access and token refresh first). Confirmation/recovery delivery requires a user-controlled test mailbox; none has been supplied. Preserve all completed M07 work and its evidence. Close M03/M07 status only from actual results. Do not begin M08.
+**Exact next action:** finish the single remaining M03 check (recovery link → same-browser code exchange → new password) per M03_CHECKPOINT.md "Follow-up verification (2026-09-25)". Admin access, token refresh, confirmation/recovery delivery, revoked session and the login 500 all passed on 2026-09-25. Preserve all completed M07 work and its evidence. Close M03/M07 status only from actual results. Do not begin M08.
 
 ## Approvals already received
 
@@ -98,8 +98,8 @@ No file deleted; no package/lockfile/environment change. Approved PRD changes ar
 - m07-browser-results.json/log; m07-browser-recovery-results.json/log.
 - m07-checkout-mobile.png, m07-checkout-desktop.png.
 - m07-prd/verification.json, archive-verification.json and after-*.png.
-- Current PRD SHA-256: 4ff719966d036bc3bbbb260ba052c5cdc334c6ef781a1d46fb290eed501b5f43.
-- Workbook dashboard: 17 total, 1 Done, 1 In Progress, 0 Blocked, 15 Not Started. M06 Done, M07 In Progress; other historical statuses deliberately unchanged.
+- Current PRD SHA-256: 7164da6253c04596b32b830052a3391670c8c6a3be4412d36c9109790688561c (after the 2026-09-25 status correction; previously 4ff719966d036bc3bbbb260ba052c5cdc334c6ef781a1d46fb290eed501b5f43).
+- Workbook dashboard: 17 total, 6 Done, 2 In Progress, 0 Blocked, 9 Not Started. M00/M01/M02/M04/M05/M06 Done; M03/M07 In Progress. See CURRENT.md "Status correction".
 - m07-prd/edit.mjs --verify-only reads the final workbook. Do not rerun edit mode after later changes: it starts from the original snapshot. Artifact-tool authoring/recalculation plus preservation scripts retain native workbook features; native Excel was not run.
 - Supabase project: vaqkikxksbblgspdeiap, existing MCP, no service-role secret.
 - Windows sandbox setup can fail. Reviewed require_escalated Node/cmd execution works. A previous diagnostic was blocked by exhausted workspace credits; the next user continuation retried the same approval path successfully. Never bypass a rejection.
