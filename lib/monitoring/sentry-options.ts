@@ -7,7 +7,7 @@ export const sentryOptions = {
   enabled: Boolean(process.env.NEXT_PUBLIC_SENTRY_DSN),
   environment: process.env.NEXT_PUBLIC_VERCEL_ENV ?? process.env.NODE_ENV,
   sendDefaultPii: false,
-  // Temporary diagnostics: SDK self-logging only when SENTRY_DEBUG=1 (server) is set on a preview.
+  // Diagnostics: SDK self-logging only when SENTRY_DEBUG=1 is set (never in production; it prints unscrubbed messages).
   debug: process.env.SENTRY_DEBUG === "1",
   tracesSampleRate: 0,
   beforeSend: (event: ErrorEvent, _hint: EventHint) => scrubEvent(event),

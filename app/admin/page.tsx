@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { MonitoringTest } from "@/components/admin/monitoring-test";
 import { AuthCard } from "@/components/auth/auth-card";
 import { Button } from "@/components/ui/button";
 import { logout } from "@/lib/auth/actions";
@@ -18,7 +17,6 @@ export default async function AdminPage() {
           <li><Link href="/admin/orders" className="inline-flex min-h-11 items-center underline underline-offset-4">Orders</Link></li>
         </ul>
       </nav>
-      <div className="mb-6"><MonitoringTest /></div>
       <Link href="/account" className="mb-5 block text-sm underline underline-offset-4">Your account</Link>
       <form action={logout}><Button type="submit" variant="outline">Sign out</Button></form>
     </AuthCard>

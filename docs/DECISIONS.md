@@ -189,3 +189,7 @@ Status: Approved by explicit user replies.
 - Error monitoring: @sentry/nextjs (PRD-approved Sentry), errors only: no performance tracing, no session replay, sendDefaultPii off. Every event passes a scrubber that drops cookies, request headers, request bodies, query strings and user fields, and masks email addresses and key-like strings (sk_/pk_ PayMongo, re_ Resend, whsk_, sb_secret_/sb_publishable_, JWTs) in messages, exception values and breadcrumbs. Enabled only when NEXT_PUBLIC_SENTRY_DSN is set. Source-map upload is out of scope for the MVP.
 - Analytics: Vercel Web Analytics (@vercel/analytics), cookieless page views; enabled in the Vercel project's Analytics tab.
 - A temporary admin-only "test error" action verifies delivery and scrubbing and is removed after testing.
+
+## Known issue for M15 - 2026-09-28
+
+Unhandled server errors are also printed by Next.js to the Vercel function log with their full message (seen with the M14 test error, whose message deliberately contained a fake email and key). Sentry events are scrubbed, but Vercel's own runtime log is not. Application code keeps customer data and secrets out of error messages (existing webhook/action logs use ids and codes only); M15 should confirm no thrown message includes PII and decide on log retention. SENTRY_DEBUG=1 prints unscrubbed messages and must never be set in production. Status: Open.
