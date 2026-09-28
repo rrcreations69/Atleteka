@@ -156,3 +156,7 @@ Status: Approved by explicit user instruction. Each phase gets manual functional
 ## M03 last check deferred - 2026-09-28
 
 Status: Approved by explicit user instruction ("skip m03 and proceed"). The single open M03 check (recovery link → same-browser PKCE code exchange → new password) is deferred to the final QA pass. It has not passed: recovery emails are delivered, but every link so far was consumed by a Discord link preview before use (the user relays links from phone to laptop via Discord; wrap links in <…> or relay only the token). M03, M07 and M08 remain In Progress in the PRD until it passes. M09 is authorized to start.
+
+## Known issue for the final QA pass - 2026-09-28
+
+Submitting a Server Action form before the page hydrates (hidden or slow tab, JavaScript unavailable) returns a raw HTTP 500 "Internal Server Error"; the server logs `Error: Invalid Server Actions request.` and no action runs. Reproduced on /account/addresses (Remove) by a native form submission. This matches the unexplained M03 "login HTTP 500 / Invalid Server Actions request". Hydrated pages work normally. Fix in the final QA pass: make the useActionState forms progressively enhanced, or handle the error with a friendly retry page. Status: Open.
