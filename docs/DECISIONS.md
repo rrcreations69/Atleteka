@@ -160,3 +160,10 @@ Status: Approved by explicit user instruction ("skip m03 and proceed"). The sing
 ## Known issue for the final QA pass - 2026-09-28
 
 Submitting a Server Action form before the page hydrates (hidden or slow tab, JavaScript unavailable) returns a raw HTTP 500 "Internal Server Error"; the server logs `Error: Invalid Server Actions request.` and no action runs. Reproduced on /account/addresses (Remove) by a native form submission. This matches the unexplained M03 "login HTTP 500 / Invalid Server Actions request". Hydrated pages work normally. Fix in the final QA pass: make the useActionState forms progressively enhanced, or handle the error with a friendly retry page. Status: Open.
+
+## M11-P01 approval - 2026-09-28
+
+Status: Approved by explicit user replies.
+- Product images: JPEG, PNG or WebP, at most 4 MB (Vercel request bodies are capped near 4.5 MB). Checked on the server by content signature, not just the file name, and enforced again by the product-images bucket (allowed MIME types and size limit). Uploads and deletes are admin-only via storage policies; the bucket stays public for reading.
+- Stock: the admin sets a new quantity; the update applies only if stock still equals the value the page loaded (optimistic check), so a concurrent sale is never overwritten. No adjustment log table.
+- Archive over delete: products (status active/inactive), variants (active) and categories (active) are deactivated, never deleted. Product images can be removed (orders do not reference them). Product status is constrained to active/inactive.
