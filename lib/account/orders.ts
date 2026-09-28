@@ -1,5 +1,6 @@
 import "server-only";
 import { z } from "zod";
+import { orderStatusSchema, customerStatusLabel } from "@/lib/orders/status";
 import { createSupabaseClient } from "@/lib/supabase/server";
 
 const money = z.union([z.number(), z.string()]).transform(String);
@@ -8,12 +9,13 @@ const addressSchema = z.object({
   city: z.string(), region: z.string(), postal_code: z.string(), country: z.string(),
 });
 const orderSummarySchema = z.object({
-  id: z.uuid(), created_at: z.string(), status: z.enum(["unfulfilled", "needs_review"]),
+  id: z.uuid(), created_at: z.string(), status: orderStatusSchema,
   grand_total: money, order_items: z.array(z.object({ quantity: z.number().int() })),
 });
 const orderDetailSchema = z.object({
   id: z.uuid(), user_id: z.uuid().nullable(), created_at: z.string(),
-  status: z.enum(["unfulfilled", "needs_review"]), payment_status: z.literal("paid"),
+  status: orderStatusSchema, payment_status: z.literal("paid"),
+  courier: z.string().nullable(), tracking_number: z.string().nullable(),
   subtotal: money, discount_total: money, grand_total: money, currency: z.literal("PHP"),
   shipping_address: addressSchema,
   order_items: z.array(z.object({
@@ -40,7 +42,7 @@ export async function getOwnOrder(userId: string, orderId: string) {
   if (!z.uuid().safeParse(orderId).success) return null;
   const supabase = await createSupabaseClient();
   const { data, error } = await supabase.from("orders")
-    .select("id, user_id, created_at, status, payment_status, subtotal, discount_total, grand_total, currency, shipping_address, order_items(id, sku, product_name, variant_name, unit_price, quantity, line_total)")
+    .select("id, user_id, created_at, status, payment_status, courier, tracking_number, subtotal, discount_total, grand_total, currency, shipping_address, order_items(id, sku, product_name, variant_name, unit_price, quantity, line_total)")
     .eq("id", orderId).eq("user_id", userId).maybeSingle();
   if (error) throw new Error("This order could not be loaded.");
   if (!data) return null;
@@ -49,5 +51,4 @@ export async function getOwnOrder(userId: string, orderId: string) {
   return order.user_id === userId ? order : null;
 }
 
-export const orderStatusLabel = (status: "unfulfilled" | "needs_review") =>
-  status === "unfulfilled" ? "Processing" : "Under review";
+export const orderStatusLabel = customerStatusLabel;
