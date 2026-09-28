@@ -29,12 +29,13 @@ export async function startPayment(_state: CheckoutState, form: FormData): Promi
       line_items: checkoutLineItems(plan),
       description: "Atleteka merchandise. Shipping is not included: you pay the courier directly on delivery.",
       reference_number: cartId,
-      // M09 re-reads these from the verified webhook payload; string values only.
+      // The webhook re-reads these from PayMongo's copy of the session (lib/payment/webhook.ts); strings only.
       metadata: {
         cart_id: cartId, cart_kind: kind, user_id: user?.id ?? "",
         coupon_code: plan.couponCode ?? "", currency: "PHP",
-        subtotal: quote.subtotal, discount_total: quote.discountTotal, merchandise_total: quote.merchandiseTotal,
-        variant_ids: plan.lines.map((line) => `${line.variantId}:${line.quantity}`).join(","),
+        lines: plan.lines.map((line) => `${line.variantId}:${line.quantity}:${line.unitAmount}`).join(";"),
+        subtotal_centavos: String(plan.subtotal), discount_centavos: String(plan.discount), total_centavos: String(plan.total),
+        shipping_address: JSON.stringify(address),
         shipping: "paid_to_courier_on_delivery",
       },
       billing: {
