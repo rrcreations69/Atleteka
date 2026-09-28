@@ -66,7 +66,10 @@ export async function proxy(request: NextRequest) {
   response.headers.set("Cache-Control", "private, no-store, max-age=0");
   response.headers.set("Pragma", "no-cache");
   response.headers.set("Expires", "0");
-  response.headers.set("Referrer-Policy", "no-referrer");
+  // same-origin, not no-referrer: no referrer ever goes to other sites (auth codes and order URLs stay
+  // private), but same-site form posts keep a real Origin. With no-referrer, browsers send "Origin: null"
+  // on non-JS form submissions and Next.js refuses the Server Action as CSRF (M15 finding; old M03 500).
+  response.headers.set("Referrer-Policy", "same-origin");
   return response;
 }
 
