@@ -198,6 +198,12 @@ export async function updateOrderStatus(_state: AdminState, form: FormData): Pro
   return { message: "Status updated." };
 }
 
+// TEMPORARY (M14-P01): proves Sentry receives server errors with emails/keys masked. Remove after testing.
+export async function triggerTestServerError(): Promise<void> {
+  await requireAdmin();
+  throw new Error("M14 test server error for test.customer@example.com with key sk_test_FAKEFAKEFAKE1234");
+}
+
 export async function setStock(_state: AdminState, form: FormData): Promise<AdminState> {
   const input = stockInputSchema.safeParse({
     variantId: single(form, "variantId"), expected: single(form, "expected"), quantity: single(form, "quantity"),

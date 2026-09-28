@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
+import { Analytics } from "@vercel/analytics/next";
 import { SiteHeader } from "@/components/layout/site-header";
 import { SiteFooter } from "@/components/layout/site-footer";
 import "./globals.css";
@@ -27,6 +28,8 @@ export default function RootLayout({
           {children}
         </main>
         <SiteFooter />
+        {/* Cookieless page views (M14-P01); inert until Web Analytics is enabled on the Vercel project. */}
+        <Analytics />
       </body>
     </html>
   );
