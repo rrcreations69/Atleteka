@@ -1,4 +1,39 @@
-# Current milestone: M11 - Admin products/categories/inventory
+# Current milestone: M12 - Admin orders
+
+Updated: 2026-09-28. Status: **In Progress**: functional acceptance passed; held, like M07–M11, only for the deferred M03 check and the final QA pass.
+
+M12-P01 (DECISIONS.md): statuses needs_review "Under review", unfulfilled "To ship", shipped, delivered, cancelled; steps needs_review → unfulfilled | cancelled, unfulfilled → shipped | cancelled, shipped → delivered; courier and tracking number when shipping; order_status_history audit; cancelling never changes payment state.
+
+## Implemented behavior
+
+- Migrations 20260928081020_order_fulfillment.sql and 20260928081056_order_status_private.sql: status values; orders.courier, tracking_number, status_updated_at, status_updated_by; order_status_history (RLS, admin read only; no client writes); private.admin_update_order_status (security definer, empty search_path) behind a public SQL-standard security invoker wrapper, following the checkout_quote pattern so no definer function is exposed. It requires an admin caller, locks the order, enforces the allowed step, trims courier/tracking (only allowed when shipping), updates only status/courier/tracking/audit fields and writes history. Admins still have no UPDATE grant on orders; payment_status and amounts are unreachable.
+- /admin/orders (lib/admin/orders.ts): all orders newest first with date, short id, email (guest marked), item count, total, status; filter by status. /admin/orders/[id]: items with SKU, totals, customer and delivery address, PayMongo payment/session references, payment status (set only by the webhook), the needs_review explanation, a form offering only the allowed next statuses (courier/tracking fields when Shipped, a refund warning when Cancelled; the form remounts on status change), and the status history.
+- lib/orders/status.ts holds the shared statuses, labels and steps. Customer pages (/account/orders, /order/[id]) accept all statuses, label unfulfilled as "Processing", show courier/tracking once shipped, and explain cancellation.
+- Security advisor: after the private-wrapper migration only the long-standing webhook_events INFO and leaked-password WARN remain.
+
+## Functional verification (2026-09-28)
+
+| # | Check | Result |
+| --- | --- | --- |
+| — | Rolled-back dry run: allowed/refused steps, courier on non-ship step, unknown order, customer call, admin direct payment edit, history visibility | PASS |
+| — | Customer through the public wrapper after the private move | PASS; denied |
+| 1 | /admin/orders list and status filters (Vercel preview, admin via Claude in Chrome) | PASS; 3 orders newest first; filters 1 / 2 / empty-state |
+| 2 | Under review → To ship → Shipped (" LBC Express ", LBC-TEST-12345) → Delivered | PASS; only allowed options at each step; courier trimmed; final state message; payment stayed Paid; 3 history entries |
+| 3 | To ship → Cancelled (guest order) | PASS; refund warning shown, no courier fields, final, payment Paid |
+| 4 | Stale second tab tries Cancelled after the order was Shipped | PASS; refused by the database ("not allowed from the order's current status") |
+| 5 | Final data and customer visibility (rolled-back check) | PASS; statuses and payments as expected; 5 history rows all by the admin; customer sees own orders with courier/tracking, no history, not the guest order |
+
+Test data now: guest order cancelled; coupon order shipped (no courier); flagged order delivered (LBC Express / LBC-TEST-12345).
+
+## M12 CHECKPOINT
+
+- Completed: M12-P01, migrations, admin order pages and action, customer status display, functional tests.
+- Exact next action: M13 (transactional email: order confirmation via Resend).
+- Remaining: the deferred M03 check, the pre-hydration 500 fix, the not-found status code, the final QA pass, and Production Vercel variable cleanup before launch.
+
+---
+
+# Previous milestone record: M11 - Admin products/categories/inventory
 
 Updated: 2026-09-28. Status: **In Progress**: functional acceptance passed; held, like M07–M10, only for the deferred M03 check and the final QA pass.
 
