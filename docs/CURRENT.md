@@ -1,4 +1,37 @@
-# Current milestone: M12 - Admin orders
+# Current milestone: M13 - Transactional email
+
+Updated: 2026-09-28. Status: **In Progress**: functional acceptance passed; held, like M07–M12, only for the deferred M03 check and the final QA pass.
+
+M13-P01 (DECISIONS.md, PRD 14_DECISION_LOG row 11): one confirmation per paid order via Resend; orders.confirmation_email_sent_at plus Resend Idempotency-Key = order id; on failure the order is untouched, the error is logged and the webhook returns 500 so PayMongo retries the email; EMAIL_FROM sender variable.
+
+## Implemented behavior
+
+- Migration 20260928082612_order_confirmation_email.sql adds orders.confirmation_email_sent_at (written only by the service-role webhook).
+- app/api/paymongo/webhook/route.ts: after record_paid_checkout (new order or duplicate), lib/email/confirmation.ts loads the order with the service client and, while confirmation_email_sent_at is empty, sends via lib/email/resend.ts (POST https://api.resend.com/emails, Bearer RESEND_API_KEY, Idempotency-Key order-confirmation-<order id>, 15 s timeout; response bodies not logged), then stamps the time only if still empty. Failures log "paymongo_webhook email_failed <order id> <HTTP status>" and return 500.
+- lib/email/order-confirmation.ts builds subject, HTML (all customer-entered text escaped) and plain text: order number, items with SKU, subtotal, discount, amount paid (tax included), shipping paid to the courier on delivery, delivery address, and an order link for account orders.
+- .env.example and PRD 10_ENV row 14 list EMAIL_FROM. Local and preview use Atleteka <onboarding@resend.dev>; the Resend key is a sending-only key.
+- The PayMongo test webhook hook_e5HJPTAUgtKmM1aEQBx28Lz2 now points to https://atleteka-git-feat-m13-order-email-rr-4c7a.vercel.app/api/paymongo/webhook (user-approved). Branch-scoped Preview variables for feat/m13-order-email include RESEND_API_KEY and EMAIL_FROM.
+
+## Functional verification (2026-09-28, Vercel preview, PayMongo test mode)
+
+| # | Check | Result |
+| --- | --- | --- |
+| 1 | Guest pays with the Resend account's address | PASS; order E789E1B4 recorded, confirmation accepted 0.5 s later, exactly one email received with correct content |
+| 2 | Signed replay of the same event; new event id for the same session | PASS; both 200 duplicate; confirmation_email_sent_at unchanged; still one email |
+| 3 | Recipient Resend refuses (test sender, non-owner address) | PASS; order 2C00FDCC intact, "email_failed <order> 403" logged, webhook returned 500 and PayMongo retried; email stays unsent for that test order |
+| — | tests/email.test.mjs | content, HTML escaping, guest variant |
+
+Before launch: verify an own sending domain in Resend and set EMAIL_FROM to it (the test sender only delivers to the account owner).
+
+## M13 CHECKPOINT
+
+- Completed: M13-P01, migration, email sending in the webhook, functional tests; PRD decision log rows 8–11 (M09–M13-P01) and the EMAIL_FROM env row.
+- Exact next action: M14 (observability & analytics: Sentry, basic analytics).
+- Remaining: the deferred M03 check, the pre-hydration 500 fix, the not-found status code, the final QA pass, Resend domain, and Production Vercel variable cleanup before launch.
+
+---
+
+# Previous milestone record: M12 - Admin orders
 
 Updated: 2026-09-28. Status: **In Progress**: functional acceptance passed; held, like M07–M11, only for the deferred M03 check and the final QA pass.
 
