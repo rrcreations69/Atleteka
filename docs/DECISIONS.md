@@ -175,3 +175,10 @@ Status: Approved by explicit user replies.
 - Orders gain optional courier and tracking_number (set when marking Shipped, shown to the customer) and status_updated_at/status_updated_by.
 - New table order_status_history (order, from → to status, courier, tracking number, who, when): readable by admins only, written only by the status function.
 - Status changes go through one admin-only security definer function that re-checks the admin role and the allowed step in the database. It cannot change payment state or amounts; admins get no direct UPDATE on orders.
+
+## M13-P01 approval - 2026-09-28
+
+Status: Approved by explicit user replies.
+- The PayMongo webhook sends one order confirmation per paid order through the Resend API (fetch; no package) after the order is recorded. orders.confirmation_email_sent_at is set on success, and the webhook only sends while it is empty. Resend also receives Idempotency-Key = order id (Resend keeps keys 24 hours), so concurrent deliveries cannot send twice.
+- On failure the order is untouched; the error is logged (order id and HTTP status only) and the webhook answers 500 so PayMongo retries; each retry finds the existing order and only retries the email.
+- New server variable EMAIL_FROM (sender). Testing uses Resend's onboarding@resend.dev, which delivers only to the Resend account owner's address; a verified own domain is required before launch.

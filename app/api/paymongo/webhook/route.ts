@@ -1,4 +1,6 @@
 import { NextResponse } from "next/server";
+import { sendOrderConfirmation } from "@/lib/email/confirmation";
+import { EmailSendError } from "@/lib/email/resend";
 import { getPaidCheckoutSession, isLiveMode } from "@/lib/payment/paymongo";
 import { parseEvent, paymentMetadataSchema, toPeso, verifySignature } from "@/lib/payment/webhook";
 import { createServiceSupabaseClient } from "@/lib/supabase/service";
@@ -38,7 +40,8 @@ export async function POST(request: Request) {
     const email = session.email?.trim();
     if (!email) return fail(422, "missing_email");
 
-    const { data, error } = await createServiceSupabaseClient().rpc("record_paid_checkout", {
+    const service = createServiceSupabaseClient();
+    const { data, error } = await service.rpc("record_paid_checkout", {
       p_event_id: event.id, p_event_type: event.type, p_session_id: session.id, p_payment_ref: session.paymentId,
       p_customer_email: email, p_customer_id: meta.user_id || null, p_cart_ref: meta.cart_id,
       p_coupon_code: meta.coupon_code || null,
@@ -51,7 +54,17 @@ export async function POST(request: Request) {
       console.error("paymongo_webhook record_failed", event.id, error.code);
       return fail(500, "record_failed");
     }
-    return ok({ received: true, duplicate: Boolean((data as { duplicate?: boolean } | null)?.duplicate) });
+    const recorded = data as { orderId?: string | null; duplicate?: boolean } | null;
+    // The order is safe at this point. The email runs on every delivery until it succeeds (M13-P01).
+    if (recorded?.orderId) {
+      try {
+        await sendOrderConfirmation(service, recorded.orderId);
+      } catch (emailError) {
+        console.error("paymongo_webhook email_failed", recorded.orderId, emailError instanceof EmailSendError ? emailError.status : "error");
+        return fail(500, "email_failed");
+      }
+    }
+    return ok({ received: true, duplicate: Boolean(recorded?.duplicate) });
   } catch {
     console.error("paymongo_webhook processing_failed", event.id);
     return fail(500, "processing_failed");
