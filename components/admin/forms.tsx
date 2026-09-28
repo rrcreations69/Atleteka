@@ -10,9 +10,9 @@ import {
 const selectClass = "min-h-11 w-full min-w-0 rounded-md border border-input bg-background px-3";
 const areaClass = "min-h-28 w-full min-w-0 rounded-md border border-input bg-background px-3 py-2";
 
-function Checkbox({ id, name, label, defaultChecked }: { id: string; name: string; label: string; defaultChecked: boolean }) {
+function Checkbox({ id, name, label, defaultChecked, value }: { id: string; name: string; label: string; defaultChecked: boolean; value?: string }) {
   return <label htmlFor={id} className="flex min-h-11 items-center gap-2">
-    <input id={id} name={name} type="checkbox" defaultChecked={defaultChecked} className="size-4" /> {label}
+    <input id={id} name={name} type="checkbox" value={value} defaultChecked={defaultChecked} className="size-4" /> {label}
   </label>;
 }
 
@@ -71,7 +71,7 @@ export function ProductCategoriesForm({ productId, categories, selected }: {
   return <ActionForm action={saveProductCategories} submitLabel="Save categories" variant="outline">
     <input type="hidden" name="productId" value={productId} />
     <fieldset className="space-y-1"><legend className="sr-only">Categories</legend>
-      {categories.map((category) => <Checkbox key={category.id} id={`cat-${category.id}`} name="categoryId"
+      {categories.map((category) => <Checkbox key={category.id} id={`cat-${category.id}`} name="categoryId" value={category.id}
         label={category.name + (category.active ? "" : " (inactive)")} defaultChecked={selected.includes(category.id)} />)}
     </fieldset>
     {/* Unchecked boxes send nothing, so the checked values are the complete new set. */}

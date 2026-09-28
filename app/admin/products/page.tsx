@@ -7,6 +7,11 @@ import { listAdminProducts } from "@/lib/admin/data";
 export const dynamic = "force-dynamic";
 export const metadata = { title: "Products | Admin | Atleteka" };
 
+const activeOptions = (variants: { active: boolean }[]) => {
+  const count = variants.filter((variant) => variant.active).length;
+  return `${count} active ${count === 1 ? "option" : "options"}`;
+};
+
 export default async function AdminProductsPage() {
   const products = await listAdminProducts();
   return <Container className="space-y-8 py-10">
@@ -17,7 +22,7 @@ export default async function AdminProductsPage() {
         <Link href={`/admin/products/${product.id}`} className="flex flex-wrap items-center justify-between gap-2 p-4 hover:bg-accent">
           <span className="min-w-0 break-words font-medium">{product.name}</span>
           <span className="text-sm text-muted-foreground">
-            {product.status === "active" ? "Active" : "Archived"} · {product.product_variants.filter((variant) => variant.active).length} active options
+            {product.status === "active" ? "Active" : "Archived"} · {activeOptions(product.product_variants)}
           </span>
         </Link>
       </li>)}
