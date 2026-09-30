@@ -148,3 +148,11 @@ Alternatives:
 3. Xendit or Maya Business: also PH-capable; not evaluated in detail.
 
 Prerequisites and risks: PayMongo's quick start requires an account with KYC completed to obtain test keys; the user creates the account and adds the key to .env.local. Commercial fees and merchant requirements are unverified and should be checked by the user. Stock is not reserved between payment start and completion (an M09 requirement, unchanged from the Stripe plan).
+
+## Testing cadence - 2026-09-28
+
+Status: Approved by explicit user instruction. Each phase gets manual functional testing of what it introduced, and functional issues are fixed before moving on. Project-wide quality checks (lint, typecheck, build validation, mobile/responsive views, cross-screen UI consistency, general frontend quality, regression testing) are no longer repeated per milestone. They run once as a comprehensive final QA pass after all planned phases, and its findings are fixed then. This supersedes the per-milestone lint/typecheck and mobile/desktop checks in AGENTS.md "Milestone workflow and verification" steps 5–6. It does not relax security or money correctness: functional tests still cover them in each phase, and no milestone is marked Done without its functional acceptance passing.
+
+## M03 last check deferred - 2026-09-28
+
+Status: Approved by explicit user instruction ("skip m03 and proceed"). The single open M03 check (recovery link → same-browser PKCE code exchange → new password) is deferred to the final QA pass. It has not passed: recovery emails are delivered, but every link so far was consumed by a Discord link preview before use (the user relays links from phone to laptop via Discord; wrap links in <…> or relay only the token). M03, M07 and M08 remain In Progress in the PRD until it passes. M09 is authorized to start.

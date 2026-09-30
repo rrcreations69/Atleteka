@@ -39,11 +39,18 @@ function secretKey() {
   return key.data;
 }
 
+const authorization = () => `Basic ${Buffer.from(`${secretKey()}:`).toString("base64")}`;
+
+/** True when the configured key is live; webhooks must match this mode. */
+export function isLiveMode() {
+  return secretKey().startsWith("sk_live_");
+}
+
 export async function createCheckoutSession(input: CheckoutSessionInput) {
   const response = await fetch(API_URL, {
     method: "POST",
     headers: {
-      Authorization: `Basic ${Buffer.from(`${secretKey()}:`).toString("base64")}`,
+      Authorization: authorization(),
       "Content-Type": "application/json",
       Accept: "application/json",
     },
@@ -57,4 +64,44 @@ export async function createCheckoutSession(input: CheckoutSessionInput) {
   if (!response.ok) throw new Error(`PayMongo rejected the checkout session (HTTP ${response.status}).`);
   const session = sessionResponseSchema.parse(await response.json()).data;
   return { id: session.id, url: session.attributes.checkout_url };
+}
+
+const paidSessionSchema = z.object({
+  data: z.object({
+    id: z.string().min(1),
+    attributes: z.object({
+      livemode: z.boolean(),
+      metadata: z.record(z.string(), z.string()).nullable().optional(),
+      customer_email: z.string().nullable().optional(),
+      billing: z.object({ email: z.string().nullable().optional() }).passthrough().nullable().optional(),
+      payments: z.array(z.object({
+        id: z.string().min(1),
+        attributes: z.object({
+          amount: z.number().int().nonnegative(),
+          currency: z.string(),
+          status: z.string(),
+          billing: z.object({ email: z.string().nullable().optional() }).passthrough().nullable().optional(),
+        }).passthrough(),
+      })).nullable().optional(),
+    }).passthrough(),
+  }),
+});
+
+/** Re-reads a checkout session from PayMongo; the webhook body is never trusted for amounts or state. */
+export async function getPaidCheckoutSession(sessionId: string) {
+  const response = await fetch(`https://api.paymongo.com/v1/checkout_sessions/${encodeURIComponent(sessionId)}`, {
+    headers: { Authorization: authorization(), Accept: "application/json" },
+    signal: AbortSignal.timeout(20_000),
+    cache: "no-store",
+  });
+  if (!response.ok) throw new Error(`PayMongo session lookup failed (HTTP ${response.status}).`);
+  const { data } = paidSessionSchema.parse(await response.json());
+  const paid = (data.attributes.payments ?? []).filter((payment) => payment.attributes.status === "paid");
+  if (paid.length !== 1 || paid[0].attributes.currency !== "PHP") return null;
+  const payment = paid[0];
+  const email = payment.attributes.billing?.email ?? data.attributes.billing?.email ?? data.attributes.customer_email ?? null;
+  return {
+    id: data.id, livemode: data.attributes.livemode, metadata: data.attributes.metadata ?? {},
+    paymentId: payment.id, amountCentavos: payment.attributes.amount, email,
+  };
 }

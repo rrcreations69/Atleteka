@@ -1,6 +1,45 @@
-# Current milestone: M08 - PayMongo payment
+# Current milestone: M09 - Webhook & order creation
 
-Updated: 2026-09-25. Status: **In Progress** (implementation done; browser verification waits for PAYMONGO_SECRET_KEY).
+Updated: 2026-09-28. Status: **In Progress**: functional acceptance passed; held, like M07/M08, only for the deferred M03 check (DECISIONS.md 2026-09-28).
+
+M09-P01 (approved A–F, DECISIONS.md): provider-neutral payment_session_id/payment_id; immutable orders.shipping_address snapshot; payment_status 'paid' and status 'unfulfilled'/'needs_review'; short stock or an over-limit coupon is recorded as needs_review without deducting stock; shipping_total 0 = paid to the courier, tax_total 0 = included in prices.
+
+## Implemented behavior
+
+- Migration 20260928054657_paid_checkout_orders.sql (hosted and local names match). public.record_paid_checkout is security definer with an empty search_path, executable by service_role only. In one transaction it records the event (unique provider_event_id), creates the order (unique payment_session_id) and item snapshots (SKU and names at payment time, charged unit price and quantity), locks and deducts stock once, counts the coupon, and removes the paid lines from the cart. Duplicate events and resends return the existing order. Totals must reconcile or the call fails (P7101).
+- POST /api/paymongo/webhook reads the raw body and verifies Paymongo-Signature (HMAC-SHA256 of "t.body", te or li chosen by our key's mode, 5-minute tolerance, timing-safe) before parsing. Other event types or modes get 200 and are ignored. For checkout_session.payment.paid it re-reads the session from PayMongo (GET /v1/checkout_sessions/{id}), requires exactly one paid PHP payment matching our centavo metadata, then calls the function through a service-role client (lib/supabase/service.ts). Logs contain event ids and error codes only.
+- Checkout session metadata (lib/payment/actions.ts) now carries per-line variant:quantity:unit centavos, centavo totals and the shipping address JSON; lib/payment/webhook.ts validates it with Zod.
+
+## Environment and setup
+
+SUPABASE_SERVICE_ROLE_KEY and PAYMONGO_WEBHOOK_SECRET are server-only (.env.example). Vercel Preview variables for branch feat/m09-webhook-orders were set with the Vercel CLI (values piped from .env.local, never printed); Production was not changed. Preview Deployment Protection was disabled by the user so PayMongo can reach the endpoint. PayMongo test webhook hook_e5HJPTAUgtKmM1aEQBx28Lz2 → https://atleteka-git-feat-m09-webhook-orders-rr-4c7a.vercel.app/api/paymongo/webhook (checkout_session.payment.paid). Existing shared Production/Preview variables include obsolete STRIPE_* entries and values created from .env.example; review them before any production deployment.
+
+## Functional verification (2026-09-28, PayMongo test mode on the Vercel preview)
+
+| # | Check | Result |
+| --- | --- | --- |
+| — | Migration dry run inside a rolled-back transaction (first event, duplicate, resend, short stock + over-limit coupon, mismatch, grants) | PASS; nothing persisted |
+| 1 | Guest pays and closes the tab at "Payment Received" | PASS; one paid unfulfilled order, item snapshot, Medium 5→4, cart line removed |
+| 2 | Signed replay of the same event; new event id for the same session; 10-minute-old signature | PASS; duplicates return 200 with no new order or stock change; stale signature 401 |
+| — | Unsigned and forged signatures | PASS; 401 invalid_signature |
+| 3 | Signed-in customer with a 10% coupon | PASS; order linked to the account, 25.00 − 2.50 = 22.50, coupon count 0→1, Medium 4→3 |
+| 4 | Stock dropped below the cart quantity after Pay, before payment | PASS; paid order recorded as needs_review, stock not deducted |
+
+Test data kept deliberately for M10 (customer orders) and M12 (admin orders): 3 orders (guest unfulfilled, account unfulfilled with coupon, account needs_review) and coupon M09TEST10. Seed stock after tests: Medium 3 (two real test orders), Small restored to 8.
+
+Unit tests added: tests/webhook.test.mjs (signature, event parsing, metadata). Project-wide checks are deferred to the final QA pass.
+
+## M09 CHECKPOINT
+
+- Completed: M09-P01 approval, migration, webhook, metadata, Vercel preview setup, functional tests.
+- Exact next action: M10 (customer account: order history/detail, addresses, settings).
+- Remaining: the deferred M03 check and the final QA pass before M03/M07/M08/M09 can be Done; review production Vercel variables before launch.
+
+---
+
+# Previous milestone record: M08 - PayMongo payment
+
+Updated: 2026-09-28. Status: **In Progress**: functional acceptance passed; held only for the M07/M03 dependency (one open M03 check).
 
 The user authorized M08 while M03 and M07 stay In Progress for one open M03 check. M08-P01 (DECISIONS.md, PRD 14_DECISION_LOG row 7) replaced Stripe with PayMongo for a Philippines deployment, and the online payment charges the merchandise total after discounts only: the customer pays the courier's shipping fee on delivery.
 
@@ -17,16 +56,30 @@ The user authorized M08 while M03 and M07 stay In Progress for one open M03 chec
 
 No new package (plain fetch). The `stripe` package added earlier in this session was removed; package files match the previous commit. .env.example now lists PAYMONGO_SECRET_KEY (M08) and PAYMONGO_WEBHOOK_SECRET (M09) in place of the Stripe variables. No schema change.
 
-## Verification so far
+## Functional verification (2026-09-25/28, PayMongo test mode, user in Chrome)
 
-Lint, typecheck and 35/35 Node tests pass (7 new payment tests: centavo conversion, reconciliation, fail-closed carts, minimum charge, itemized and discounted lines, description length).
+| # | Check | Result |
+| --- | --- | --- |
+| 1 | Guest card payment (4343 4343 4343 4345) → PayMongo "Card Payment Received" → /checkout/success | PASS; reference = real cart id, amount and no-shipping note shown |
+| 2 | Failed card (3DS "Fail Test Payment") | PASS; PayMongo returns to method selection, nothing paid |
+| 3 | Cancel (PayMongo back arrow) | PASS; /checkout?payment=cancelled, cart unchanged |
+| 4 | Cart changed between total check and Pay | PASS after fix: Pay refused ("Your cart changed…"); re-check shows the new amount and clears the error |
+| 5 | Coupon (10% test code) | PASS; one exact ₱45.00 line with an item/discount description |
+| 6 | Signed-in customer | PASS; account cart used, billing email prefilled from the verified session |
+| 7 | Empty cart | PASS; no Pay button |
 
-Pending (needs a PayMongo test key from a KYC-verified account in .env.local): session creation, redirect to PayMongo, test payment, failed payment, cancel, cart changed between quote and pay, empty cart, account vs guest billing email, mobile/desktop.
+After every payment: 0 orders, stock unchanged, coupon redemption_count 0 (M08 writes nothing). PayMongo methods offered: QR Ph, card, GCash, Maya. Test data (coupon, carts) removed afterwards; seed intact.
+
+Fixes found by testing: shown-amount guard (Pay sends the displayed total and the server refuses a mismatch; compared only, never charged), cancel notice moved to the top, stale payment error cleared on re-check.
+
+Deferred to the final QA pass (DECISIONS.md "Testing cadence"): lint/typecheck/build, mobile/responsive, UI consistency, regression.
+
+Notes: the PayMongo page header shows the account's business name (currently the owner's personal name); set it to Atleteka before launch. The Vercel PR preview uses the test key only; it needs NEXT_PUBLIC_APP_URL set to the preview URL for redirects. No live key until M09 (orders) exists.
 
 ## M08 CHECKPOINT
 
 - Completed: M08-P01 approval and PRD/doc updates, implementation, unit tests.
-- Exact next action: when PAYMONGO_SECRET_KEY is present, build, start the server and run the pending browser checks; then record results and decide M08 status.
+- Exact next action: M09 (webhook and order creation). The single open M03 check is deferred to the final QA pass (DECISIONS.md 2026-09-28); M03, M07 and M08 become Done only after it passes.
 - Remaining after M08: resume the single open M03 check (M03_CHECKPOINT.md), then M09 (webhook, orders, inventory, redemption, provider-neutral order columns).
 
 ---
