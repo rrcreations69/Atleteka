@@ -101,7 +101,7 @@ Document names and placeholders in M00; introduce actual connections only in the
 | PAYMONGO_WEBHOOK_SECRET | Server only | Yes | Verify PayMongo webhook signatures | Required for trusted payment state. |
 | RESEND_API_KEY | Server only | Yes | Transactional email | Server only. |
 | NEXT_PUBLIC_APP_URL | Public | Yes | Canonical app URL / redirects | Use correct environment value. |
-| SENTRY_DSN / related | Mixed | Recommended | Error monitoring | Scrub PII/secrets. |
+| NEXT_PUBLIC_SENTRY_DSN | Public | Recommended | Error monitoring (M14-P01) | Scrub PII/secrets; lib/monitoring/scrub.ts; off when unset. |
 | .env.example | Repository | Yes | Documents required variable names | Contains placeholders only, never real secrets. |
 
 ## Implementation philosophy

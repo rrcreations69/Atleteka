@@ -1,6 +1,6 @@
 # M07 handoff
 
-Updated: 2026-09-28. **M13 (order email) and M08–M12 are In Progress with functional acceptance passed; M03/M07–M13 wait only for the deferred M03 check and the final QA pass.** See CURRENT.md.
+Updated: 2026-09-28. **M14 (observability) and M08–M13 are In Progress with functional acceptance passed; M03/M07–M14 wait only for the deferred M03 check and the final QA pass.** See CURRENT.md.
 
 ## Authoritative continuation position
 
@@ -8,7 +8,7 @@ Do not restart M06 or reimplement M07. Read AGENTS.md, CURRENT.md, relevant PRD 
 
 The last unfinished M07 feature check was error recovery. It failed because resetting the error boundary did not fetch checkout again. app/checkout/error.tsx now reloads the page on Try again. Final lint/typecheck/28 tests/build and all 5 recovery browser cases pass after that fix.
 
-**Exact next action:** M14 (observability & analytics); see CURRENT.md "M13 CHECKPOINT". Testing cadence: per-phase functional tests only, one final QA pass at the end (DECISIONS.md 2026-09-28). Test on Vercel branch previews; the user signs in and Claude drives Chrome via Claude in Chrome.
+**Exact next action:** M15 (security & abuse review); see CURRENT.md "M14 CHECKPOINT". Testing cadence: per-phase functional tests only, one final QA pass at the end (DECISIONS.md 2026-09-28). Test on Vercel branch previews; the user signs in and Claude drives Chrome via Claude in Chrome.
 
 ## Approvals already received
 

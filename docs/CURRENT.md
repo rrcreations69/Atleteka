@@ -1,4 +1,40 @@
-# Current milestone: M13 - Transactional email
+# Current milestone: M14 - Observability & analytics
+
+Updated: 2026-09-28. Status: **In Progress**: functional acceptance passed; held, like M07–M13, only for the deferred M03 check and the final QA pass.
+
+M14-P01 (DECISIONS.md, PRD 14_DECISION_LOG row 12): Sentry errors only with scrubbing; Vercel Web Analytics.
+
+## Implemented behavior
+
+- @sentry/nextjs 11.0.0 and @vercel/analytics 2.0.1 (exact versions, 0 audit findings).
+- instrumentation.ts loads sentry.server.config.ts / sentry.edge.config.ts and exports onRequestError, which captures and then awaits Sentry.flush(2000). Without the await, Vercel froze the function before the upload (found in testing). instrumentation-client.ts initializes the browser SDK and exports onRouterTransitionStart.
+- lib/monitoring/sentry-options.ts (shared): DSN from NEXT_PUBLIC_SENTRY_DSN (monitoring off when unset), sendDefaultPii false, tracesSampleRate 0, no replay/feedback integrations, beforeSend/beforeBreadcrumb → lib/monitoring/scrub.ts (drops request cookies/headers/body/query/env and user; masks emails, PayMongo sk_/pk_, Resend re_, whsk_, Supabase sb_ keys, JWTs, provider ids). Optional debug logging only with SENTRY_DEBUG=1.
+- app/error.tsx, app/checkout/error.tsx and the new app/global-error.tsx report caught render errors.
+- next.config.ts wraps withSentryConfig({ silent, telemetry: false, sourcemaps: { disable: true } }): nothing is uploaded at build time.
+- <Analytics /> in app/layout.tsx; Web Analytics enabled by the user in the Vercel project.
+- .env.example: NEXT_PUBLIC_SENTRY_DSN (replaces SENTRY_DSN); PRD 10_ENV row 12 updated.
+
+## Functional verification (2026-09-28, Vercel preview, admin via Claude in Chrome)
+
+| # | Check | Result |
+| --- | --- | --- |
+| — | tests/scrub.test.mjs | emails, keys, JWTs, provider ids masked; request/user data dropped |
+| 1 | Browser error (temporary admin button, message with a fake email and re_ key) | PASS; Sentry issue "M14 test browser error for [email] with key [resend-key]" |
+| 2 | Server Action error (fake email and sk_test_ key) | PASS after fix 71637ad (await flush): "M14 test server error for [email] with key [paymongo-key]", Unhandled, POST /admin, 0 users |
+| 3 | Vercel Web Analytics | PASS; first-party analytics script loads and its endpoint answers 200 |
+| — | Cleanup | temporary buttons and action removed; SENTRY_DEBUG removed from the preview |
+
+Finding recorded for M15 (DECISIONS.md): Vercel's own function log prints unhandled server error messages unscrubbed.
+
+## M14 CHECKPOINT
+
+- Completed: M14-P01, Sentry and analytics, scrubbing, flush fix, functional tests, cleanup.
+- Exact next action: M15 (security & abuse review: RLS, price tampering, role abuse, upload validation, webhook replay).
+- Remaining: the deferred M03 check, the pre-hydration 500 fix, the not-found status code, the Vercel-log finding, the final QA pass, Resend domain, Sentry DSN and Production Vercel variable cleanup before launch.
+
+---
+
+# Previous milestone record: M13 - Transactional email
 
 Updated: 2026-09-28. Status: **In Progress**: functional acceptance passed; held, like M07–M12, only for the deferred M03 check and the final QA pass.
 
