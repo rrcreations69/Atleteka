@@ -97,6 +97,7 @@ Document names and placeholders in M00; introduce actual connections only in the
 | SUPABASE_SERVICE_ROLE_KEY | Server only | Maybe | Privileged server/admin/service operations if needed | Never expose to client or NEXT_PUBLIC prefix. |
 | NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY (removed) | Public | No | Not used: PayMongo hosted checkout needs no public key (M08-P01). | Do not configure. |
 | PAYMONGO_SECRET_KEY | Server only | Yes | Create PayMongo checkout sessions | Never log or expose. |
+| EMAIL_FROM | Server only | Yes | Sender for order confirmation email (M13-P01) | Testing: onboarding@resend.dev; verified domain before launch. |
 | PAYMONGO_WEBHOOK_SECRET | Server only | Yes | Verify PayMongo webhook signatures | Required for trusted payment state. |
 | RESEND_API_KEY | Server only | Yes | Transactional email | Server only. |
 | NEXT_PUBLIC_APP_URL | Public | Yes | Canonical app URL / redirects | Use correct environment value. |
