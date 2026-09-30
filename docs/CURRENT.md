@@ -1,4 +1,43 @@
-# Current milestone: M09 - Webhook & order creation
+# Current milestone: M10 - Customer account
+
+Updated: 2026-09-28. Status: **In Progress**: functional acceptance passed; held, like M07–M09, only for the deferred M03 check and the final QA pass.
+
+No schema or policy change: existing RLS already limits orders/order_items to the owner (admins read all), addresses to the owner (admins included), and customer profile updates to display_name.
+
+## Implemented behavior
+
+- /account links to Your orders, Saved addresses and Settings.
+- /account/orders (lib/account/orders.ts listOwnOrders): own orders, newest first, with date (Asia/Manila), item count, status label (unfulfilled → Processing, needs_review → Under review) and total; empty state.
+- /order/[id] (getOwnOrder): own order detail with items, SKU, unit and line totals, subtotal, discount, "Tax: Included in prices", "Shipping: Paid to the courier on delivery", amount paid, the delivery address snapshot, and a note for needs_review. Malformed, missing and other users' ids (including an admin viewing a customer's order here) render the same "Order not found". Guest orders are not viewable in accounts (email confirmation is M13).
+- /account/addresses: own saved addresses (reuses the checkout reader) with Remove (lib/account/actions.ts deleteAddress: one uuid, owner filter + RLS). New addresses are still saved at checkout (M07-P01). Past orders keep their own snapshot.
+- /account/settings: display name only (1–80 characters), email shown read-only, password via the existing reset flow. Role cannot be changed.
+- proxy.ts refreshes the session on /order routes too.
+
+## Functional verification (2026-09-28)
+
+| # | Check | Result |
+| --- | --- | --- |
+| — | Signed out: /account/orders, /account/addresses, /account/settings, /order/[id] | PASS; redirect to /login (local and Vercel preview) |
+| — | RLS as customer and admin (rolled-back transaction) | PASS; customer sees own 2 orders/items and own address only, the guest order is invisible, order update and role escalation are denied; admin sees 3 orders but no other user's addresses |
+| 1 | Order history | PASS; 2 orders newest first with correct status, item count and total |
+| 2 | Order details | PASS; items, SKU, discount 2.50 → 22.50 paid, tax/shipping wording, address, needs_review note |
+| 3 | Guest order id and malformed id while signed in as the customer | PASS; "Order not found", no details |
+| 4 | Remove saved address (Vercel preview) | PASS; 0 addresses left, orders keep their address |
+| 5 | Change display name (Vercel preview) | PASS; saved as "Rr Test", role still customer. Empty-name rejection is enforced server-side but was not browser-checked |
+
+Found during testing: a Server Action form submitted before hydration returns a raw 500 ("Invalid Server Actions request"); recorded in DECISIONS.md as a known issue for the final QA pass (likely the old M03 login 500).
+
+Vercel: branch feat/m10-customer-account has its own branch-scoped Preview variables (NEXT_PUBLIC_APP_URL = https://atleteka-git-feat-m10-customer-account-rr-4c7a.vercel.app); Production unchanged.
+
+## M10 CHECKPOINT
+
+- Completed: account pages, ownership checks, functional tests.
+- Exact next action: M11 (admin products/categories/inventory).
+- Remaining: the deferred M03 check, the pre-hydration 500 fix and the final QA pass; clean up shared Production Vercel variables before launch.
+
+---
+
+# Previous milestone record: M09 - Webhook & order creation
 
 Updated: 2026-09-28. Status: **In Progress**: functional acceptance passed; held, like M07/M08, only for the deferred M03 check (DECISIONS.md 2026-09-28).
 

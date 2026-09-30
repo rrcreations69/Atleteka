@@ -1,6 +1,6 @@
 # M07 handoff
 
-Updated: 2026-09-28. **M09 (webhook & order creation) is In Progress with functional acceptance passed; M08 likewise. M03/M07/M08/M09 wait only for the deferred M03 check and the final QA pass.** See CURRENT.md.
+Updated: 2026-09-28. **M10 (customer account) and M09/M08 are In Progress with functional acceptance passed; M03/M07–M10 wait only for the deferred M03 check and the final QA pass.** See CURRENT.md.
 
 ## Authoritative continuation position
 
@@ -8,7 +8,7 @@ Do not restart M06 or reimplement M07. Read AGENTS.md, CURRENT.md, relevant PRD 
 
 The last unfinished M07 feature check was error recovery. It failed because resetting the error boundary did not fetch checkout again. app/checkout/error.tsx now reloads the page on Try again. Final lint/typecheck/28 tests/build and all 5 recovery browser cases pass after that fix.
 
-**Exact next action:** M10 (customer account: order history/detail, addresses, settings); see CURRENT.md "M09 CHECKPOINT". Testing cadence: per-phase functional tests only, one final QA pass at the end (DECISIONS.md 2026-09-28).
+**Exact next action:** M11 (admin products/categories/inventory); see CURRENT.md "M10 CHECKPOINT". Testing cadence: per-phase functional tests only, one final QA pass at the end (DECISIONS.md 2026-09-28). Test on Vercel branch previews (user preference).
 
 ## Approvals already received
 
