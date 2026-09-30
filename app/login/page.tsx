@@ -3,6 +3,8 @@ import { AuthCard } from "@/components/auth/auth-card";
 import { AuthForm } from "@/components/auth/auth-form";
 import { getIdentity } from "@/lib/auth/session";
 
+export const metadata = { title: "Sign in | Atleteka" };
+
 export default async function LoginPage({ searchParams }: {
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {

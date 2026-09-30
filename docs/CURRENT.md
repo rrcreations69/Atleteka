@@ -1,4 +1,56 @@
-# Current milestone: M15 - Security & abuse review
+# Current milestone: M16 - QA & launch
+
+Updated: 2026-09-30. Status: **In Progress**. Branch feat/m16-qa-launch, stacked on feat/m15-security-review (PR #9). PR #10 opened against feat/m15-security-review. Authorized by the user ("start M16").
+
+## Final QA pass (local production build, 2026-09-30)
+
+| Check | Result |
+| --- | --- |
+| Lint | PASS after removing an unused Sentry hint parameter (lib/monitoring/sentry-options.ts) |
+| Typecheck, 51 automated tests, production build | PASS |
+| Not-found HTTP status (known issue) | **Fixed**: removed app/(catalog)/loading.tsx; its Suspense boundary streamed a 200 before notFound(). Missing and inactive products and categories now return 404; valid pages 200; /account and /admin redirect signed-out users to /login |
+| SEO core metadata (PRD 02_SCOPE: title, description, canonical, OpenGraph basics) | **Added**: metadataBase from NEXT_PUBLIC_APP_URL, site description and OpenGraph defaults (lib/seo.ts); product and category titles, descriptions, canonical URLs and OG tags (first product image when present); /shop canonical; sign-in and register titles. Verified in the rendered HTML |
+| Responsive 320px and 1440px (home, shop, search, product, not-found, cart, checkout, login, register) | PASS; no horizontal overflow |
+| Accessibility sanity (T-018 basics) | PASS; lang=en, one main and one visible h1 per page, no unlabeled inputs, nameless buttons/links or images without alt. The second h1 on cart/checkout is an unswapped hidden streaming chunk in the non-hydrating pane |
+| Performance sanity | Catalog TTFB 0.19-0.42 s (database round trip), static pages under 30 ms; HTML 3-6 KB |
+
+Trade-off: catalog pages no longer show a loading skeleton; during client navigation the current page stays until the next is ready.
+
+## E2E critical path (2026-09-30, M16 preview, PayMongo test mode, user's Chrome via Claude in Chrome)
+
+Setup (user-approved): branch-scoped Preview variables for feat/m16-qa-launch (9, values piped from .env.local, APP_URL = branch URL), redeployed; PayMongo test webhook hook_e5HJPTAUgtKmM1aEQBx28Lz2 moved from the M13 preview to https://atleteka-git-feat-m16-qa-launch-rr-4c7a.vercel.app/api/paymongo/webhook (events unchanged: checkout_session.payment.paid).
+
+| # | Step | Result |
+| --- | --- | --- |
+| 1 | Product page, sold-out variant | PASS; Medium "Sold out", Small "In stock" |
+| 2 | Add to cart, cart totals | PASS; Small × 1, subtotal PHP 25.00 |
+| 3 | Checkout with a test address (QA Tester, Makati City) | PASS; server quote PHP 25.00, shipping paid to the courier, "Pay PHP 25.00" |
+| 4 | PayMongo hosted payment (the user paid with the test card) | PASS; pay_pY2pGwj7BFLkLAgjccq6kP9J; redirect to /checkout/success |
+| 5 | Webhook order | PASS; order C12C2C61, one order for the session, paid/unfulfilled, guest, snapshot M02-SHIRT-S × 1 = 25.00 |
+| 6 | Stock and cart | PASS; Small 8 → 7; guest cart empty |
+| 7 | Confirmation email | PASS; sent 1.3 s after the order; the user confirmed one email received |
+| 8 | Admin: order detail, mark Shipped (LBC, QA-M16-0001) | PASS; status, courier and tracking saved; one history row unfulfilled → shipped by the admin; shown after reload |
+
+Test data kept: order C12C2C61 (shipped).
+
+## M16-P01 soft launch (approved 2026-09-30)
+
+No custom domain for now: production on https://atleteka.vercel.app, guest checkout only; Supabase Site URL and production redirect URL set by the user and verified. The webhook now acknowledges a permanent Resend refusal (logged, 200) instead of retrying forever; transient failures still retry. Test added (52 tests pass). See DECISIONS.md M16-P01.
+
+Functional test (2026-09-30, M16 preview, the user paid with the test card as the signed-in admin, billing email rrai.creatives+admin@gmail.com, which the Resend test sender refuses): order 6D59A7B7 recorded once (paid, unfulfilled, account order, PHP 25.00, Small 7 → 6), confirmation_email_sent_at empty; function log `paymongo_webhook email_rejected <order> 403`; response 200; no PayMongo retries (only one delivery for the event). PASS. Side effect: the test address was saved to the admin account.
+
+## Production Vercel variables (2026-09-30)
+
+Removed from Production: NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY, STRIPE_SECRET_KEY, STRIPE_WEBHOOK_SECRET, SENTRY_DSN. Set (values from .env.local, never printed): NEXT_PUBLIC_APP_URL=https://atleteka.vercel.app, NEXT_PUBLIC_SUPABASE_URL, NEXT_PUBLIC_SUPABASE_ANON_KEY, NEXT_PUBLIC_SENTRY_DSN, EMAIL_FROM (Resend test sender per M16-P01), SUPABASE_SERVICE_ROLE_KEY and RESEND_API_KEY (sensitive). Still missing, entered by the user: PAYMONGO_SECRET_KEY (live) and PAYMONGO_WEBHOOK_SECRET (live webhook). Done via a user-added permission rule in the outer folder's .claude/settings.local.json.
+
+## M16 CHECKPOINT
+
+- Completed: automated checks, not-found fix, SEO basics, responsive/accessibility/performance sanity, E2E critical path on the M16 preview.
+- Remaining (needs the user): the deferred M03 reset check; launch checklist (live PayMongo key and webhook secret in Production, live PayMongo webhook, PayMongo business name, merge PRs #2-#9 and M16 in order, rotate the database password); then close M03 and M07-M16 in the PRD.
+
+---
+
+# Previous milestone record: M15 - Security & abuse review
 
 Updated: 2026-09-30. Status: **In Progress**. The review is complete and two fixes are deployed to the M15 preview. **The M03 password-reset check is deferred to M16** (blocked by the Supabase email rate limit; see "M15 CHECKPOINT").
 

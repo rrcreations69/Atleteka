@@ -3,7 +3,7 @@ import { CatalogListing } from "@/components/catalog/catalog-listing";
 import { catalogQuerySchema, type CatalogSearchParams } from "@/lib/catalog/validation";
 
 export const dynamic = "force-dynamic";
-export const metadata = { title: "Shop | Atleteka", description: "Browse the Atleteka catalog." };
+export const metadata = { title: "Shop | Atleteka", description: "Browse the Atleteka catalog.", alternates: { canonical: "/shop" } };
 
 export default async function ShopPage({ searchParams }: { searchParams: Promise<CatalogSearchParams> }) {
   const query = catalogQuerySchema.safeParse(await searchParams);

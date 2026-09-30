@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { sendOrderConfirmation } from "@/lib/email/confirmation";
 import { EmailSendError } from "@/lib/email/resend";
+import { isPermanentEmailRefusal } from "@/lib/email/retry";
 import { getPaidCheckoutSession, isLiveMode } from "@/lib/payment/paymongo";
 import { parseEvent, paymentMetadataSchema, toPeso, verifySignature } from "@/lib/payment/webhook";
 import { createServiceSupabaseClient } from "@/lib/supabase/service";
@@ -55,12 +56,18 @@ export async function POST(request: Request) {
       return fail(500, "record_failed");
     }
     const recorded = data as { orderId?: string | null; duplicate?: boolean } | null;
-    // The order is safe at this point. The email runs on every delivery until it succeeds (M13-P01).
+    // The order is safe at this point. The email runs on every delivery until it succeeds (M13-P01),
+    // except a permanent refusal, which is logged and acknowledged so PayMongo stops retrying (M16-P01).
     if (recorded?.orderId) {
       try {
         await sendOrderConfirmation(service, recorded.orderId);
       } catch (emailError) {
-        console.error("paymongo_webhook email_failed", recorded.orderId, emailError instanceof EmailSendError ? emailError.status : "error");
+        const status = emailError instanceof EmailSendError ? emailError.status : undefined;
+        if (isPermanentEmailRefusal(status)) {
+          console.error("paymongo_webhook email_rejected", recorded.orderId, status);
+          return ok({ received: true, duplicate: Boolean(recorded.duplicate), email: "rejected" });
+        }
+        console.error("paymongo_webhook email_failed", recorded.orderId, status ?? "error");
         return fail(500, "email_failed");
       }
     }

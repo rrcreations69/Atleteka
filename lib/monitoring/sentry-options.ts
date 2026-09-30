@@ -1,4 +1,4 @@
-import type { ErrorEvent, EventHint } from "@sentry/nextjs";
+import type { ErrorEvent } from "@sentry/nextjs";
 import { scrubEvent } from "./scrub";
 
 // Shared by server, edge and browser (M14-P01): errors only, no tracing or replay, no default PII.
@@ -10,7 +10,7 @@ export const sentryOptions = {
   // Diagnostics: SDK self-logging only when SENTRY_DEBUG=1 is set (never in production; it prints unscrubbed messages).
   debug: process.env.SENTRY_DEBUG === "1",
   tracesSampleRate: 0,
-  beforeSend: (event: ErrorEvent, _hint: EventHint) => scrubEvent(event),
+  beforeSend: (event: ErrorEvent) => scrubEvent(event),
   beforeBreadcrumb: <T extends { message?: string; data?: Record<string, unknown> }>(crumb: T) =>
     scrubEvent({ breadcrumbs: [crumb] }).breadcrumbs?.[0] as T,
 };
