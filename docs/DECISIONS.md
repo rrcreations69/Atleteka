@@ -167,3 +167,11 @@ Status: Approved by explicit user replies.
 - Product images: JPEG, PNG or WebP, at most 4 MB (Vercel request bodies are capped near 4.5 MB). Checked on the server by content signature, not just the file name, and enforced again by the product-images bucket (allowed MIME types and size limit). Uploads and deletes are admin-only via storage policies; the bucket stays public for reading.
 - Stock: the admin sets a new quantity; the update applies only if stock still equals the value the page loaded (optimistic check), so a concurrent sale is never overwritten. No adjustment log table.
 - Archive over delete: products (status active/inactive), variants (active) and categories (active) are deactivated, never deleted. Product images can be removed (orders do not reference them). Product status is constrained to active/inactive.
+
+## M12-P01 approval - 2026-09-28
+
+Status: Approved by explicit user replies.
+- Fulfillment statuses (database value → label): needs_review "Under review", unfulfilled "To ship", shipped "Shipped", delivered "Delivered", cancelled "Cancelled". Allowed steps: needs_review → unfulfilled | cancelled; unfulfilled → shipped | cancelled; shipped → delivered. Delivered and cancelled are final. Cancelled means the merchant refunded in the PayMongo dashboard; payment_status is not changed by the app.
+- Orders gain optional courier and tracking_number (set when marking Shipped, shown to the customer) and status_updated_at/status_updated_by.
+- New table order_status_history (order, from → to status, courier, tracking number, who, when): readable by admins only, written only by the status function.
+- Status changes go through one admin-only security definer function that re-checks the admin role and the allowed step in the database. It cannot change payment state or amounts; admins get no direct UPDATE on orders.

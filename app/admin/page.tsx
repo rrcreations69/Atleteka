@@ -14,6 +14,7 @@ export default async function AdminPage() {
           <li><Link href="/admin/products" className="inline-flex min-h-11 items-center underline underline-offset-4">Products</Link></li>
           <li><Link href="/admin/categories" className="inline-flex min-h-11 items-center underline underline-offset-4">Categories</Link></li>
           <li><Link href="/admin/inventory" className="inline-flex min-h-11 items-center underline underline-offset-4">Inventory</Link></li>
+          <li><Link href="/admin/orders" className="inline-flex min-h-11 items-center underline underline-offset-4">Orders</Link></li>
         </ul>
       </nav>
       <Link href="/account" className="mb-5 block text-sm underline underline-offset-4">Your account</Link>

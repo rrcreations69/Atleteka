@@ -21,6 +21,12 @@ export default async function OrderPage({ params }: { params: Promise<{ id: stri
       <h1 className="text-3xl font-semibold">Order details</h1>
       <p className="text-sm text-muted-foreground">Placed {placed} · Order {order.id.slice(0, 8).toUpperCase()}</p>
       <p><span className="font-medium">Status:</span> {orderStatusLabel(order.status)} · Paid</p>
+      {order.status === "shipped" || order.status === "delivered" ? (order.courier || order.tracking_number) && <p className="text-sm">
+        Courier: {order.courier ?? "not specified"}{order.tracking_number ? <> · Tracking number: <span className="break-all">{order.tracking_number}</span></> : null}
+      </p> : null}
+      {order.status === "cancelled" && <p role="status" className="rounded-md border border-border p-3 text-sm">
+        This order was cancelled. If you were charged, the refund is handled through the payment provider; contact us if you have questions.
+      </p>}
       {order.status === "needs_review" && <p role="status" className="rounded-md border border-border p-3 text-sm">
         We need to check this order before shipping it (for example, an item sold out while you were paying). We will contact you by email.
       </p>}

@@ -167,6 +167,37 @@ export async function saveCategory(_state: AdminState, form: FormData): Promise<
   return { message: categoryId ? "Category saved." : "Category created." };
 }
 
+const fulfillmentSchema = z.object({
+  orderId: z.uuid(),
+  status: z.enum(["unfulfilled", "shipped", "delivered", "cancelled"], { error: "Choose the next status." }),
+  courier: z.string().trim().max(80, "Use 80 characters or fewer."),
+  trackingNumber: z.string().trim().max(100, "Use 100 characters or fewer."),
+});
+
+export async function updateOrderStatus(_state: AdminState, form: FormData): Promise<AdminState> {
+  const input = fulfillmentSchema.safeParse({
+    orderId: single(form, "orderId"), status: single(form, "status"),
+    courier: single(form, "courier") ?? "", trackingNumber: single(form, "trackingNumber") ?? "",
+  });
+  if (!input.success) return { error: "Check the highlighted fields.", errors: fieldErrors(input.error) };
+  const { orderId, status, courier, trackingNumber } = input.data;
+  if (status !== "shipped" && (courier || trackingNumber)) {
+    return { errors: { courier: "Courier and tracking apply only when marking an order Shipped." } };
+  }
+  const supabase = await admin();
+  // The database function re-checks the admin role and the allowed step; it cannot touch payment or amounts.
+  const { error } = await supabase.rpc("admin_update_order_status", {
+    p_order_id: orderId, p_status: status, p_courier: courier || null, p_tracking_number: trackingNumber || null,
+  });
+  if (error) {
+    return { error: error.code === "P7202" ? "That status change is not allowed from the order's current status. Reload the page."
+      : error.code === "42501" ? "Admin access is required." : "The status could not be updated." };
+  }
+  revalidatePath(`/admin/orders/${orderId}`);
+  revalidatePath("/admin/orders");
+  return { message: "Status updated." };
+}
+
 export async function setStock(_state: AdminState, form: FormData): Promise<AdminState> {
   const input = stockInputSchema.safeParse({
     variantId: single(form, "variantId"), expected: single(form, "expected"), quantity: single(form, "quantity"),
