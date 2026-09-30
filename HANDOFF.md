@@ -1,6 +1,6 @@
 # M07 handoff
 
-Updated: 2026-09-24. **M07 features are implemented and verified. M07 remains In Progress because the M03 dependency is not fully verified. M08 has not started.**
+Updated: 2026-09-25. **M08 (PayMongo payment) is In Progress: implemented and unit-tested; browser verification waits for a PayMongo test key. M03/M07 remain In Progress for one open M03 check.** See CURRENT.md.
 
 ## Authoritative continuation position
 
@@ -8,7 +8,7 @@ Do not restart M06 or reimplement M07. Read AGENTS.md, CURRENT.md, relevant PRD 
 
 The last unfinished M07 feature check was error recovery. It failed because resetting the error boundary did not fetch checkout again. app/checkout/error.tsx now reloads the page on Try again. Final lint/typecheck/28 tests/build and all 5 recovery browser cases pass after that fix.
 
-**Exact next action:** finish the single remaining M03 check (recovery link → same-browser code exchange → new password) per M03_CHECKPOINT.md "Follow-up verification (2026-09-25)". Admin access, token refresh, confirmation/recovery delivery, revoked session and the login 500 all passed on 2026-09-25. Preserve all completed M07 work and its evidence. Close M03/M07 status only from actual results. Do not begin M08.
+**Exact next action:** run the pending M08 browser checks once PAYMONGO_SECRET_KEY (test, KYC-verified PayMongo account) is in .env.local (see CURRENT.md "M08 CHECKPOINT"); then finish the single remaining M03 check (recovery link → same-browser code exchange → new password) per M03_CHECKPOINT.md "Follow-up verification (2026-09-25)". Admin access, token refresh, confirmation/recovery delivery, revoked session and the login 500 all passed on 2026-09-25. Preserve all completed M07 work and its evidence. Close M03/M07 status only from actual results. Do not begin M08.
 
 ## Approvals already received
 

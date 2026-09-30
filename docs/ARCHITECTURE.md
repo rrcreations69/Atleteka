@@ -8,13 +8,13 @@ A modern single-store, direct-to-consumer e-commerce web application for one mer
 
 MVP success: browse, select a variant, add to cart, pay, receive confirmation, and see the order in account; administrators can manage products, orders, and inventory. Core flows must work on mobile and desktop.
 
-Approved scope includes active catalog/category/detail pages, basic database-backed search and filters, variant-aware persistent cart, minimal checkout addresses, Stripe payment, one valid discount, trusted orders and confirmation email, Supabase authentication/reset, own order history and saved addresses, admin catalog/category/inventory/fulfillment management, error monitoring, and basic SEO metadata. Optional details stay optional: price-range filtering, simple category hierarchy if needed, reusable checkout addresses if simple, and analytics as described in the architecture. Analytics wording differs in M14; see DECISIONS.md.
+Approved scope includes active catalog/category/detail pages, basic database-backed search and filters, variant-aware persistent cart, minimal checkout addresses, PayMongo payment (M08-P01, replaced Stripe), one valid discount, trusted orders and confirmation email, Supabase authentication/reset, own order history and saved addresses, admin catalog/category/inventory/fulfillment management, error monitoring, and basic SEO metadata. Optional details stay optional: price-range filtering, simple category hierarchy if needed, reusable checkout addresses if simple, and analytics as described in the architecture. Analytics wording differs in M14; see DECISIONS.md.
 
 Non-goals include reviews, wishlists, recommendations, loyalty, subscriptions, multi-currency, multi-vendor/marketplace, native mobile apps, microservices, Kafka, Kubernetes, GraphQL, advanced search infrastructure, complex coupon stacking, and unnecessary CMS. User stories also exclude bulk import and warehouse/multi-location inventory; shipping-carrier APIs are not required.
 
 ## Request and data flow
 
-Browser → Next.js Server Components / Server Actions / Route Handlers → Supabase / Stripe / Resend.
+Browser → Next.js Server Components / Server Actions / Route Handlers → Supabase / PayMongo / Resend.
 
 One repository and a monolith-first application. Server Components are the default; interactive islands use Client Components. Avoid redundant API layers and speculative abstractions. Authorization belongs on the server and in Supabase RLS. Migrations own schema changes.
 
@@ -28,7 +28,7 @@ One repository and a monolith-first application. Server Components are the defau
 | Auth | Supabase Auth | Identity and sessions | Authorization is checked server-side and via RLS. |
 | Authorization | Supabase RLS + server checks | Data isolation and privilege enforcement | Never rely only on hidden buttons/routes. |
 | Storage | Supabase Storage | Product images/media | Restrict upload type/size; admin-only writes. |
-| Payments | Stripe | Payment collection | Never trust client amount. Server calculates amounts; verified webhook is authoritative. |
+| Payments | PayMongo | Payment collection | Never trust client amount. Server calculates amounts; verified webhook is authoritative. |
 | Email | Resend | Transactional emails | Triggered from trusted server events; avoid client-triggered arbitrary sends. |
 | Hosting | Vercel | Deploy Next.js application | Use environment separation for preview/production. |
 | Monitoring | Sentry | Error and exception monitoring | No secrets/PII in logs. |
@@ -60,7 +60,7 @@ Only these MVP routes are listed. Reset/callback and guest-access questions are 
 | /admin/categories | Admin | Server protected | Category management | CRUD. |
 | /admin/orders | Admin | Server protected | Order management | Fulfillment/status actions. |
 | /admin/inventory | Admin | Server protected | Variant inventory | Adjust stock with audit-friendly updates. |
-| /api/stripe/webhook | Stripe only | Route handler | Receive Stripe webhook | Verify signature; idempotent. |
+| /api/paymongo/webhook | PayMongo only | Route handler | Receive PayMongo webhook | Verify signature; idempotent. |
 
 ## Reusable component inventory
 
@@ -95,9 +95,9 @@ Document names and placeholders in M00; introduce actual connections only in the
 | NEXT_PUBLIC_SUPABASE_URL | Public | Yes | Supabase project URL | Safe for browser. |
 | NEXT_PUBLIC_SUPABASE_ANON_KEY | Public | Yes | Supabase anonymous key | RLS must make it safe. |
 | SUPABASE_SERVICE_ROLE_KEY | Server only | Maybe | Privileged server/admin/service operations if needed | Never expose to client or NEXT_PUBLIC prefix. |
-| NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY | Public | Yes | Stripe client initialization | Safe for browser. |
-| STRIPE_SECRET_KEY | Server only | Yes | Create Stripe server-side resources | Never log or expose. |
-| STRIPE_WEBHOOK_SECRET | Server only | Yes | Verify Stripe webhook signatures | Required for trusted payment state. |
+| NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY (removed) | Public | No | Not used: PayMongo hosted checkout needs no public key (M08-P01). | Do not configure. |
+| PAYMONGO_SECRET_KEY | Server only | Yes | Create PayMongo checkout sessions | Never log or expose. |
+| PAYMONGO_WEBHOOK_SECRET | Server only | Yes | Verify PayMongo webhook signatures | Required for trusted payment state. |
 | RESEND_API_KEY | Server only | Yes | Transactional email | Server only. |
 | NEXT_PUBLIC_APP_URL | Public | Yes | Canonical app URL / redirects | Use correct environment value. |
 | SENTRY_DSN / related | Mixed | Recommended | Error monitoring | Scrub PII/secrets. |

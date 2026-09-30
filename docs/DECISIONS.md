@@ -118,3 +118,33 @@ M06 is verified. M03's full verification remains incomplete; customer cart login
 ## M07-P01 approval - 2026-09-24
 
 Status: Approved by explicit user replies. Supersedes the pending proposal above: PHP; Philippines-only delivery; tax included in prices; shipping fee pending third-party confirmation, with merchandise total after discounts and no final payable total. The user explicitly approved the coupon/database proposal unchanged and then the pending-shipping display. The user changed the address proposal to save account addresses for future orders; guest addresses remain transient. Reuse existing addresses and ownership RLS for minimal save/reuse at checkout; no address management route. Fixed/percentage single coupon, cap/rounding/case-sensitive rules and protected redemption_count/read-only quote routine are approved. No payment-time redemption, orders, Stripe or future milestone functionality. Existing hosted discounts/orders counts were both zero before migration, so no historical counter backfill is required.
+
+## M08 authorization and shipping - 2026-09-25
+
+Status: Approved by explicit user replies.
+- The user authorized starting M08 while M03 and M07 remain In Progress for the single open M03 check (recovery link → same-browser code exchange). That check must still pass before M03/M07 can be Done.
+- Shipping: the online payment charges the merchandise total after discounts only. The customer pays the third-party courier's shipping fee directly on delivery. Checkout and the payment page must say so. This supersedes the M07-P01 "no final payable total" display: the amount charged now is the merchandise total. Unknown shipping is still never shown as zero or free; order shipping semantics are settled in M09.
+
+## M08-P01 proposal: replace Stripe with PayMongo - 2026-09-25
+
+Status: **Approved** by explicit user reply on 2026-09-25 ("approved, go ahead with PayMongo"). Supersedes D-001 only for the payment provider.
+
+Problem: D-001 selected Stripe before the merchant's location was considered. The deployment is in the Philippines. Stripe's global availability page does not list the Philippines; third-party reports describe PH onboarding as invite-only with PHP-only payouts. Support for the local methods PH shoppers use most (GCash, Maya, QR Ph) is uncertain. The existing requirements cannot be met for a PH merchant without a foreign entity.
+
+Proposal: use PayMongo (Philippine provider) Hosted Checkout.
+- Server creates a Checkout Session (`POST https://api.paymongo.com/v2/checkout_sessions`, secret key as HTTP Basic username) with `line_items` in centavos, PHP, and a `reference_number` and string `metadata` referencing the cart. The customer pays on the PayMongo-hosted page; methods are configured per account (cards, GCash, Maya, GrabPay, ShopeePay, QR Ph, online banking; availability depends on account enablement).
+- PayMongo has no coupon object. With a discount, the session carries one consolidated line (merchandise total after discount, with an item description); without a discount, lines are itemized. Amounts are exact centavos with no rounding.
+- The redirect is not proof of payment. M09 finalizes only from a verified `checkout_session.payment.paid` webhook (`Paymongo-Signature` header, endpoint secret), idempotent via the existing webhook_events table.
+- No new package: server-side `fetch` with Zod-validated responses. The `stripe` package added during M08 is removed.
+- Environment: replace STRIPE_SECRET_KEY / NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY / STRIPE_WEBHOOK_SECRET with PAYMONGO_SECRET_KEY (server only, `sk_test_`/`sk_live_`) and PAYMONGO_WEBHOOK_SECRET (server only, M09). No public key is needed for hosted checkout.
+- Schema: orders.stripe_checkout_session_id / stripe_payment_intent_id become provider-neutral references in M09 via a migration (proposed then, not now). M08 makes no schema change.
+- Route: PRD /api/stripe/webhook becomes /api/paymongo/webhook (M09).
+
+PRD rows to update on approval: 01_EXEC_SUMMARY r10; 02_SCOPE r12; 03_ARCHITECTURE r12, r25–r28; 04_ROUTES r23; 05_DATA_MODEL r14 (stripe refs); 07_ROADMAP M08 title/scope; 08_USER_STORIES US-005 ("Stripe only for MVP"); 10_ENV_INTEGRATIONS r7–r9; 12_AI_GUARDRAILS r16, r24; 14_DECISION_LOG (new row superseding D-001's provider); AGENTS.md stack list; .env.example.
+
+Alternatives:
+1. PayMongo (recommended): PH-native onboarding and settlement; local methods; hosted checkout and signed webhooks map one-to-one onto the approved architecture.
+2. Keep Stripe: only viable if the merchant has a Stripe account able to accept payments (e.g. via a foreign entity), a legal and tax decision outside this project.
+3. Xendit or Maya Business: also PH-capable; not evaluated in detail.
+
+Prerequisites and risks: PayMongo's quick start requires an account with KYC completed to obtain test keys; the user creates the account and adds the key to .env.local. Commercial fees and merchant requirements are unverified and should be checked by the user. Stock is not reserved between payment start and completion (an M09 requirement, unchanged from the Stripe plan).

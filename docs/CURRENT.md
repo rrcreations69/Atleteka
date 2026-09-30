@@ -1,6 +1,39 @@
-# Current milestone: M07 - Checkout foundation
+# Current milestone: M08 - PayMongo payment
 
-Updated: 2026-09-24.
+Updated: 2026-09-25. Status: **In Progress** (implementation done; browser verification waits for PAYMONGO_SECRET_KEY).
+
+The user authorized M08 while M03 and M07 stay In Progress for one open M03 check. M08-P01 (DECISIONS.md, PRD 14_DECISION_LOG row 7) replaced Stripe with PayMongo for a Philippines deployment, and the online payment charges the merchandise total after discounts only: the customer pays the courier's shipping fee on delivery.
+
+## Implemented behavior
+
+- /checkout shows **Pay PHP x** only after a fresh total check with the current form. The server action (lib/payment/actions.ts) re-runs checkout_quote for the current owned cart; browser prices, totals, identity and address IDs are never used.
+- lib/payment/session.ts converts exact decimal strings to centavos without floating point, re-checks line totals, subtotal and discount, and refuses totals below PayMongo's PHP 1.00 minimum. Lines are itemized without a coupon; with a coupon one exact line carries the discounted total (PayMongo has no coupon object and no negative lines).
+- lib/payment/paymongo.ts creates a hosted Checkout Session (POST /v2/checkout_sessions, secret key as Basic auth, server-only, 20 s timeout). Methods: card, GCash, Maya, QR Ph, subject to account enablement. The response is Zod-validated and must be an https URL; error bodies are not logged or shown. Live keys are refused on a non-https app URL.
+- The session carries reference_number = cart id and string metadata (cart id/kind, user id, coupon, quote totals, variant:quantity list, shipping = paid_to_courier_on_delivery) plus billing name/address (and email for accounts) for M09.
+- /checkout/success says the payment is being confirmed; it marks nothing paid. Cancel returns to /checkout?payment=cancelled with a not-charged message; the cart is unchanged.
+- No database writes, stock reservation, order creation or coupon redemption in M08. The verified webhook, orders, inventory and redemption are M09.
+
+## Environment and dependencies
+
+No new package (plain fetch). The `stripe` package added earlier in this session was removed; package files match the previous commit. .env.example now lists PAYMONGO_SECRET_KEY (M08) and PAYMONGO_WEBHOOK_SECRET (M09) in place of the Stripe variables. No schema change.
+
+## Verification so far
+
+Lint, typecheck and 35/35 Node tests pass (7 new payment tests: centavo conversion, reconciliation, fail-closed carts, minimum charge, itemized and discounted lines, description length).
+
+Pending (needs a PayMongo test key from a KYC-verified account in .env.local): session creation, redirect to PayMongo, test payment, failed payment, cancel, cart changed between quote and pay, empty cart, account vs guest billing email, mobile/desktop.
+
+## M08 CHECKPOINT
+
+- Completed: M08-P01 approval and PRD/doc updates, implementation, unit tests.
+- Exact next action: when PAYMONGO_SECRET_KEY is present, build, start the server and run the pending browser checks; then record results and decide M08 status.
+- Remaining after M08: resume the single open M03 check (M03_CHECKPOINT.md), then M09 (webhook, orders, inventory, redemption, provider-neutral order columns).
+
+---
+
+# Previous milestone record: M07 - Checkout foundation
+
+Updated: 2026-09-24. Shipping display superseded by M08-P01 (2026-09-25).
 
 ## Status
 

@@ -2,6 +2,7 @@
 
 import { useActionState, useState } from "react";
 import { calculateCheckout } from "@/lib/checkout/actions";
+import { startPayment } from "@/lib/payment/actions";
 import { type Address, type CheckoutState, type Quote, type SavedAddress } from "@/lib/checkout/validation";
 import { formatPrice } from "@/lib/catalog/validation";
 import { TextField } from "@/components/ui/text-field";
@@ -21,14 +22,25 @@ export function CheckoutForm({ initialQuote, addresses, account }: { initialQuot
   const [selected, setSelected] = useState(addresses[0]?.id ?? "");
   const [coupon, setCoupon] = useState("");
   const [dirty, setDirty] = useState(false);
+  // A payment error belongs to the Pay attempt that produced it; a new total check clears it.
+  const [paymentError, setPaymentError] = useState<string | null>(null);
   const [state, action, pending] = useActionState<CheckoutState, FormData>(async (previous, form) => {
+    setPaymentError(null);
     const result = await calculateCheckout(previous, form);
     setDirty(false);
     return result;
   }, {});
+  const [, payAction, paying] = useActionState<CheckoutState, FormData>(async (previous, form) => {
+    const result = await startPayment(previous, form);
+    setPaymentError(result.error ?? null);
+    return result;
+  }, {});
   const quote = !dirty && state.quote ? state.quote : initialQuote;
+  // Paying requires a total checked with the current form; the server re-quotes regardless.
+  const canPay = Boolean(state.quote) && !dirty && !pending;
+  const busy = pending || paying;
   return <form action={action} aria-describedby="checkout-status" className="grid gap-8 lg:grid-cols-2">
-    <fieldset disabled={pending} className="min-w-0 space-y-5">
+    <fieldset disabled={busy} className="min-w-0 space-y-5">
       <legend className="mb-4 text-xl font-semibold">Shipping and billing address</legend>
       <p className="text-sm text-muted-foreground">Delivery within the Philippines only. This address is also used for billing.
         {account ? " Your address is saved to your account when you check the total." : " Your guest address is kept in this form for this visit."}</p>
@@ -56,11 +68,16 @@ export function CheckoutForm({ initialQuote, addresses, account }: { initialQuot
       <TextField id="checkout-coupon" name="couponCode" label="Coupon code (optional)" maxLength={100}
         description="One code per checkout. Codes are case-sensitive." value={coupon} error={state.errors?.couponCode}
         onChange={(event) => { setCoupon(event.target.value); setDirty(true); }} />
-      <Button type="submit">{pending ? "Checking…" : "Check merchandise total"}</Button>
+      <div className="flex flex-wrap gap-3">
+        <Button type="submit" variant={canPay ? "outline" : "default"}>{pending ? "Checking…" : "Check merchandise total"}</Button>
+        {canPay && <input type="hidden" name="expectedTotal" value={quote.merchandiseTotal} />}
+        {canPay && <Button type="submit" formAction={payAction}>{paying ? "Opening secure payment…" : "Pay " + formatPrice(quote.merchandiseTotal)}</Button>}
+      </div>
       <div id="checkout-status" role="status" aria-live="polite" className="space-y-2 text-sm">
-        {pending ? <p>Checking prices, availability and coupon…</p> : <>
+        {pending ? <p>Checking prices, availability and coupon…</p> : paying ? <p>Rechecking your cart and opening PayMongo…</p> : <>
+          {paymentError && <p className="text-destructive">{paymentError}</p>}
           {state.error && <p className="text-destructive">{state.error}</p>}
-          {!dirty && state.message && <p>{state.message}</p>}
+          {!dirty && !paymentError && state.message && <p>{state.message}</p>}
           {dirty && <p>Check the total again to apply your changes.</p>}
         </>}
       </div>
@@ -78,10 +95,10 @@ export function CheckoutForm({ initialQuote, addresses, account }: { initialQuot
         <div><dt>Discount{quote.couponCode ? " (" + quote.couponCode + ")" : ""}</dt><dd>{formatPrice(quote.discountTotal)}</dd></div>
         <div className="font-semibold"><dt>Merchandise total after discounts</dt><dd>{formatPrice(quote.merchandiseTotal)}</dd></div>
         <div><dt>Tax</dt><dd>Included in prices</dd></div>
-        <div><dt>Shipping</dt><dd>Shipping fee pending confirmation</dd></div>
-        <div><dt>Final payable total</dt><dd>Pending shipping confirmation</dd></div>
+        <div><dt>Shipping</dt><dd>Paid to the courier on delivery (not included)</dd></div>
+        <div className="font-semibold"><dt>Amount charged now</dt><dd>{formatPrice(quote.merchandiseTotal)}</dd></div>
       </dl>
-      <p className="text-sm text-muted-foreground">The third-party shipping fee will be confirmed separately. Items and coupons are not reserved. This is not a final payable total.</p>
+      <p className="text-sm text-muted-foreground">Online payment covers merchandise only. You pay the third-party courier&apos;s shipping fee directly on delivery. Items and coupons are not reserved until payment is confirmed.</p>
     </section>
   </form>;
 }
