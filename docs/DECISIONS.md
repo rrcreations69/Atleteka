@@ -193,3 +193,14 @@ Status: Approved by explicit user replies.
 ## Known issue for M15 - 2026-09-28
 
 Unhandled server errors are also printed by Next.js to the Vercel function log with their full message (seen with the M14 test error, whose message deliberately contained a fake email and key). Sentry events are scrubbed, but Vercel's own runtime log is not. Application code keeps customer data and secrets out of error messages (existing webhook/action logs use ids and codes only); M15 should confirm no thrown message includes PII and decide on log retention. SENTRY_DEBUG=1 prints unscrubbed messages and must never be set in production. Status: Open.
+
+## M15-P01 (Proposed) and known-issue updates - 2026-09-30
+
+Status: **Proposed**. Implemented within the authorized M15 security review; awaiting explicit user confirmation.
+- Referrer-Policy on proxied pages changed from no-referrer to same-origin (proxy.ts). Root cause of the pre-hydration 500 and the old M03 login 500: with no-referrer, browsers send "Origin: null" on plain (non-JS) form submissions, and Next.js aborts the Server Action as a CSRF risk ("x-forwarded-host ... does not match origin header with value null"). same-origin still sends no referrer to other sites. Verified on the M15 preview: a native form post now reaches the action and returns its normal validation message.
+- Every response now sends X-Frame-Options DENY, Content-Security-Policy frame-ancestors 'none' and X-Content-Type-Options nosniff (next.config.ts). Verified on the M15 preview. A full Content-Security-Policy is recommended for later (Sentry, Vercel Analytics and Next.js inline scripts need care).
+
+Known issue updates:
+- "Known issue for the final QA pass - 2026-09-28" (pre-hydration Server Action 500): **Fixed** by the Referrer-Policy change above.
+- "Known issue for M15 - 2026-09-28" (Vercel function log prints unhandled server error messages): **Resolved by design**. The audit found that thrown messages interpolate only HTTP status codes and logs carry ids and error codes only. Rule: never put customer data or secrets in error messages. SENTRY_DEBUG must never be set in production.
+- Still open for the final QA pass: missing or archived product pages return HTTP 200 with the not-found view (streaming loading state).

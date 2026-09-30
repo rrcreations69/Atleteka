@@ -1,4 +1,39 @@
-# Current milestone: M14 - Observability & analytics
+# Current milestone: M15 - Security & abuse review
+
+Updated: 2026-09-30. Status: **In Progress**. The review is complete and two fixes are deployed to the M15 preview; **one step remains: the deferred M03 password-reset check** (see "M15 CHECKPOINT").
+
+Branch feat/m15-security-review (a37ba0c Referrer-Policy fix, 7e7ffa2 anti-framing headers, plus the docs commit), stacked on feat/m14-observability. No PR yet. Preview: https://atleteka-git-feat-m15-security-review-rr-4c7a.vercel.app (branch-scoped Preview variables set, including Resend and Sentry).
+
+## Review results (2026-09-28/30)
+
+| Area | Result |
+| --- | --- |
+| RLS on every table; anon/authenticated table and column grants; security definer functions (empty search_path, expected execute grants); storage policies | PASS; no gaps |
+| Anonymous access to orders, addresses, profiles, discounts, inventory, webhook_events | Denied. Guest cart_items without the cart cookie: 0 rows. Creating a paid order or calling record_paid_checkout: denied |
+| T-007 price tampering | PASS; quote and charge come from database prices (server re-quote; the Pay button amount is compared, never charged) |
+| T-008 quantity -5, T-014 above stock, T-013 inactive option | PASS; rejected by mutate_cart |
+| T-009 another user's order | PASS; 0 rows and "Order not found" |
+| T-010 customer admin writes (stock, price, order status, order items, coupon counter) | PASS; 0 rows or denied |
+| T-011 expired coupon, T-012 coupon at limit, wrong letter case | PASS; rejected (P7003) |
+| T-015 role escalation; address filed under or moved to another user | PASS; denied |
+| T-016 upload type and size | PASS (verified in M11) |
+| Server secrets in browser bundles | PASS; actual values of the service key, PayMongo keys, webhook secret, Resend key and Vercel token are absent; only the public Sentry DSN appears; the only "whsk_" match is the scrubber's own regex |
+| Webhook abuse (M14 preview) | PASS. Unsigned, wrong secret, tampered body, stale, live slot on a test deployment: 401. Signed with livemode true or another type: 200 ignored. Replay: 200 duplicate. Nonexistent session: 500, nothing recorded. Malformed JSON: 400 |
+| Error messages and logs | PASS by design; only HTTP status codes are interpolated; webhook logs carry ids and codes only |
+| Fix 1: Referrer-Policy same-origin | Verified; a native (pre-hydration) form post reaches the Server Action instead of the CSRF abort and HTTP 500 |
+| Fix 2: anti-framing and nosniff headers | Verified in the preview response headers |
+
+Recommendations (not implemented): full Content-Security-Policy; enable Supabase leaked-password protection (Auth setting, advisor WARN); use long random coupon codes (quote attempts are not rate limited); set the PayMongo business name to "Atleteka".
+
+## M15 CHECKPOINT
+
+- Completed: full review, two fixes deployed, PRD 14_DECISION_LOG row 13 (M15-P01, Proposed), M15 In Progress in 07_ROADMAP.
+- Exact next action: the deferred M03 password-reset check on the M15 preview. The user, in their own Chrome (driven by Claude in Chrome), opens /login?mode=recover on the M15 preview and requests one reset for rrai.creatives+customer@gmail.com. The user sends ONLY the pkce_ token, never the link (Discord previews consume links). Claude fetches https://vaqkikxksbblgspdeiap.supabase.co/auth/v1/verify?token=<token>&type=recovery&redirect_to=<preview>/login with curl --max-redirs 0, then navigates the same Chrome tab to the Location ?code= URL (the PKCE verifier cookie is in that browser). Expect /login?mode=reset; the user sets a new password and lands on /account. Then ask the user to confirm M15-P01, record the result, and open the M15 PR (base feat/m14-observability).
+- Then M16 (QA & launch): the single final QA pass (DECISIONS.md "Testing cadence"): lint, typecheck, build, full test suite, mobile/responsive, UI consistency, core-path regression, the not-found HTTP status, and closing M03 and M07-M15 in the PRD. Pre-launch: verified Resend domain and EMAIL_FROM; Production Vercel variable cleanup (remove STRIPE_* and placeholders; add live values and NEXT_PUBLIC_SENTRY_DSN); live PayMongo key and live webhook; merge PRs #2-#8 and M15 in order; rotate the database password pasted in an early session.
+
+---
+
+# Previous milestone record: M14 - Observability & analytics
 
 Updated: 2026-09-28. Status: **In Progress**: functional acceptance passed; held, like M07–M13, only for the deferred M03 check and the final QA pass.
 
