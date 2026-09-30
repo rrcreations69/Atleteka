@@ -1,6 +1,6 @@
 # Current milestone: M16 - QA & launch
 
-Updated: 2026-09-30. Status: **In Progress**. Branch feat/m16-qa-launch, stacked on feat/m15-security-review (PR #9). Authorized by the user ("start M16").
+Updated: 2026-09-30. Status: **In Progress**. Branch feat/m16-qa-launch, stacked on feat/m15-security-review (PR #9). PR #10 opened against feat/m15-security-review. Authorized by the user ("start M16").
 
 ## Final QA pass (local production build, 2026-09-30)
 
