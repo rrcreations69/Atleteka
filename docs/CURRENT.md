@@ -1,4 +1,29 @@
-# Current milestone: M15 - Security & abuse review
+# Current milestone: M16 - QA & launch
+
+Updated: 2026-09-30. Status: **In Progress**. Branch feat/m16-qa-launch, stacked on feat/m15-security-review (PR #9). Authorized by the user ("start M16").
+
+## Final QA pass (local production build, 2026-09-30)
+
+| Check | Result |
+| --- | --- |
+| Lint | PASS after removing an unused Sentry hint parameter (lib/monitoring/sentry-options.ts) |
+| Typecheck, 51 automated tests, production build | PASS |
+| Not-found HTTP status (known issue) | **Fixed**: removed app/(catalog)/loading.tsx; its Suspense boundary streamed a 200 before notFound(). Missing and inactive products and categories now return 404; valid pages 200; /account and /admin redirect signed-out users to /login |
+| SEO core metadata (PRD 02_SCOPE: title, description, canonical, OpenGraph basics) | **Added**: metadataBase from NEXT_PUBLIC_APP_URL, site description and OpenGraph defaults (lib/seo.ts); product and category titles, descriptions, canonical URLs and OG tags (first product image when present); /shop canonical; sign-in and register titles. Verified in the rendered HTML |
+| Responsive 320px and 1440px (home, shop, search, product, not-found, cart, checkout, login, register) | PASS; no horizontal overflow |
+| Accessibility sanity (T-018 basics) | PASS; lang=en, one main and one visible h1 per page, no unlabeled inputs, nameless buttons/links or images without alt. The second h1 on cart/checkout is an unswapped hidden streaming chunk in the non-hydrating pane |
+| Performance sanity | Catalog TTFB 0.19-0.42 s (database round trip), static pages under 30 ms; HTML 3-6 KB |
+
+Trade-off: catalog pages no longer show a loading skeleton; during client navigation the current page stays until the next is ready.
+
+## M16 CHECKPOINT
+
+- Completed: automated checks, not-found fix, SEO basics, responsive/accessibility/performance sanity.
+- Remaining (needs the user): E2E critical path on the M16 preview (browse, cart, checkout, PayMongo test payment, webhook order, confirmation email, admin order update), which requires pointing the test webhook at the M16 preview; the deferred M03 reset check; launch checklist (Resend domain and EMAIL_FROM, Production Vercel variables, live PayMongo key and webhook, Supabase Site URL and production redirect URL, merge PRs #2-#9 and M16 in order, rotate the database password); then close M03 and M07-M16 in the PRD.
+
+---
+
+# Previous milestone record: M15 - Security & abuse review
 
 Updated: 2026-09-30. Status: **In Progress**. The review is complete and two fixes are deployed to the M15 preview. **The M03 password-reset check is deferred to M16** (blocked by the Supabase email rate limit; see "M15 CHECKPOINT").
 

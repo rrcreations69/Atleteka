@@ -1,10 +1,24 @@
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+import { cache } from "react";
 import { CatalogListing } from "@/components/catalog/catalog-listing";
 import { getCategory } from "@/lib/catalog/data";
 import { catalogQuerySchema, slugSchema, type CatalogSearchParams } from "@/lib/catalog/validation";
+import { openGraphDefaults } from "@/lib/seo";
 
 export const dynamic = "force-dynamic";
-export const metadata = { title: "Category | Atleteka" };
+
+const loadCategory = cache(getCategory);
+
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
+  const slug = slugSchema.safeParse((await params).slug);
+  const category = slug.success ? await loadCategory(slug.data) : null;
+  if (!category) return { title: "Category not found | Atleteka" };
+  const title = `${category.name} | Atleteka`;
+  const description = `Shop ${category.name} at Atleteka.`;
+  const path = `/categories/${category.slug}`;
+  return { title, description, alternates: { canonical: path }, openGraph: { ...openGraphDefaults, title, description, url: path } };
+}
 
 export default async function CategoryPage({ params, searchParams }: {
   params: Promise<{ slug: string }>; searchParams: Promise<CatalogSearchParams>;
@@ -12,7 +26,7 @@ export default async function CategoryPage({ params, searchParams }: {
   const slug = slugSchema.safeParse((await params).slug);
   const query = catalogQuerySchema.safeParse(await searchParams);
   if (!slug.success || !query.success) notFound();
-  const category = await getCategory(slug.data);
+  const category = await loadCategory(slug.data);
   if (!category) notFound();
   return <CatalogListing category={category} query={query.data} />;
 }

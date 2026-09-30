@@ -203,4 +203,4 @@ Status: **Approved** by the user on 2026-09-30 (explicit session reply). Impleme
 Known issue updates:
 - "Known issue for the final QA pass - 2026-09-28" (pre-hydration Server Action 500): **Fixed** by the Referrer-Policy change above.
 - "Known issue for M15 - 2026-09-28" (Vercel function log prints unhandled server error messages): **Resolved by design**. The audit found that thrown messages interpolate only HTTP status codes and logs carry ids and error codes only. Rule: never put customer data or secrets in error messages. SENTRY_DEBUG must never be set in production.
-- Still open for the final QA pass: missing or archived product pages return HTTP 200 with the not-found view (streaming loading state).
+- Still open for the final QA pass: missing or archived product pages return HTTP 200 with the not-found view (streaming loading state). **Fixed in M16 (2026-09-30)**: app/(catalog)/loading.tsx removed; these pages now return 404.

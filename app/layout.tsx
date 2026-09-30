@@ -3,10 +3,16 @@ import type { ReactNode } from "react";
 import { Analytics } from "@vercel/analytics/next";
 import { SiteHeader } from "@/components/layout/site-header";
 import { SiteFooter } from "@/components/layout/site-footer";
+import { openGraphDefaults } from "@/lib/seo";
 import "./globals.css";
 
+const appUrl = process.env.NEXT_PUBLIC_APP_URL;
+// Core SEO metadata (PRD 02_SCOPE): title, description, canonical base and OpenGraph basics.
 export const metadata: Metadata = {
+  metadataBase: appUrl && URL.canParse(appUrl) ? new URL(appUrl) : undefined,
   title: "Atleteka",
+  description: "Athletic apparel and gear, delivered in the Philippines.",
+  openGraph: openGraphDefaults,
   // Avoid an implicit favicon request until branding is defined.
   icons: { icon: "data:," },
 };
