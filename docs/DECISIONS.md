@@ -204,3 +204,11 @@ Known issue updates:
 - "Known issue for the final QA pass - 2026-09-28" (pre-hydration Server Action 500): **Fixed** by the Referrer-Policy change above.
 - "Known issue for M15 - 2026-09-28" (Vercel function log prints unhandled server error messages): **Resolved by design**. The audit found that thrown messages interpolate only HTTP status codes and logs carry ids and error codes only. Rule: never put customer data or secrets in error messages. SENTRY_DEBUG must never be set in production.
 - Still open for the final QA pass: missing or archived product pages return HTTP 200 with the not-found view (streaming loading state). **Fixed in M16 (2026-09-30)**: app/(catalog)/loading.tsx removed; these pages now return 404.
+
+## M16-P01 soft launch without a custom domain - 2026-09-30
+
+Status: **Approved** by the user on 2026-09-30 (explicit session reply: "soft launch guest checkout only"; no domain for now). PRD 14_DECISION_LOG row 14.
+- Production runs on https://atleteka.vercel.app. Supabase Auth Site URL is https://atleteka.vercel.app and Redirect URLs include https://atleteka.vercel.app/** plus the preview wildcard https://atleteka-git-*-rr-4c7a.vercel.app/** (set by the user in the dashboard; verified by redirect).
+- Guest checkout only. Customer emails cannot be delivered yet: the Resend test sender only delivers to the account owner, and the built-in Supabase mailer is rate limited. Customer accounts (sign-up confirmation, password reset) are not offered to customers until a domain exists; the UI is unchanged.
+- Amends M13-P01: a permanent Resend refusal (HTTP 4xx except 408, 409, 429) is logged as `email_rejected <order> <status>` and the webhook returns 200 with `email: "rejected"`, so PayMongo stops retrying. The order stays recorded and confirmation_email_sent_at stays empty. Rate limits, timeouts, conflicts, 5xx and network errors still return 500 and are retried (lib/email/retry.ts).
+- Reversal when a domain exists: verify it in Resend, set EMAIL_FROM, configure Supabase custom SMTP through Resend, and re-enable accounts for customers.

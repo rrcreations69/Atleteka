@@ -29,3 +29,9 @@ test("guest orders get no account link and no discount line when there is none",
  assert.ok(!email.text.includes("/order/"));
  assert.ok(!email.text.includes("Discount"));
 });
+
+test("M16-P01: permanent Resend refusals stop retries; transient failures stay retryable", async () => {
+ const { isPermanentEmailRefusal } = await import("../lib/email/retry.ts");
+ for (const status of [400, 401, 403, 404, 422]) assert.equal(isPermanentEmailRefusal(status), true, String(status));
+ for (const status of [undefined, 408, 409, 429, 500, 502, 503]) assert.equal(isPermanentEmailRefusal(status), false, String(status));
+});

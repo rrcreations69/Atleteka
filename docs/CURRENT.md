@@ -33,10 +33,14 @@ Setup (user-approved): branch-scoped Preview variables for feat/m16-qa-launch (9
 
 Test data kept: order C12C2C61 (shipped).
 
+## M16-P01 soft launch (approved 2026-09-30)
+
+No custom domain for now: production on https://atleteka.vercel.app, guest checkout only; Supabase Site URL and production redirect URL set by the user and verified. The webhook now acknowledges a permanent Resend refusal (logged, 200) instead of retrying forever; transient failures still retry. Test added (52 tests pass). See DECISIONS.md M16-P01.
+
 ## M16 CHECKPOINT
 
 - Completed: automated checks, not-found fix, SEO basics, responsive/accessibility/performance sanity, E2E critical path on the M16 preview.
-- Remaining (needs the user): the deferred M03 reset check; launch checklist (Resend domain and EMAIL_FROM, Production Vercel variables, live PayMongo key and webhook, Supabase Site URL and production redirect URL, merge PRs #2-#9 and M16 in order, rotate the database password); then close M03 and M07-M16 in the PRD.
+- Remaining (needs the user): functional test of the M16-P01 email refusal on the preview (a test payment with a non-owner email); the deferred M03 reset check; launch checklist (Production Vercel variables with APP_URL https://atleteka.vercel.app, live PayMongo key and webhook, PayMongo business name, merge PRs #2-#9 and M16 in order, rotate the database password); then close M03 and M07-M16 in the PRD.
 
 ---
 
