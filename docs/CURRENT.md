@@ -29,9 +29,9 @@ Recommendations (not implemented): full Content-Security-Policy; enable Supabase
 
 ## M15 CHECKPOINT
 
-- Completed: full review, two fixes deployed, PRD 14_DECISION_LOG row 13 (M15-P01, Proposed), M15 In Progress in 07_ROADMAP.
+- Completed: full review, two fixes deployed, PRD 14_DECISION_LOG row 13 (M15-P01, Approved 2026-09-30), M15 In Progress in 07_ROADMAP.
 - M03 reset check deferred to M16 (user decision 2026-09-30, email rate limit). Procedure when retried: on a device the user controls (not the company laptop), open /login?mode=recover on a preview, request ONE reset for rrai.creatives+customer@gmail.com, long-press the email link, copy it, and paste it into the same browser (the PKCE verifier cookie lives there); expect /login?mode=reset, set a new password, land on /account. Fallback: the user sends only the pkce_ token; Claude calls /auth/v1/verify with curl --max-redirs 0 and gives back the ?code= URL for that same browser. Claude in Chrome was not reachable this session.
-- M15-P01 is still **Proposed** (PRD 14_DECISION_LOG row 13); ask the user to approve it.
+- M15-P01 **Approved** by the user on 2026-09-30 (DECISIONS.md; PRD 14_DECISION_LOG row 13 F13/G13/D13).
 - Exact next action: M16.
 - Then M16 (QA & launch): the single final QA pass (DECISIONS.md "Testing cadence"): lint, typecheck, build, full test suite, mobile/responsive, UI consistency, core-path regression, the not-found HTTP status, and closing M03 and M07-M15 in the PRD. Pre-launch: verified Resend domain and EMAIL_FROM; Production Vercel variable cleanup (remove STRIPE_* and placeholders; add live values and NEXT_PUBLIC_SENTRY_DSN); live PayMongo key and live webhook; merge PRs #2-#8 and M15 in order; rotate the database password pasted in an early session; set the Supabase Auth Site URL to the production domain and add the production redirect URL (then consider removing the preview wildcard); retry the deferred M03 reset check.
 

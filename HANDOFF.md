@@ -8,7 +8,7 @@ Do not restart M06 or reimplement M07. Read AGENTS.md, CURRENT.md, relevant PRD 
 
 The last unfinished M07 feature check was error recovery. It failed because resetting the error boundary did not fetch checkout again. app/checkout/error.tsx now reloads the page on Try again. Final lint/typecheck/28 tests/build and all 5 recovery browser cases pass after that fix.
 
-**Exact next action:** see CURRENT.md "M15 CHECKPOINT" (M15 PR opened; M15-P01 still Proposed; M03 reset check deferred), then M16 final QA and launch. Stacked PRs rrcreations69/Atleteka #2 (M08) -> #3 (M09) -> #4 (M10) -> #5 (M11) -> #6 (M12) -> #7 (M13) -> #8 (M14) -> M15 (opened, base feat/m14-observability); merge in order. Testing: per-phase functional tests only until the final QA pass; test on Vercel branch previews with the user signed in and Claude driving Chrome via Claude in Chrome.
+**Exact next action:** see CURRENT.md "M15 CHECKPOINT" (M15 PR opened; M15-P01 Approved; M03 reset check deferred), then M16 final QA and launch. Stacked PRs rrcreations69/Atleteka #2 (M08) -> #3 (M09) -> #4 (M10) -> #5 (M11) -> #6 (M12) -> #7 (M13) -> #8 (M14) -> M15 (opened, base feat/m14-observability); merge in order. Testing: per-phase functional tests only until the final QA pass; test on Vercel branch previews with the user signed in and Claude driving Chrome via Claude in Chrome.
 
 ## Approvals already received
 
