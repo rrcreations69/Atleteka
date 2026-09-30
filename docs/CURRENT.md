@@ -1,4 +1,40 @@
-# Current milestone: M10 - Customer account
+# Current milestone: M11 - Admin products/categories/inventory
+
+Updated: 2026-09-28. Status: **In Progress**: functional acceptance passed; held, like M07–M10, only for the deferred M03 check and the final QA pass.
+
+M11-P01 (DECISIONS.md): archive over delete; JPEG/PNG/WebP images up to 4 MB checked by content and by the bucket; optimistic stock updates without a log table.
+
+## Implemented behavior
+
+- Migration 20260928073926_admin_catalog_media.sql: products.status limited to active/inactive; product-images bucket limited to 4 MB and image/jpeg, image/png, image/webp; admin-only storage insert/update/delete/select policies (uploads only under products/).
+- /admin links to Products, Categories, Inventory. /admin/products lists all products (active and archived) with create; new products start archived. /admin/products/[id]: details and status, options (title, SKU normalized to upper case, price as an exact PHP amount, active; new options get a zero stock row), category checkboxes, images (upload with required alt text, reorder, remove the row and the stored file). /admin/categories: create/edit, activate/deactivate. /admin/inventory: set stock per option; the update applies only if stock still equals what the page loaded.
+- lib/admin/actions.ts: every action calls requireAdmin() server-side and uses the admin's session, so RLS and storage policies apply too. Duplicate slug/SKU (23505) return field messages. Images are identified by their bytes (lib/admin/validation.ts detectImage); the stored content type comes from the detected signature. next.config.ts raises the Server Action body limit to 5 MB for uploads.
+
+## Functional verification (2026-09-28, Vercel preview, admin signed in by the user, driven through Claude in Chrome)
+
+| # | Check | Result |
+| --- | --- | --- |
+| 1 | Customer calls admin writes (RLS, rolled-back transaction); signed-out /admin | PASS; price/stock/status updates change 0 rows, category insert and storage upload denied; admin upload outside products/ denied; invalid status rejected; /admin redirects to /login |
+| 2 | Create product; duplicate slug | PASS; created archived; "This slug is already used." |
+| 3 | Add option; price 12.345; duplicate SKU; SKU with a space | PASS; HOODIE-M with 0 stock; each invalid input refused with a field message; no invalid option created |
+| 4 | Upload a real PNG; text renamed .png; 4.3 MB file | PASS; uploaded and shown from storage; refused by content; refused by size |
+| 5 | Create category, assign, publish, category and product pages | PASS after fix 156b97e (checkboxes sent "on" instead of category ids); category page lists the product; product page "In stock" |
+| 6 | Set stock; stale second tab | PASS; 0→5→4; stale tab refused with "Stock changed to 4 since this page loaded" |
+| — | Remove image; archive product | PASS; image row and storage file removed; archived product hidden from shop and category, data kept |
+
+Unit tests: tests/admin.test.mjs (image signatures, prices, slugs/SKUs, stock). Test data left: archived product "Test Hoodie" (HOODIE-M, stock 4) and active category "Hoodies".
+
+Noted for the final QA pass: missing or archived product pages show the not-found view but return HTTP 200 (streaming loading state; existing M04 behavior).
+
+## M11 CHECKPOINT
+
+- Completed: M11-P01, migration, admin pages and actions, functional tests.
+- Exact next action: M12 (admin orders: list/detail, fulfillment status updates).
+- Remaining: the deferred M03 check, the pre-hydration 500 fix, the not-found status code, the final QA pass, and Production Vercel variable cleanup before launch.
+
+---
+
+# Previous milestone record: M10 - Customer account
 
 Updated: 2026-09-28. Status: **In Progress**: functional acceptance passed; held, like M07–M09, only for the deferred M03 check and the final QA pass.
 
