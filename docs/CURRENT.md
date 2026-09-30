@@ -16,10 +16,27 @@ Updated: 2026-09-30. Status: **In Progress**. Branch feat/m16-qa-launch, stacked
 
 Trade-off: catalog pages no longer show a loading skeleton; during client navigation the current page stays until the next is ready.
 
+## E2E critical path (2026-09-30, M16 preview, PayMongo test mode, user's Chrome via Claude in Chrome)
+
+Setup (user-approved): branch-scoped Preview variables for feat/m16-qa-launch (9, values piped from .env.local, APP_URL = branch URL), redeployed; PayMongo test webhook hook_e5HJPTAUgtKmM1aEQBx28Lz2 moved from the M13 preview to https://atleteka-git-feat-m16-qa-launch-rr-4c7a.vercel.app/api/paymongo/webhook (events unchanged: checkout_session.payment.paid).
+
+| # | Step | Result |
+| --- | --- | --- |
+| 1 | Product page, sold-out variant | PASS; Medium "Sold out", Small "In stock" |
+| 2 | Add to cart, cart totals | PASS; Small × 1, subtotal PHP 25.00 |
+| 3 | Checkout with a test address (QA Tester, Makati City) | PASS; server quote PHP 25.00, shipping paid to the courier, "Pay PHP 25.00" |
+| 4 | PayMongo hosted payment (the user paid with the test card) | PASS; pay_pY2pGwj7BFLkLAgjccq6kP9J; redirect to /checkout/success |
+| 5 | Webhook order | PASS; order C12C2C61, one order for the session, paid/unfulfilled, guest, snapshot M02-SHIRT-S × 1 = 25.00 |
+| 6 | Stock and cart | PASS; Small 8 → 7; guest cart empty |
+| 7 | Confirmation email | PASS; sent 1.3 s after the order; the user confirmed one email received |
+| 8 | Admin: order detail, mark Shipped (LBC, QA-M16-0001) | PASS; status, courier and tracking saved; one history row unfulfilled → shipped by the admin; shown after reload |
+
+Test data kept: order C12C2C61 (shipped).
+
 ## M16 CHECKPOINT
 
-- Completed: automated checks, not-found fix, SEO basics, responsive/accessibility/performance sanity.
-- Remaining (needs the user): E2E critical path on the M16 preview (browse, cart, checkout, PayMongo test payment, webhook order, confirmation email, admin order update), which requires pointing the test webhook at the M16 preview; the deferred M03 reset check; launch checklist (Resend domain and EMAIL_FROM, Production Vercel variables, live PayMongo key and webhook, Supabase Site URL and production redirect URL, merge PRs #2-#9 and M16 in order, rotate the database password); then close M03 and M07-M16 in the PRD.
+- Completed: automated checks, not-found fix, SEO basics, responsive/accessibility/performance sanity, E2E critical path on the M16 preview.
+- Remaining (needs the user): the deferred M03 reset check; launch checklist (Resend domain and EMAIL_FROM, Production Vercel variables, live PayMongo key and webhook, Supabase Site URL and production redirect URL, merge PRs #2-#9 and M16 in order, rotate the database password); then close M03 and M07-M16 in the PRD.
 
 ---
 
