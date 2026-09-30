@@ -37,10 +37,12 @@ Test data kept: order C12C2C61 (shipped).
 
 No custom domain for now: production on https://atleteka.vercel.app, guest checkout only; Supabase Site URL and production redirect URL set by the user and verified. The webhook now acknowledges a permanent Resend refusal (logged, 200) instead of retrying forever; transient failures still retry. Test added (52 tests pass). See DECISIONS.md M16-P01.
 
+Functional test (2026-09-30, M16 preview, the user paid with the test card as the signed-in admin, billing email rrai.creatives+admin@gmail.com, which the Resend test sender refuses): order 6D59A7B7 recorded once (paid, unfulfilled, account order, PHP 25.00, Small 7 → 6), confirmation_email_sent_at empty; function log `paymongo_webhook email_rejected <order> 403`; response 200; no PayMongo retries (only one delivery for the event). PASS. Side effect: the test address was saved to the admin account.
+
 ## M16 CHECKPOINT
 
 - Completed: automated checks, not-found fix, SEO basics, responsive/accessibility/performance sanity, E2E critical path on the M16 preview.
-- Remaining (needs the user): functional test of the M16-P01 email refusal on the preview (a test payment with a non-owner email); the deferred M03 reset check; launch checklist (Production Vercel variables with APP_URL https://atleteka.vercel.app, live PayMongo key and webhook, PayMongo business name, merge PRs #2-#9 and M16 in order, rotate the database password); then close M03 and M07-M16 in the PRD.
+- Remaining (needs the user): the deferred M03 reset check; launch checklist (Production Vercel variables with APP_URL https://atleteka.vercel.app, live PayMongo key and webhook, PayMongo business name, merge PRs #2-#9 and M16 in order, rotate the database password); then close M03 and M07-M16 in the PRD.
 
 ---
 
