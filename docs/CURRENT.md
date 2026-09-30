@@ -39,10 +39,14 @@ No custom domain for now: production on https://atleteka.vercel.app, guest check
 
 Functional test (2026-09-30, M16 preview, the user paid with the test card as the signed-in admin, billing email rrai.creatives+admin@gmail.com, which the Resend test sender refuses): order 6D59A7B7 recorded once (paid, unfulfilled, account order, PHP 25.00, Small 7 → 6), confirmation_email_sent_at empty; function log `paymongo_webhook email_rejected <order> 403`; response 200; no PayMongo retries (only one delivery for the event). PASS. Side effect: the test address was saved to the admin account.
 
+## Production Vercel variables (2026-09-30)
+
+Removed from Production: NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY, STRIPE_SECRET_KEY, STRIPE_WEBHOOK_SECRET, SENTRY_DSN. Set (values from .env.local, never printed): NEXT_PUBLIC_APP_URL=https://atleteka.vercel.app, NEXT_PUBLIC_SUPABASE_URL, NEXT_PUBLIC_SUPABASE_ANON_KEY, NEXT_PUBLIC_SENTRY_DSN, EMAIL_FROM (Resend test sender per M16-P01), SUPABASE_SERVICE_ROLE_KEY and RESEND_API_KEY (sensitive). Still missing, entered by the user: PAYMONGO_SECRET_KEY (live) and PAYMONGO_WEBHOOK_SECRET (live webhook). Done via a user-added permission rule in the outer folder's .claude/settings.local.json.
+
 ## M16 CHECKPOINT
 
 - Completed: automated checks, not-found fix, SEO basics, responsive/accessibility/performance sanity, E2E critical path on the M16 preview.
-- Remaining (needs the user): the deferred M03 reset check; launch checklist (Production Vercel variables with APP_URL https://atleteka.vercel.app, live PayMongo key and webhook, PayMongo business name, merge PRs #2-#9 and M16 in order, rotate the database password); then close M03 and M07-M16 in the PRD.
+- Remaining (needs the user): the deferred M03 reset check; launch checklist (live PayMongo key and webhook secret in Production, live PayMongo webhook, PayMongo business name, merge PRs #2-#9 and M16 in order, rotate the database password); then close M03 and M07-M16 in the PRD.
 
 ---
 
