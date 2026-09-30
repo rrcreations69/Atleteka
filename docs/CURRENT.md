@@ -1,4 +1,43 @@
-# Current milestone: M14 - Observability & analytics
+# Current milestone: M15 - Security & abuse review
+
+Updated: 2026-09-30. Status: **In Progress**. The review is complete and two fixes are deployed to the M15 preview. **The M03 password-reset check is deferred to M16** (blocked by the Supabase email rate limit; see "M15 CHECKPOINT").
+
+Branch feat/m15-security-review (a37ba0c Referrer-Policy fix, 7e7ffa2 anti-framing headers, plus the docs commit), stacked on feat/m14-observability. PR opened against feat/m14-observability (see HANDOFF.md). Preview: https://atleteka-git-feat-m15-security-review-rr-4c7a.vercel.app (branch-scoped Preview variables set, including Resend and Sentry).
+
+## Review results (2026-09-28/30)
+
+| Area | Result |
+| --- | --- |
+| RLS on every table; anon/authenticated table and column grants; security definer functions (empty search_path, expected execute grants); storage policies | PASS; no gaps |
+| Anonymous access to orders, addresses, profiles, discounts, inventory, webhook_events | Denied. Guest cart_items without the cart cookie: 0 rows. Creating a paid order or calling record_paid_checkout: denied |
+| T-007 price tampering | PASS; quote and charge come from database prices (server re-quote; the Pay button amount is compared, never charged) |
+| T-008 quantity -5, T-014 above stock, T-013 inactive option | PASS; rejected by mutate_cart |
+| T-009 another user's order | PASS; 0 rows and "Order not found" |
+| T-010 customer admin writes (stock, price, order status, order items, coupon counter) | PASS; 0 rows or denied |
+| T-011 expired coupon, T-012 coupon at limit, wrong letter case | PASS; rejected (P7003) |
+| T-015 role escalation; address filed under or moved to another user | PASS; denied |
+| T-016 upload type and size | PASS (verified in M11) |
+| Server secrets in browser bundles | PASS; actual values of the service key, PayMongo keys, webhook secret, Resend key and Vercel token are absent; only the public Sentry DSN appears; the only "whsk_" match is the scrubber's own regex |
+| Webhook abuse (M14 preview) | PASS. Unsigned, wrong secret, tampered body, stale, live slot on a test deployment: 401. Signed with livemode true or another type: 200 ignored. Replay: 200 duplicate. Nonexistent session: 500, nothing recorded. Malformed JSON: 400 |
+| Error messages and logs | PASS by design; only HTTP status codes are interpolated; webhook logs carry ids and codes only |
+| Fix 1: Referrer-Policy same-origin | Verified; a native (pre-hydration) form post reaches the Server Action instead of the CSRF abort and HTTP 500 |
+| Fix 2: anti-framing and nosniff headers | Verified in the preview response headers |
+| Auth redirect allowlist (found 2026-09-30 during the M03 reset attempt) | The reset email sent the user to localhost: the preview URL was not in Supabase Auth Redirect URLs, so Supabase fell back to the Site URL. The user added `https://atleteka-git-*-rr-4c7a.vercel.app/**` in the dashboard. Verified: /auth/v1/verify with an invalid token now 303-redirects to the M15 preview /login with otp_expired. Site URL left unchanged (still local) |
+| M03 password reset end to end | DEFERRED to M16. Two reset emails were used (the first went to localhost); the built-in mailer's limit (about 2/hour) then stopped delivery |
+
+Recommendations (not implemented): full Content-Security-Policy; enable Supabase leaked-password protection (Auth setting, advisor WARN); use long random coupon codes (quote attempts are not rate limited); set the PayMongo business name to "Atleteka".
+
+## M15 CHECKPOINT
+
+- Completed: full review, two fixes deployed, PRD 14_DECISION_LOG row 13 (M15-P01, Approved 2026-09-30), M15 In Progress in 07_ROADMAP.
+- M03 reset check deferred to M16 (user decision 2026-09-30, email rate limit). Procedure when retried: on a device the user controls (not the company laptop), open /login?mode=recover on a preview, request ONE reset for rrai.creatives+customer@gmail.com, long-press the email link, copy it, and paste it into the same browser (the PKCE verifier cookie lives there); expect /login?mode=reset, set a new password, land on /account. Fallback: the user sends only the pkce_ token; Claude calls /auth/v1/verify with curl --max-redirs 0 and gives back the ?code= URL for that same browser. Claude in Chrome was not reachable this session.
+- M15-P01 **Approved** by the user on 2026-09-30 (DECISIONS.md; PRD 14_DECISION_LOG row 13 F13/G13/D13).
+- Exact next action: M16.
+- Then M16 (QA & launch): the single final QA pass (DECISIONS.md "Testing cadence"): lint, typecheck, build, full test suite, mobile/responsive, UI consistency, core-path regression, the not-found HTTP status, and closing M03 and M07-M15 in the PRD. Pre-launch: verified Resend domain and EMAIL_FROM; Production Vercel variable cleanup (remove STRIPE_* and placeholders; add live values and NEXT_PUBLIC_SENTRY_DSN); live PayMongo key and live webhook; merge PRs #2-#8 and M15 in order; rotate the database password pasted in an early session; set the Supabase Auth Site URL to the production domain and add the production redirect URL (then consider removing the preview wildcard); retry the deferred M03 reset check.
+
+---
+
+# Previous milestone record: M14 - Observability & analytics
 
 Updated: 2026-09-28. Status: **In Progress**: functional acceptance passed; held, like M07–M13, only for the deferred M03 check and the final QA pass.
 
