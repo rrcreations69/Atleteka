@@ -2,11 +2,14 @@
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
 
-/* Shared neutral typography, spacing and interaction tokens for M01. */
+/* "Sunday Market" warm lifestyle theme (design refresh 2026-10-02): cream ground, espresso text,
+   terracotta actions, olive reassurance; Fraunces headings over Figtree. */
 @theme inline {
-  --text-display: clamp(2rem, 5vw, 3.5rem);
-  --text-display--line-height: 1.12;
-  --text-display--letter-spacing: -0.03em;
+  --font-sans: var(--font-figtree), ui-sans-serif, system-ui, sans-serif;
+  --font-serif: var(--font-fraunces), Georgia, ui-serif, serif;
+  --text-display: clamp(2.25rem, 5vw, 3.75rem);
+  --text-display--line-height: 1.05;
+  --text-display--letter-spacing: -0.015em;
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
@@ -21,47 +24,58 @@
   --color-muted-foreground: var(--muted-foreground);
   --color-accent: var(--accent);
   --color-accent-foreground: var(--accent-foreground);
+  --color-success: var(--success);
+  --color-sand: var(--sand);
   --color-destructive: var(--destructive);
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
-  --radius-sm: calc(var(--radius) - 4px);
-  --radius-md: calc(var(--radius) - 2px);
+  --radius-sm: calc(var(--radius) - 8px);
+  --radius-md: calc(var(--radius) - 4px);
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 4px);
+  --radius-2xl: calc(var(--radius) + 8px);
 }
 
 :root {
-  --radius: 0.625rem;
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.45 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
-  --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.6 0 0);
-  --ring: oklch(0.35 0 0);
+  --radius: 0.875rem;
+  --background: #f6f1e9;
+  --foreground: #2b2620;
+  --card: #fffdf9;
+  --card-foreground: #2b2620;
+  --popover: #fffdf9;
+  --popover-foreground: #2b2620;
+  --primary: #b5532e;
+  --primary-foreground: #ffffff;
+  --secondary: #2b2620;
+  --secondary-foreground: #f6f1e9;
+  --muted: #efe8dc;
+  --muted-foreground: #6b5f50;
+  --accent: #e8dcc8;
+  --accent-foreground: #2b2620;
+  --success: #5e6b3a;
+  --sand: #e8dcc8;
+  --destructive: #a12d1f;
+  --border: #e3d9c8;
+  /* Form-control borders keep 3:1 against the cream ground (WCAG 1.4.11). */
+  --input: #8f8270;
+  --ring: #2b2620;
 }
 
 @layer base {
   :where(a, button, input, select, textarea, [tabindex]):focus-visible {
     outline: 2px solid var(--ring);
-    outline-offset: 4px;
+    outline-offset: 3px;
   }
   * {
     @apply border-border outline-ring/50;
   }
   body {
     @apply bg-background font-sans text-foreground antialiased;
+  }
+  h1, h2 {
+    @apply font-serif font-medium;
+    font-variation-settings: "SOFT" 100;
+    letter-spacing: -0.01em;
   }
 }

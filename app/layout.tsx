@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Figtree, Fraunces } from "next/font/google";
 import type { ReactNode } from "react";
 import { Analytics } from "@vercel/analytics/next";
 import { SiteHeader } from "@/components/layout/site-header";
@@ -6,12 +7,16 @@ import { SiteFooter } from "@/components/layout/site-footer";
 import { openGraphDefaults } from "@/lib/seo";
 import "./globals.css";
 
+// Self-hosted at build time by next/font (no runtime request to Google).
+const fraunces = Fraunces({ subsets: ["latin"], axes: ["SOFT", "opsz"], variable: "--font-fraunces", display: "swap" });
+const figtree = Figtree({ subsets: ["latin"], variable: "--font-figtree", display: "swap" });
+
 const appUrl = process.env.NEXT_PUBLIC_APP_URL;
 // Core SEO metadata (PRD 02_SCOPE): title, description, canonical base and OpenGraph basics.
 export const metadata: Metadata = {
   metadataBase: appUrl && URL.canParse(appUrl) ? new URL(appUrl) : undefined,
   title: "Atleteka",
-  description: "Athletic apparel and gear, delivered in the Philippines.",
+  description: "Comfortable, well-made clothing for women and men, delivered across the Philippines.",
   openGraph: openGraphDefaults,
   // Avoid an implicit favicon request until branding is defined.
   icons: { icon: "data:," },
@@ -21,7 +26,7 @@ export default function RootLayout({
   children,
 }: Readonly<{ children: ReactNode }>) {
   return (
-    <html lang="en">
+    <html lang="en" className={`${fraunces.variable} ${figtree.variable}`}>
       <body className="flex min-h-svh flex-col">
         <a
           href="#main-content"

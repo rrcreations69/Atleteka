@@ -212,3 +212,11 @@ Status: **Approved** by the user on 2026-09-30 (explicit session reply: "soft la
 - Guest checkout only. Customer emails cannot be delivered yet: the Resend test sender only delivers to the account owner, and the built-in Supabase mailer is rate limited. Customer accounts (sign-up confirmation, password reset) are not offered to customers until a domain exists; the UI is unchanged.
 - Amends M13-P01: a permanent Resend refusal (HTTP 4xx except 408, 409, 429) is logged as `email_rejected <order> <status>` and the webhook returns 200 with `email: "rejected"`, so PayMongo stops retrying. The order stays recorded and confirmation_email_sent_at stays empty. Rate limits, timeouts, conflicts, 5xx and network errors still return 500 and are retried (lib/email/retry.ts).
 - Reversal when a domain exists: verify it in Resend, set EMAIL_FROM, configure Supabase custom SMTP through Resend, and re-enable accounts for customers.
+
+## D-DESIGN-01 warm lifestyle visual design - 2026-10-02
+
+Status: **Approved** by the user on 2026-10-02 (explicit session replies: rejected a sporty theme because Atleteka is a general clothing line; chose "warm lifestyle", separate Men and Women sections and mid-range positioning; approved the "Sunday Market" mockup with "implement it"). No logo yet; a text wordmark stands in.
+- Visual only: no new features, data, routes or packages. Fonts Fraunces (headings) and Figtree (body) load through the built-in next/font and are self-hosted at build time.
+- Tokens in app/globals.css: cream #F6F1E9, card #FFFDF9, espresso #2B2620, terracotta #B5532E (primary actions), olive #5E6B3A (reassurance), sand #E8DCC8; form borders #8F8270 for 3:1 non-text contrast. Pill buttons, rounded cards.
+- Header navigation lists the active categories, with `women` and `men` slugs first (up to five) plus "Shop all"; the home hero shows Shop women / Shop men only when those categories exist. Create them in Admin → Categories to get Men and Women sections.
+- Product page options are a radio group of pills (was a select); a root app/not-found.tsx replaces the framework default 404 page.

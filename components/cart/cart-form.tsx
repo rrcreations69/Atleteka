@@ -18,15 +18,15 @@ export function CartForm({ variantId, quantity = 1, operation, disabled = false 
     <form action={action} aria-label={label} aria-busy={pending} className="space-y-3">
       <input type="hidden" name="variantId" value={variantId} />
       <input type="hidden" name="operation" value={operation} />
-      <fieldset disabled={pending || disabled} className="min-w-0 space-y-3">
+      <fieldset disabled={pending || disabled} className="flex min-w-0 flex-wrap items-end gap-3">
         <legend className="sr-only">{label}</legend>
-        {operation !== "remove" && <div className="space-y-2">
+        {operation !== "remove" && <div className="space-y-1.5">
           <Label htmlFor={id}>Quantity</Label>
           <Input id={id} name="quantity" type="number" min={1} max={2147483647} step={1}
             required defaultValue={quantity} aria-invalid={state.error ? true : undefined}
-            aria-describedby={state.error ? id + "-status" : undefined} className="max-w-32" />
+            aria-describedby={state.error ? id + "-status" : undefined} className="w-24" />
         </div>}
-        <Button type="submit" variant={operation === "remove" ? "outline" : "default"}>
+        <Button type="submit" variant={operation === "remove" ? "outline" : operation === "set" ? "secondary" : "default"} className={operation === "add" ? "min-w-48 flex-1" : undefined}>
           {pending ? "Please wait..." : label}
         </Button>
       </fieldset>

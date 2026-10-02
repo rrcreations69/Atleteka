@@ -40,13 +40,13 @@ export function CheckoutForm({ initialQuote, addresses, account }: { initialQuot
   const canPay = Boolean(state.quote) && !dirty && !pending;
   const busy = pending || paying;
   return <form action={action} aria-describedby="checkout-status" className="grid gap-8 lg:grid-cols-2">
-    <fieldset disabled={busy} className="min-w-0 space-y-5">
-      <legend className="mb-4 text-xl font-semibold">Shipping and billing address</legend>
+    <fieldset disabled={busy} className="min-w-0 space-y-5 rounded-2xl bg-card p-5 sm:p-6">
+      <legend className="mb-4 font-serif text-2xl [font-variation-settings:'SOFT'_100]">Shipping and billing address</legend>
       <p className="text-sm text-muted-foreground">Delivery within the Philippines only. This address is also used for billing.
         {account ? " Your address is saved to your account when you check the total." : " Your guest address is kept in this form for this visit."}</p>
       {account && addresses.length > 0 && <div className="space-y-2">
         <Label htmlFor="saved-address">Use a saved address</Label>
-        <select id="saved-address" value={selected} className="min-h-11 w-full min-w-0 rounded-md border border-input bg-background px-3"
+        <select id="saved-address" value={selected} className="min-h-12 w-full min-w-0 rounded-xl border-[1.5px] border-input bg-card px-4"
           onChange={(event) => {
             setSelected(event.target.value);
             setAddress(addresses.find((item) => item.id === event.target.value) ?? blank);
@@ -82,8 +82,8 @@ export function CheckoutForm({ initialQuote, addresses, account }: { initialQuot
         </>}
       </div>
     </fieldset>
-    <section aria-labelledby="checkout-summary" className="min-w-0 space-y-5 rounded-lg border border-border p-5">
-      <h2 id="checkout-summary" className="text-xl font-semibold">Merchandise summary</h2>
+    <section aria-labelledby="checkout-summary" className="min-w-0 space-y-5 self-start rounded-2xl bg-card p-5 sm:p-6 lg:sticky lg:top-6">
+      <h2 id="checkout-summary" className="text-2xl">Merchandise summary</h2>
       <ul className="space-y-3">
         {quote.cart.items.map((item) => <li key={item.variantId} className="break-words">
           <p>{item.productName} · {item.variantName} × {item.quantity}</p>

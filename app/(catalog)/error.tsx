@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 export default function CatalogError() {
   return (
     <Container className="py-12">
-      <h1 className="text-2xl font-semibold">We could not load the catalog</h1>
+      <h1 className="text-4xl">We could not load the catalog</h1>
       <p role="alert" className="my-5 text-muted-foreground">Please try again in a moment.</p>
       <div className="flex flex-wrap items-center gap-5">
         <Button onClick={() => window.location.reload()}>Try again</Button>

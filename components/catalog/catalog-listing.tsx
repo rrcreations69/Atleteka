@@ -21,11 +21,11 @@ export async function CatalogListing({ query, category, search = false }: {
   const linkQuery = { ...query, category: "", page: 1 };
   const filtered = !!(query.q || query.category || query.availability === "in-stock");
   return (
-    <Container className="py-10 sm:py-16">
-      <h1 className="text-3xl font-semibold tracking-tight sm:text-4xl">{category?.name ?? (search ? "Search" : "Shop")}</h1>
-      {categories.length > 0 && <nav aria-label="Browse categories" className="my-6 flex flex-wrap gap-x-6 gap-y-3 text-sm">
-        <Link href={catalogHref(search ? "/search" : "/shop", linkQuery)} aria-current={!selectedCategory ? "page" : undefined} className="inline-flex min-h-11 items-center underline underline-offset-4">All products</Link>
-        {categories.map((item) => <Link key={item.id} href={catalogHref(`/categories/${item.slug}`, linkQuery)} aria-current={item.id === selectedCategory?.id ? "page" : undefined} className="inline-flex min-h-11 items-center underline underline-offset-4">{item.name}</Link>)}
+    <Container className="py-8 sm:py-12">
+      <h1 className="text-4xl sm:text-5xl">{category?.name ?? (search ? "Search" : "Shop")}</h1>
+      {categories.length > 0 && <nav aria-label="Browse categories" className="my-6 flex flex-wrap gap-2">
+        <Link href={catalogHref(search ? "/search" : "/shop", linkQuery)} aria-current={!selectedCategory ? "page" : undefined} className="inline-flex min-h-11 items-center rounded-full bg-card px-4 text-[0.95rem] font-semibold aria-[current=page]:bg-foreground aria-[current=page]:text-background">All products</Link>
+        {categories.map((item) => <Link key={item.id} href={catalogHref(`/categories/${item.slug}`, linkQuery)} aria-current={item.id === selectedCategory?.id ? "page" : undefined} className="inline-flex min-h-11 items-center rounded-full bg-card px-4 text-[0.95rem] font-semibold aria-[current=page]:bg-foreground aria-[current=page]:text-background">{item.name}</Link>)}
       </nav>}
       <CatalogFilters key={catalogHref(base, query)} base={base} query={query} categories={categories} fixedCategory={!!category} />
       <p className="my-6 text-sm text-muted-foreground">{total} {total === 1 ? "product" : "products"}</p>
