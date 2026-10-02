@@ -4,8 +4,9 @@ import { ProductGrid } from "@/components/catalog/product-grid";
 import { ProductImage } from "@/components/catalog/product-image";
 import { buttonVariants } from "@/components/ui/button";
 import { BrandStatement, ClosingCta, Faq, HowItWorks, WhyAtleteka, type ShopLink } from "@/components/home/landing-sections";
+import { FeaturedHero, type HeroSlide } from "@/components/home/featured-hero";
 import { getCategories, getProducts } from "@/lib/catalog/data";
-import { catalogQuerySchema, priceLabel, type CatalogCategory, type CatalogImage, type CatalogProduct } from "@/lib/catalog/validation";
+import { PAGE_SIZE, catalogQuerySchema, priceLabel, type CatalogCategory, type CatalogImage, type CatalogProduct } from "@/lib/catalog/validation";
 
 // Catalog content refreshes at most once a minute.
 export const revalidate = 60;
@@ -42,43 +43,55 @@ async function withCovers(categories: CatalogCategory[]): Promise<Covered[]> {
   });
 }
 
-// Spotlight: the highest-priced in-stock product with a photo that the hero tiles don't already show.
-function pickSpotlight(products: CatalogProduct[], shown: Set<string>) {
-  return products.filter((product) => product.images.length > 0 && product.variants.some((variant) => variant.inStock) && !shown.has(product.images[0].id))
-    .sort((a, b) => Math.max(...b.variants.map((variant) => variant.price)) - Math.max(...a.variants.map((variant) => variant.price)))[0];
+function firstSentence(text: string) {
+  const paragraph = text.split("\n")[0].trim();
+  return (paragraph.match(/^.*?[.!?](?=\s|$)/)?.[0] ?? paragraph).trim();
+}
+
+// Featured hero: the five highest-priced in-stock pieces with a photo.
+function featuredSlides(products: CatalogProduct[]): HeroSlide[] {
+  const top = (product: CatalogProduct) => Math.max(...product.variants.map((variant) => variant.price));
+  return products.filter((product) => product.images.length > 0 && product.variants.some((variant) => variant.inStock))
+    .sort((a, b) => top(b) - top(a)).slice(0, 5)
+    .map((product) => ({
+      id: product.id, slug: product.slug, name: product.name, price: priceLabel(product.variants),
+      // First sentence of the description keeps the hero copy short.
+      blurb: firstSentence(product.description),
+      sizes: product.variants.map((variant) => ({ title: variant.title, inStock: variant.inStock })),
+      image: product.images[0],
+    }));
 }
 
 export default async function HomePage() {
   const [categories, listing] = await Promise.all([getCategories(), getProducts(firstQuery)]);
+  // The hero considers the whole active catalog, not only the first page.
+  const pages = Math.ceil((listing?.total ?? 0) / PAGE_SIZE);
+  const rest = pages > 1 ? await Promise.all(Array.from({ length: Math.min(pages, 5) - 1 }, (_, i) => getProducts(catalogQuerySchema.parse({ page: i + 2 })))) : [];
+  const catalog = [...(listing?.products ?? []), ...rest.flatMap((page) => page?.products ?? [])];
   const ordered = [...LEAD.map((slug) => categories.find((category) => category.slug === slug)).filter((category) => category !== undefined),
     ...categories.filter((category) => !LEAD.includes(category.slug))].slice(0, 8);
   const covered = await withCovers(ordered);
   const lead = covered.filter((category) => LEAD.includes(category.slug));
   const others = covered.filter((category) => !LEAD.includes(category.slug));
   const products = listing?.products.slice(0, 8) ?? [];
-  const spotlight = pickSpotlight(listing?.products ?? [], new Set(lead.flatMap((category) => category.cover ? [category.cover.id] : [])));
+  const slides = featuredSlides(catalog);
   const shopLinks: ShopLink[] = lead.length > 0
     ? lead.map((category) => ({ href: `/categories/${category.slug}`, label: `Shop ${category.name.toLowerCase()}` }))
     : [{ href: "/shop", label: "Shop the collection" }];
   return (
     <>
-      {lead.length > 0 ? <section aria-labelledby="home-heading" className={"grid " + (lead.length > 1 ? "sm:grid-cols-2" : "")}>
-        <h1 id="home-heading" className="sr-only">Atleteka: everyday clothing for women and men</h1>
+      <h1 className="sr-only">Atleteka: everyday clothing for women and men</h1>
+      <FeaturedHero slides={slides} />
+      {lead.length > 0 ? <section aria-label="Shop by department" className={"grid " + (lead.length > 1 ? "sm:grid-cols-2" : "")}>
         {lead.map((category) => <Link key={category.id} href={`/categories/${category.slug}`} className="group relative block bg-foreground">
-          <ProductImage image={category.cover} sizes="(min-width: 640px) 50vw, 100vw" className="aspect-[4/5] opacity-90 group-hover:opacity-100 sm:aspect-[3/4] lg:aspect-[4/5] lg:max-h-[46rem]" />
+          <ProductImage image={category.cover} sizes="(min-width: 640px) 50vw, 100vw" className="aspect-[4/3] opacity-90 group-hover:opacity-100 lg:aspect-[16/10]" />
           <span aria-hidden="true" className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-[#181a2f]/75 to-transparent" />
           <span className="absolute bottom-6 left-5 text-white sm:bottom-9 sm:left-9">
             <span className="block text-4xl font-semibold tracking-[-0.02em] sm:text-5xl">{category.name}</span>
             <span className={buttonVariants({ variant: "inverse", className: "pointer-events-none mt-4" })}>Shop {category.name.toLowerCase()}</span>
           </span>
         </Link>)}
-      </section> : <section className="bg-navy text-background [--ring:var(--apricot)]">
-        <Container className="py-20 sm:py-28">
-          <p className="eyebrow text-xs text-apricot">New season</p>
-          <h1 className="mt-4 max-w-2xl text-display">Everyday clothing for women and men.</h1>
-          <Link href="/shop" className={buttonVariants({ variant: "inverse", className: "mt-8" })}>Shop the collection</Link>
-        </Container>
-      </section>}
+      </section> : null}
 
       <BrandStatement />
 
@@ -93,20 +106,6 @@ export default async function HomePage() {
         <ProductGrid products={products} />
       </Container>
 
-      {spotlight && <section aria-labelledby="spotlight-heading">
-        <Container className="mt-16 grid items-center gap-8 sm:mt-24 lg:grid-cols-2 lg:gap-16">
-          <Link href={`/products/${spotlight.slug}`} className="block" tabIndex={-1} aria-hidden="true">
-            <ProductImage image={spotlight.images[0]} sizes="(min-width: 1024px) 50vw, 100vw" />
-          </Link>
-          <div>
-            <p className="eyebrow text-xs text-primary">Spotlight</p>
-            <h2 id="spotlight-heading" className="mt-3 text-3xl sm:text-4xl">{spotlight.name}</h2>
-            <p className="mt-3 text-lg font-semibold">{priceLabel(spotlight.variants)}</p>
-            {spotlight.description && <p className="mt-5 max-w-md leading-relaxed text-muted-foreground">{spotlight.description.split("\n")[0]}</p>}
-            <Link href={`/products/${spotlight.slug}`} className={buttonVariants({ className: "mt-8" })}>Shop now</Link>
-          </div>
-        </Container>
-      </section>}
 
       {others.length > 0 && <Container className="mt-16 sm:mt-24">
         <p className="eyebrow text-xs text-primary">Categories</p>
