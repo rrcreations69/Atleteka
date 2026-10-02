@@ -1,6 +1,8 @@
 // Seeds the demo catalog (categories, products, variants, stock, images). Safe to re-run: rows are
 // upserted by slug/SKU and images are only uploaded for products that have none.
-// Usage: node --env-file=.env.local scripts/demo-catalog/seed.mjs [imageDir]
+// Usage: node --env-file=.env.local scripts/demo-catalog/seed.mjs [imageDir] [--replace-images]
+// --replace-images uploads the current files under new versioned paths, repoints the existing rows
+// and removes the old objects (new paths avoid stale CDN copies).
 // Uses the service role key from the environment; it is never printed.
 import { readFile } from "node:fs/promises";
 import path from "node:path";
@@ -10,7 +12,10 @@ import { CATEGORIES, PRODUCTS, RETIRED_CATEGORY_SLUGS, RETIRED_PRODUCT_SLUGS } f
 const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
 if (!url || !key) throw new Error("NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY are required.");
-const imageDir = process.argv[2] ?? path.join(".verification", "demo-catalog");
+const args = process.argv.slice(2);
+const replaceImages = args.includes("--replace-images");
+const imageDir = args.find((arg) => !arg.startsWith("--")) ?? path.join(".verification", "demo-catalog");
+const IMAGE_VERSION = "v2";
 const db = createClient(url, key, { auth: { persistSession: false } });
 
 function check(result, what) {
@@ -38,15 +43,25 @@ for (const item of PRODUCTS) {
   check(await db.from("product_categories").delete().eq("product_id", product.id), `clear categories ${item.slug}`);
   check(await db.from("product_categories").insert(item.categories.map((slug) => ({ product_id: product.id, category_id: categoryId[slug] }))), `categories ${item.slug}`);
 
-  const existing = check(await db.from("product_images").select("id").eq("product_id", product.id), `images ${item.slug}`);
+  const existing = check(await db.from("product_images").select("id,storage_path,sort_order").eq("product_id", product.id).order("sort_order"), `images ${item.slug}`);
+  if (replaceImages && existing.length > 0) {
+    for (const row of existing.slice(0, 2)) {
+      const storagePath = `products/${product.id}/demo-${IMAGE_VERSION}-${row.sort_order + 1}.webp`;
+      if (row.storage_path === storagePath) continue;
+      const bytes = await readFile(path.join(imageDir, `${item.slug}-${row.sort_order + 1}.webp`));
+      check(await db.storage.from("product-images").upload(storagePath, bytes, { contentType: "image/webp", upsert: true }), `upload ${item.slug}`);
+      check(await db.from("product_images").update({ storage_path: storagePath }).eq("id", row.id), `repoint ${item.slug}`);
+      check(await db.storage.from("product-images").remove([row.storage_path]), `remove old ${item.slug}`);
+    }
+  }
   if (existing.length === 0) {
     for (const [index, view] of ["front view", "detail"].entries()) {
-      const storagePath = `products/${product.id}/demo-${index + 1}.webp`;
+      const storagePath = `products/${product.id}/demo-${IMAGE_VERSION}-${index + 1}.webp`;
       const bytes = await readFile(path.join(imageDir, `${item.slug}-${index + 1}.webp`));
       check(await db.storage.from("product-images").upload(storagePath, bytes, { contentType: "image/webp", upsert: true }), `upload ${item.slug}`);
       check(await db.from("product_images").insert({ product_id: product.id, storage_path: storagePath, alt_text: `${item.name}, ${view}`, sort_order: index }), `image row ${item.slug}`);
     }
   }
-  console.log(`${item.slug}: ${variants.length} sizes, ${existing.length === 0 ? "2 images uploaded" : "images kept"}`);
+  console.log(`${item.slug}: ${variants.length} sizes, ${existing.length === 0 ? "2 images uploaded" : replaceImages ? "images replaced" : "images kept"}`);
 }
 console.log(`Done: ${CATEGORIES.length} categories, ${PRODUCTS.length} products.`);

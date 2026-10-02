@@ -1,4 +1,5 @@
-// Draws flat-lay product illustrations for the demo catalog and writes WebP files (1200×1500).
+// Draws flat-lay product illustrations for the demo catalog and writes transparent WebP cut-outs
+// (1200×1500). The storefront supplies the backdrop: --photo on cards, the slide color in the hero.
 // Usage: node scripts/demo-catalog/generate-images.mjs [outDir]
 import { mkdir, writeFile } from "node:fs/promises";
 import path from "node:path";
@@ -145,7 +146,6 @@ function svgFor(product) {
     <clipPath id="garment">${body}</clipPath>
     <linearGradient id="light" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff" stop-opacity="0.10"/><stop offset="0.7" stop-color="#fff" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity="0.06"/></linearGradient>
   </defs>
-  <rect width="${W}" height="${H}" fill="${product.bg}"/>
   <g transform="translate(14 26)" fill="#000" opacity="0.16" filter="url(#shadow)">${body}</g>
   <g fill="${product.color}">${body}</g>
   <rect width="${W}" height="${H}" fill="${product.color}" clip-path="url(#garment)" filter="url(#weave)"/>
@@ -160,8 +160,8 @@ const DETAIL = { left: 300, top: 200, width: 600, height: 750 };
 await mkdir(outDir, { recursive: true });
 for (const product of PRODUCTS) {
   const png = await sharp(Buffer.from(svgFor(product))).png().toBuffer();
-  const front = await sharp(png).webp({ quality: 86 }).toBuffer();
-  const detail = await sharp(png).extract(DETAIL).resize(W, H).webp({ quality: 86 }).toBuffer();
+  const front = await sharp(png).webp({ quality: 86, alphaQuality: 90 }).toBuffer();
+  const detail = await sharp(png).extract(DETAIL).resize(W, H).webp({ quality: 86, alphaQuality: 90 }).toBuffer();
   await writeFile(path.join(outDir, `${product.slug}-1.webp`), front);
   await writeFile(path.join(outDir, `${product.slug}-2.webp`), detail);
   console.log(`${product.slug}: ${(front.length / 1024).toFixed(0)} KB + ${(detail.length / 1024).toFixed(0)} KB`);
