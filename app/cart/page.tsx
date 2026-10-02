@@ -3,6 +3,7 @@ import { Container } from "@/components/layout/container";
 import { CartForm } from "@/components/cart/cart-form";
 import { getCart, CartAccessError } from "@/lib/cart/data";
 import { formatPrice } from "@/lib/catalog/validation";
+import { buttonVariants } from "@/components/ui/button";
 
 export const dynamic = "force-dynamic";
 export const metadata = { title: "Cart | Atleteka" };
@@ -14,7 +15,7 @@ export default async function CartPage() {
   } catch (error) {
     if (!(error instanceof CartAccessError)) throw error;
     return <Container className="space-y-5 py-12">
-      <h1 className="text-3xl font-semibold">Your cart</h1>
+      <h1 className="text-4xl">Your cart</h1>
       <p role="alert">{error.message}</p>
       <Link href="/login" className="underline underline-offset-4">Sign in</Link>
       <p><a href="/cart" className="underline underline-offset-4">Refresh cart</a></p>
@@ -22,22 +23,22 @@ export default async function CartPage() {
   }
   const { cart, kind } = result;
   return (
-    <Container className="space-y-8 py-10 sm:py-16">
+    <Container className="max-w-3xl space-y-6 py-8 sm:py-12">
       <div className="space-y-3">
-        <h1 className="text-3xl font-semibold tracking-tight">Your cart</h1>
+        <h1 className="text-4xl sm:text-5xl">Your cart</h1>
         <p className="text-sm text-muted-foreground">{kind === "guest"
           ? "Your guest cart is saved in this browser for 30 days. Signing in opens your separate account cart."
           : "This is your account cart. Your guest cart stays separate in this browser."}</p>
       </div>
-      {cart.items.length === 0 ? <div className="space-y-4">
-        <p>Your cart is empty.</p>
-        <Link href="/shop" className="inline-flex min-h-11 items-center underline underline-offset-4">Browse products</Link>
+      {cart.items.length === 0 ? <div className="space-y-5 rounded-2xl bg-card p-8 text-center">
+        <p className="text-lg">Your cart is empty.</p>
+        <Link href="/shop" className={buttonVariants()}>Browse products</Link>
       </div> : <>
-        <ul className="space-y-5">
-          {cart.items.map((item) => <li key={item.variantId} className="grid gap-5 rounded-lg border border-border p-5 sm:grid-cols-[1fr_auto]">
+        <ul className="space-y-3">
+          {cart.items.map((item) => <li key={item.variantId} className="grid gap-5 rounded-2xl bg-card p-5 sm:grid-cols-[1fr_auto]">
             <div className="min-w-0 space-y-2">
-              <h2 className="break-words text-xl font-semibold">{item.productSlug
-                ? <Link href={"/products/" + item.productSlug} className="underline underline-offset-4">{item.productName}</Link>
+              <h2 className="break-words font-sans text-lg font-semibold [font-variation-settings:normal]">{item.productSlug
+                ? <Link href={"/products/" + item.productSlug} className="underline-offset-4 hover:underline">{item.productName}</Link>
                 : item.productName}</h2>
               <p className="break-words text-muted-foreground">{item.variantName}</p>
               <p>Unit price: {item.unitPrice === null ? "Unavailable" : formatPrice(item.unitPrice)}</p>
@@ -53,12 +54,13 @@ export default async function CartPage() {
             </div>
           </li>)}
         </ul>
-        <section aria-labelledby="cart-subtotal" className="space-y-3 border-t border-border pt-6">
-          <h2 id="cart-subtotal" className="text-xl font-semibold">Subtotal: {formatPrice(cart.subtotal)}</h2>
+        <section aria-labelledby="cart-subtotal" className="space-y-3 rounded-2xl bg-card p-5">
+          <h2 id="cart-subtotal" className="flex items-baseline justify-between gap-4 text-2xl"><span>Subtotal</span><span>{formatPrice(cart.subtotal)}</span></h2>
+          <p className="text-sm text-muted-foreground">Shipping is paid to the courier on delivery. Prices include tax.</p>
           <p className="text-sm text-muted-foreground">Prices and availability are checked when your cart loads or changes. Items are not reserved. Unavailable product prices are excluded.</p>
           <a href="/cart" className="inline-flex min-h-11 items-center text-sm underline underline-offset-4">Refresh prices and availability</a>
         </section>
-        <div className="flex flex-wrap gap-6"><Link href="/checkout" className="inline-flex min-h-11 items-center underline underline-offset-4">Continue to checkout</Link><Link href="/shop" className="inline-flex min-h-11 items-center underline underline-offset-4">Continue shopping</Link></div>
+        <div className="flex flex-col gap-3 sm:flex-row"><Link href="/checkout" className={buttonVariants({ className: "sm:flex-1" })}>Continue to checkout</Link><Link href="/shop" className={buttonVariants({ variant: "outline" })}>Continue shopping</Link></div>
       </>}
     </Container>
   );

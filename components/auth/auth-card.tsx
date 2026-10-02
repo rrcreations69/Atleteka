@@ -7,9 +7,9 @@ export function AuthCard({ title, description, children }: {
 }) {
   return (
     <Container className="py-12 sm:py-20">
-      <Card className="mx-auto max-w-md">
+      <Card className="mx-auto max-w-md border-0">
         <CardHeader>
-          <h1 className="text-2xl font-semibold tracking-tight">{title}</h1>
+          <h1 className="text-3xl">{title}</h1>
           <CardDescription>{description}</CardDescription>
         </CardHeader>
         <CardContent>{children}</CardContent>

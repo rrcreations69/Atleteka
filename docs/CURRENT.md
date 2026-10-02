@@ -49,6 +49,10 @@ Removed from Production: NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY, STRIPE_SECRET_KEY, 
 - Production smoke test: pages 200, missing product/category 404, /account redirects to /login, security headers present, canonical URLs on atleteka.vercel.app. The webhook answers 500 not_configured until the live PAYMONGO_WEBHOOK_SECRET is set (expected).
 - Latency: functions ran in iad1 (US East) while Supabase is in ap-southeast-1, so warm catalog pages took 1.2-2.9 s. The dashboard region change did not save, so vercel.json now pins functions to sin1 (Singapore).
 
+## Design refresh (2026-10-02, branch feat/design-warm-lifestyle)
+
+Approved direction D-DESIGN-01 (DECISIONS.md). Implemented: theme tokens and fonts, buttons/inputs/cards, header (category navigation) and footer, home (hero, category tiles, product grid, trust notes), catalog listing, product page (option pills), cart, checkout, payment submitted, auth card, catalog and root not-found pages. Local production build checks: no horizontal overflow at 320 px on home, shop, cart, checkout, login and product; one visible h1 and one main per page; no unlabeled controls. Known, pre-existing: the missing-product 404 renders its message client-side (server HTML body empty; status 404 is correct).
+
 ## M16 CHECKPOINT
 
 - Completed: automated checks, not-found fix, SEO basics, responsive/accessibility/performance sanity, E2E critical path on the M16 preview.

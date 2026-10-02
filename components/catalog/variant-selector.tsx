@@ -1,26 +1,37 @@
 "use client";
 
-import { useState } from "react";
+import { useId, useState } from "react";
 import { CartForm } from "@/components/cart/cart-form";
-import { Label } from "@/components/ui/label";
 import { formatPrice, priceLabel, type CatalogVariant } from "@/lib/catalog/validation";
 
 export function VariantSelector({ variants }: { variants: CatalogVariant[] }) {
   const [selectedId, setSelectedId] = useState(variants.length === 1 ? variants[0].id : "");
   const selected = variants.find((variant) => variant.id === selectedId);
+  const group = useId();
   return (
-    <div className="space-y-5">
-      {variants.length > 0 && <div className="space-y-2">
-        <Label htmlFor="variant">Choose an option</Label>
-        <select id="variant" value={selectedId} onChange={(event) => setSelectedId(event.target.value)} className="min-h-11 w-full rounded-md border border-input bg-background px-3 py-2 text-sm" aria-describedby="variant-status">
-          <option value="">Select an option</option>
-          {variants.map((variant) => <option key={variant.id} value={variant.id}>{variant.title}{variant.inStock ? "" : " - Sold out"}</option>)}
-        </select>
-      </div>}
-      <div id="variant-status" aria-live="polite" aria-atomic="true" className="space-y-2">
+    <div className="space-y-6">
+      <div id="variant-status" aria-live="polite" aria-atomic="true" className="space-y-1">
         <p className="text-2xl font-semibold">{selected ? formatPrice(selected.price) : priceLabel(variants)}</p>
-        <p className="text-sm text-muted-foreground">{selected ? selected.inStock ? "In stock" : "Sold out" : variants.length ? "Select an option to see availability." : "This product is currently unavailable."}</p>
+        <p className="text-sm text-muted-foreground">Tax included · Shipping paid to the courier on delivery</p>
       </div>
+      {variants.length > 0 && <fieldset className="space-y-3" aria-describedby="variant-availability">
+        <div className="flex items-baseline justify-between gap-4">
+          <legend className="text-[0.95rem] font-semibold">{selected ? `Option: ${selected.title}` : "Choose an option"}</legend>
+          <p id="variant-availability" className={selected?.inStock ? "text-sm font-semibold text-success" : "text-sm text-muted-foreground"}>
+            {selected ? selected.inStock ? "In stock" : "Sold out" : "Select an option to see availability."}
+          </p>
+        </div>
+        <div className="flex flex-wrap gap-2">
+          {variants.map((variant) => <div key={variant.id}>
+            <input type="radio" id={`${group}-${variant.id}`} name={group} value={variant.id} checked={selectedId === variant.id}
+              onChange={() => setSelectedId(variant.id)} className="peer sr-only" />
+            <label htmlFor={`${group}-${variant.id}`} className={"inline-flex min-h-12 min-w-14 cursor-pointer items-center justify-center rounded-xl border-[1.5px] border-input bg-card px-4 text-[0.95rem] font-semibold peer-checked:border-foreground peer-checked:bg-foreground peer-checked:text-background peer-focus-visible:outline-2 peer-focus-visible:outline-offset-3 peer-focus-visible:outline-ring" + (variant.inStock ? "" : " text-muted-foreground line-through")}>
+              {variant.title}<span className="sr-only">{variant.inStock ? "" : " (sold out)"}</span>
+            </label>
+          </div>)}
+        </div>
+      </fieldset>}
+      {variants.length === 0 && <p className="text-sm text-muted-foreground">This product is currently unavailable.</p>}
       <CartForm key={selectedId} variantId={selectedId} operation="add" disabled={!selected?.inStock} />
     </div>
   );
