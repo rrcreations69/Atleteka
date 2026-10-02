@@ -43,6 +43,12 @@ Functional test (2026-09-30, M16 preview, the user paid with the test card as th
 
 Removed from Production: NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY, STRIPE_SECRET_KEY, STRIPE_WEBHOOK_SECRET, SENTRY_DSN. Set (values from .env.local, never printed): NEXT_PUBLIC_APP_URL=https://atleteka.vercel.app, NEXT_PUBLIC_SUPABASE_URL, NEXT_PUBLIC_SUPABASE_ANON_KEY, NEXT_PUBLIC_SENTRY_DSN, EMAIL_FROM (Resend test sender per M16-P01), SUPABASE_SERVICE_ROLE_KEY and RESEND_API_KEY (sensitive). Still missing, entered by the user: PAYMONGO_SECRET_KEY (live) and PAYMONGO_WEBHOOK_SECRET (live webhook). Done via a user-added permission rule in the outer folder's .claude/settings.local.json.
 
+## Merge and production deploy (2026-09-30 to 2026-10-02)
+
+- PRs #2 to #10 merged into main in order (merge commits, branches kept); main e7e5e9f is identical to feat/m16-qa-launch. Production https://atleteka.vercel.app deployed from it.
+- Production smoke test: pages 200, missing product/category 404, /account redirects to /login, security headers present, canonical URLs on atleteka.vercel.app. The webhook answers 500 not_configured until the live PAYMONGO_WEBHOOK_SECRET is set (expected).
+- Latency: functions ran in iad1 (US East) while Supabase is in ap-southeast-1, so warm catalog pages took 1.2-2.9 s. The dashboard region change did not save, so vercel.json now pins functions to sin1 (Singapore).
+
 ## M16 CHECKPOINT
 
 - Completed: automated checks, not-found fix, SEO basics, responsive/accessibility/performance sanity, E2E critical path on the M16 preview.
