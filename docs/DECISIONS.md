@@ -228,3 +228,14 @@ Status: **Approved** by the user on 2026-10-02 (explicit session replies: the wa
 - Home: Women/Men hero tiles and category tiles use a product photo from that category (categories have no image field); picks prefer category-specific, signature products and avoid repeats.
 - Clothing sizes sort XS → XL (other option names stay alphabetical).
 - **Demo catalog (presentation only):** scripts/demo-catalog seeds 6 categories (Women, Men, Tops, Bottoms, Outerwear, Accessories) and 14 products with sizes, stock and 2 generated flat-lay illustrations each (generate-images.mjs, sharp; no third-party photos). Development fixtures and the hoodies / m02-training categories were set inactive, not deleted. Replace the demo products and illustrations with real products and photos before launch.
+
+## D-DESIGN-03 navy and crimson palette - 2026-10-02
+
+Status: **Approved** by the user on 2026-10-02 (explicit session reply: attached a six-color palette, "analyze it well and apply it on my website"). Keeps the Studio layout, type and shapes of D-DESIGN-02; replaces its colors.
+- Midnight ink #181A2F: text, announcement bar, footer, selected options, hero surfaces. Navy #242E49: dark fallback hero. Slate #37415C: secondary text. Crimson #B4182D: primary actions and section labels; wine #54162B: primary hover. Apricot #FDA481: accents on dark surfaces only (about 1.9:1 on white, so never on light backgrounds).
+- Derived neutrals: paper #F3F4F7, hairline #E3E5EB, photo #ECEEF1, form borders #7D8499 (3.7:1). Contrast: ink/white 17.1, slate/white 10.1, white/crimson 6.8, apricot/ink 8.8. Focus rings switch to apricot on the dark footer.
+- Error text uses crimson as well; errors are always worded, so color is never the only signal.
+
+## Demo checkout on production - 2026-10-02
+
+Status: **Approved** by explicit user instruction ("make checkout demo-able on the live site with test keys"). Vercel Production uses the PayMongo test secret key and the test webhook secret; the test webhook hook_e5HJPTAUgtKmM1aEQBx28Lz2 points to https://atleteka.vercel.app/api/paymongo/webhook (the M16 preview no longer receives events). No real payment is possible on the live site until launch, when the live key, a live webhook and its secret replace these.

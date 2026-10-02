@@ -57,6 +57,14 @@ Approved direction D-DESIGN-01 (DECISIONS.md). Implemented: theme tokens and fon
 
 D-DESIGN-02 (DECISIONS.md) replaces the warm design. Demo catalog seeded on the hosted database with `node --env-file=.env.local scripts/demo-catalog/seed.mjs` after `node scripts/demo-catalog/generate-images.mjs` (images in ignored .verification/demo-catalog): 6 categories, 14 products, 62 variants with stock (some sizes sold out; the bucket hat is fully sold out), 28 images. Checks: lint, typecheck, 53 tests, build; local production server shows distinct cover photos (Women: Cropped Denim Jacket, Men: Relaxed Chino), sizes XS → XL, desktop navigation without overlap.
 
+## Demo checkout on production (2026-10-02)
+
+Production runs in PayMongo test mode for presentations (DECISIONS.md "Demo checkout on production"). Verified end to end in the user's Chrome: option pills select a size and enable Add to cart; cart remove and quantity update work; checkout quote PHP 3,870.00; PayMongo test card payment; webhook order F19705A8 (guest, paid, one order for the session), stock Utility Overshirt XL 2 → 1 and Heavyweight Crew Tee M 14 → 12, confirmation email sent. Demo test card 4343 4343 4343 4345, any future expiry, any CVC. Before launch: live PAYMONGO_SECRET_KEY, live webhook and its PAYMONGO_WEBHOOK_SECRET in Production.
+
+## Navy and crimson palette (2026-10-02, branch feat/design-navy-crimson)
+
+D-DESIGN-03 recolors the Studio design with the user's palette (tokens in app/globals.css).
+
 ## M16 CHECKPOINT
 
 - Completed: automated checks, not-found fix, SEO basics, responsive/accessibility/performance sanity, E2E critical path on the M16 preview.

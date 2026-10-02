@@ -26,7 +26,7 @@ export async function SiteHeader() {
   const links = [...categories.map((category) => ({ href: `/categories/${category.slug}`, label: category.name })), { href: "/shop", label: "Shop all" }];
   return (
     <header id="top" className="border-b border-border bg-background">
-      <p className="eyebrow bg-foreground px-4 py-2.5 text-center text-[0.6875rem] font-medium text-background">Nationwide delivery · Shipping paid on delivery</p>
+      <p className="eyebrow bg-foreground px-4 py-2.5 text-center text-[0.6875rem] font-medium text-apricot">Nationwide delivery · Shipping paid on delivery</p>
       <Container className="grid min-h-16 grid-cols-[1fr_auto] items-center gap-4 py-2 lg:grid-cols-[1fr_auto_1fr]">
         <nav aria-label="Main navigation" className="hidden items-center gap-7 lg:flex">
           {/* Desktop shows the first three categories so the centered logo never collides. */}
