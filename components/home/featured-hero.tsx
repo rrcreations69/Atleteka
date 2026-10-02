@@ -58,13 +58,13 @@ export function FeaturedHero({ slides }: { slides: HeroSlide[] }) {
           <span aria-hidden="true" className="pointer-events-none absolute inset-x-0 top-1/2 -translate-y-1/2 select-none whitespace-nowrap text-center text-[clamp(5rem,17vw,15rem)] font-bold leading-none tracking-[-0.04em] text-white/[0.07]">
             {slide.name}
           </span>
-          <div className="relative mx-auto grid min-h-[38rem] max-w-6xl gap-6 px-5 pb-28 pt-16 sm:px-8 lg:min-h-[40rem] lg:grid-cols-[1fr_1.15fr_0.8fr] lg:items-center lg:gap-10 lg:px-12 lg:pb-24 lg:pt-16">
+          <div className="relative mx-auto grid min-h-[36rem] max-w-6xl gap-6 px-5 pb-24 pt-10 sm:px-8 lg:min-h-[34rem] lg:grid-cols-[1fr_1.15fr_0.8fr] lg:items-center lg:gap-10 lg:px-12 lg:pb-24 lg:pt-8">
             <div className="relative order-2 lg:order-1">
               <h2 className="text-[clamp(2.25rem,5vw,3.75rem)] font-semibold leading-[1.02] tracking-[-0.03em]">{slide.name}</h2>
               <p className="mt-4 max-w-sm text-base leading-relaxed text-white/80">{slide.blurb}</p>
               <Link href={`/products/${slide.slug}`} tabIndex={index === active ? 0 : -1} className={buttonVariants({ variant: "inverse", className: "mt-7" })}>Shop now</Link>
             </div>
-            <div className="relative order-1 mx-auto aspect-[4/5] w-full max-w-[19rem] sm:max-w-sm lg:order-2 lg:max-w-none">
+            <div className="relative order-1 mx-auto aspect-[4/5] w-full max-w-[17rem] sm:max-w-xs lg:order-2 lg:max-w-[24rem]">
               <span aria-hidden="true" className="absolute inset-[8%] rounded-full bg-white/[0.09]" />
               <Image src={slide.image.url} alt={slide.image.alt} fill unoptimized priority={index === 0}
                 sizes="(min-width: 1024px) 40vw, 80vw" className="object-contain drop-shadow-[0_30px_40px_rgba(0,0,0,0.35)]" />
@@ -97,7 +97,7 @@ export function FeaturedHero({ slides }: { slides: HeroSlide[] }) {
             <p aria-live="polite" className="ml-1 text-sm tabular-nums text-white/80">{active + 1} of {slides.length}</p>
           </div>
           <button type="button" onClick={() => go(active + 1)} className="pointer-events-auto hidden items-center gap-3 rounded-sm bg-white/10 p-2 pr-4 text-left hover:bg-white/15 sm:flex">
-            <span className="relative block size-14 shrink-0"><Image src={next.image.url} alt="" fill unoptimized sizes="56px" className="object-contain" /></span>
+            <span className="relative block size-14 shrink-0 rounded-sm bg-photo"><Image src={next.image.url} alt="" fill unoptimized sizes="56px" className="object-contain p-1" /></span>
             <span className="text-sm"><span className="block text-white/70">Next</span><span className="block font-semibold">{next.name}</span></span>
           </button>
         </div>
