@@ -65,7 +65,7 @@ export function FeaturedHero({ slides }: { slides: HeroSlide[] }) {
               <Link href={`/products/${slide.slug}`} tabIndex={index === active ? 0 : -1} className={buttonVariants({ variant: "inverse", className: "mt-7" })}>Shop now</Link>
             </div>
             <div className="relative order-1 mx-auto aspect-[4/5] w-full max-w-[17rem] sm:max-w-xs lg:order-2 lg:max-w-[24rem]">
-              <span aria-hidden="true" className="absolute inset-[8%] rounded-full bg-white/[0.09]" />
+              <span aria-hidden="true" className="absolute left-1/2 top-1/2 aspect-square w-[88%] -translate-x-1/2 -translate-y-1/2 rounded-full bg-white/[0.09]" />
               <Image src={slide.image.url} alt={slide.image.alt} fill unoptimized priority={index === 0}
                 sizes="(min-width: 1024px) 40vw, 80vw" className="object-contain drop-shadow-[0_30px_40px_rgba(0,0,0,0.35)]" />
             </div>
