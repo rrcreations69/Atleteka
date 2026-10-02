@@ -3,8 +3,9 @@ import { Container } from "@/components/layout/container";
 import { ProductGrid } from "@/components/catalog/product-grid";
 import { ProductImage } from "@/components/catalog/product-image";
 import { buttonVariants } from "@/components/ui/button";
+import { BrandStatement, ClosingCta, Faq, HowItWorks, WhyAtleteka, type ShopLink } from "@/components/home/landing-sections";
 import { getCategories, getProducts } from "@/lib/catalog/data";
-import { catalogQuerySchema, type CatalogCategory, type CatalogImage } from "@/lib/catalog/validation";
+import { catalogQuerySchema, priceLabel, type CatalogCategory, type CatalogImage, type CatalogProduct } from "@/lib/catalog/validation";
 
 // Catalog content refreshes at most once a minute.
 export const revalidate = 60;
@@ -41,6 +42,12 @@ async function withCovers(categories: CatalogCategory[]): Promise<Covered[]> {
   });
 }
 
+// Spotlight: the highest-priced in-stock product with a photo that the hero tiles don't already show.
+function pickSpotlight(products: CatalogProduct[], shown: Set<string>) {
+  return products.filter((product) => product.images.length > 0 && product.variants.some((variant) => variant.inStock) && !shown.has(product.images[0].id))
+    .sort((a, b) => Math.max(...b.variants.map((variant) => variant.price)) - Math.max(...a.variants.map((variant) => variant.price)))[0];
+}
+
 export default async function HomePage() {
   const [categories, listing] = await Promise.all([getCategories(), getProducts(firstQuery)]);
   const ordered = [...LEAD.map((slug) => categories.find((category) => category.slug === slug)).filter((category) => category !== undefined),
@@ -49,6 +56,10 @@ export default async function HomePage() {
   const lead = covered.filter((category) => LEAD.includes(category.slug));
   const others = covered.filter((category) => !LEAD.includes(category.slug));
   const products = listing?.products.slice(0, 8) ?? [];
+  const spotlight = pickSpotlight(listing?.products ?? [], new Set(lead.flatMap((category) => category.cover ? [category.cover.id] : [])));
+  const shopLinks: ShopLink[] = lead.length > 0
+    ? lead.map((category) => ({ href: `/categories/${category.slug}`, label: `Shop ${category.name.toLowerCase()}` }))
+    : [{ href: "/shop", label: "Shop the collection" }];
   return (
     <>
       {lead.length > 0 ? <section aria-labelledby="home-heading" className={"grid " + (lead.length > 1 ? "sm:grid-cols-2" : "")}>
@@ -61,27 +72,45 @@ export default async function HomePage() {
             <span className={buttonVariants({ variant: "inverse", className: "pointer-events-none mt-4" })}>Shop {category.name.toLowerCase()}</span>
           </span>
         </Link>)}
-      </section> : <section className="bg-navy text-background">
+      </section> : <section className="bg-navy text-background [--ring:var(--apricot)]">
         <Container className="py-20 sm:py-28">
           <p className="eyebrow text-xs text-apricot">New season</p>
-          <h1 className="mt-4 max-w-2xl text-display">Everyday pieces, made to last.</h1>
+          <h1 className="mt-4 max-w-2xl text-display">Everyday clothing for women and men.</h1>
           <Link href="/shop" className={buttonVariants({ variant: "inverse", className: "mt-8" })}>Shop the collection</Link>
         </Container>
       </section>}
 
-      <Container className="mt-14 sm:mt-20">
+      <BrandStatement />
+
+      <Container className="mt-16 sm:mt-24">
         <div className="mb-6 flex items-end justify-between gap-4">
           <div>
             <p className="eyebrow text-xs text-primary">The collection</p>
-            <h2 className="mt-2 text-2xl sm:text-3xl">Everyday pieces, made to last.</h2>
+            <h2 className="mt-2 text-2xl sm:text-3xl">Pieces for every day.</h2>
           </div>
           <Link href="/shop" className="inline-flex min-h-11 shrink-0 items-center text-sm font-semibold underline underline-offset-4">View all</Link>
         </div>
         <ProductGrid products={products} />
       </Container>
 
-      {others.length > 0 && <Container className="mt-16 sm:mt-20">
-        <h2 className="eyebrow mb-6 text-xs tracking-[0.12em]">Shop by category</h2>
+      {spotlight && <section aria-labelledby="spotlight-heading">
+        <Container className="mt-16 grid items-center gap-8 sm:mt-24 lg:grid-cols-2 lg:gap-16">
+          <Link href={`/products/${spotlight.slug}`} className="block" tabIndex={-1} aria-hidden="true">
+            <ProductImage image={spotlight.images[0]} sizes="(min-width: 1024px) 50vw, 100vw" />
+          </Link>
+          <div>
+            <p className="eyebrow text-xs text-primary">Spotlight</p>
+            <h2 id="spotlight-heading" className="mt-3 text-3xl sm:text-4xl">{spotlight.name}</h2>
+            <p className="mt-3 text-lg font-semibold">{priceLabel(spotlight.variants)}</p>
+            {spotlight.description && <p className="mt-5 max-w-md leading-relaxed text-muted-foreground">{spotlight.description.split("\n")[0]}</p>}
+            <Link href={`/products/${spotlight.slug}`} className={buttonVariants({ className: "mt-8" })}>Shop now</Link>
+          </div>
+        </Container>
+      </section>}
+
+      {others.length > 0 && <Container className="mt-16 sm:mt-24">
+        <p className="eyebrow text-xs text-primary">Categories</p>
+        <h2 className="mb-6 mt-2 text-2xl sm:text-3xl">Shop by category.</h2>
         <ul className="grid grid-cols-2 gap-x-2 gap-y-6 sm:gap-x-3 lg:grid-cols-4">
           {others.map((category) => <li key={category.id}>
             <Link href={`/categories/${category.slug}`} className="group block">
@@ -92,13 +121,10 @@ export default async function HomePage() {
         </ul>
       </Container>}
 
-      <Container className="mt-16 sm:mt-20">
-        <ul className="grid gap-6 border-t border-border pt-8 sm:grid-cols-3">
-          <li><h2 className="eyebrow text-xs tracking-[0.12em]">Pay your way</h2><p className="mt-2 text-sm leading-relaxed text-muted-foreground">Card, QR Ph and e-wallets, secured by PayMongo.</p></li>
-          <li><h2 className="eyebrow text-xs tracking-[0.12em]">Delivered nationwide</h2><p className="mt-2 text-sm leading-relaxed text-muted-foreground">You pay the courier for shipping when your order arrives.</p></li>
-          <li><h2 className="eyebrow text-xs tracking-[0.12em]">No account needed</h2><p className="mt-2 text-sm leading-relaxed text-muted-foreground">Check out as a guest. Prices include tax.</p></li>
-        </ul>
-      </Container>
+      <WhyAtleteka />
+      <HowItWorks />
+      <Faq />
+      <ClosingCta links={shopLinks} />
     </>
   );
 }

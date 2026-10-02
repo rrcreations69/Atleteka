@@ -239,3 +239,7 @@ Status: **Approved** by the user on 2026-10-02 (explicit session reply: attached
 ## Demo checkout on production - 2026-10-02
 
 Status: **Approved** by explicit user instruction ("make checkout demo-able on the live site with test keys"). Vercel Production uses the PayMongo test secret key and the test webhook secret; the test webhook hook_e5HJPTAUgtKmM1aEQBx28Lz2 points to https://atleteka.vercel.app/api/paymongo/webhook (the M16 preview no longer receives events). No real payment is possible on the live site until launch, when the live key, a live webhook and its secret replace these.
+
+## D-DESIGN-04 landing-style home page - 2026-10-02
+
+Status: **Approved** by the user on 2026-10-02 (explicit session replies: "create me a landing page for it"; chose "Richer home page" on the live site). Content only, no new features: Women/Men hero, brand statement band, collection grid, spotlight product (highest-priced in-stock product with a photo not shown in the hero), category tiles, Why Atleteka (four facts), How it works (three steps), FAQ (shipping, payment, accounts, tax, delivery area) and a closing call to action. Copy states only what the store does; no returns policy or quality claims are stated because none are defined. Sections live in components/home/landing-sections.tsx.

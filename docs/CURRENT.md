@@ -65,6 +65,10 @@ Production runs in PayMongo test mode for presentations (DECISIONS.md "Demo chec
 
 D-DESIGN-03 recolors the Studio design with the user's palette (tokens in app/globals.css).
 
+## Landing-style home page (2026-10-02, branch feat/home-landing)
+
+D-DESIGN-04. Local production check: section order hero, brand statement, collection, spotlight (Oxford Button-Down), categories, Why Atleteka, How it works, FAQ (5), closing CTA (Shop women / Shop men); one h1; no horizontal overflow; apricot focus rings on the dark bands.
+
 ## M16 CHECKPOINT
 
 - Completed: automated checks, not-found fix, SEO basics, responsive/accessibility/performance sanity, E2E critical path on the M16 preview.
