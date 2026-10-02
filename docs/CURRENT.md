@@ -53,6 +53,10 @@ Removed from Production: NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY, STRIPE_SECRET_KEY, 
 
 Approved direction D-DESIGN-01 (DECISIONS.md). Implemented: theme tokens and fonts, buttons/inputs/cards, header (category navigation) and footer, home (hero, category tiles, product grid, trust notes), catalog listing, product page (option pills), cart, checkout, payment submitted, auth card, catalog and root not-found pages. Local production build checks: no horizontal overflow at 320 px on home, shop, cart, checkout, login and product; one visible h1 and one main per page; no unlabeled controls. Known, pre-existing: the missing-product 404 renders its message client-side (server HTML body empty; status 404 is correct).
 
+## Studio design and demo catalog (2026-10-02, branch feat/design-studio-minimal)
+
+D-DESIGN-02 (DECISIONS.md) replaces the warm design. Demo catalog seeded on the hosted database with `node --env-file=.env.local scripts/demo-catalog/seed.mjs` after `node scripts/demo-catalog/generate-images.mjs` (images in ignored .verification/demo-catalog): 6 categories, 14 products, 62 variants with stock (some sizes sold out; the bucket hat is fully sold out), 28 images. Checks: lint, typecheck, 53 tests, build; local production server shows distinct cover photos (Women: Cropped Denim Jacket, Men: Relaxed Chino), sizes XS → XL, desktop navigation without overlap.
+
 ## M16 CHECKPOINT
 
 - Completed: automated checks, not-found fix, SEO basics, responsive/accessibility/performance sanity, E2E critical path on the M16 preview.

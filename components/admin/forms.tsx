@@ -7,8 +7,8 @@ import {
   createProduct, removeImage, saveCategory, saveProductCategories, saveVariant, setStock, updateImage, updateProduct, uploadImage,
 } from "@/lib/admin/actions";
 
-const selectClass = "min-h-11 w-full min-w-0 rounded-xl border-[1.5px] border-input bg-card px-3";
-const areaClass = "min-h-28 w-full min-w-0 rounded-xl border-[1.5px] border-input bg-card px-3 py-2";
+const selectClass = "min-h-11 w-full min-w-0 rounded-sm border border-input bg-background px-3";
+const areaClass = "min-h-28 w-full min-w-0 rounded-sm border border-input bg-background px-3 py-2";
 
 function Checkbox({ id, name, label, defaultChecked, value }: { id: string; name: string; label: string; defaultChecked: boolean; value?: string }) {
   return <label htmlFor={id} className="flex min-h-11 items-center gap-2">

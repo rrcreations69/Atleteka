@@ -15,7 +15,7 @@ export default async function CartPage() {
   } catch (error) {
     if (!(error instanceof CartAccessError)) throw error;
     return <Container className="space-y-5 py-12">
-      <h1 className="text-4xl">Your cart</h1>
+      <h1 className="text-3xl">Cart</h1>
       <p role="alert">{error.message}</p>
       <Link href="/login" className="underline underline-offset-4">Sign in</Link>
       <p><a href="/cart" className="underline underline-offset-4">Refresh cart</a></p>
@@ -25,19 +25,19 @@ export default async function CartPage() {
   return (
     <Container className="max-w-3xl space-y-6 py-8 sm:py-12">
       <div className="space-y-3">
-        <h1 className="text-4xl sm:text-5xl">Your cart</h1>
+        <h1 className="text-3xl sm:text-4xl">Cart</h1>
         <p className="text-sm text-muted-foreground">{kind === "guest"
           ? "Your guest cart is saved in this browser for 30 days. Signing in opens your separate account cart."
           : "This is your account cart. Your guest cart stays separate in this browser."}</p>
       </div>
-      {cart.items.length === 0 ? <div className="space-y-5 rounded-2xl bg-card p-8 text-center">
+      {cart.items.length === 0 ? <div className="space-y-5 bg-card p-10 text-center">
         <p className="text-lg">Your cart is empty.</p>
         <Link href="/shop" className={buttonVariants()}>Browse products</Link>
       </div> : <>
-        <ul className="space-y-3">
-          {cart.items.map((item) => <li key={item.variantId} className="grid gap-5 rounded-2xl bg-card p-5 sm:grid-cols-[1fr_auto]">
+        <ul className="border-t border-border">
+          {cart.items.map((item) => <li key={item.variantId} className="grid gap-5 border-b border-border py-6 sm:grid-cols-[1fr_auto]">
             <div className="min-w-0 space-y-2">
-              <h2 className="break-words font-sans text-lg font-semibold [font-variation-settings:normal]">{item.productSlug
+              <h2 className="break-words text-base font-semibold tracking-normal">{item.productSlug
                 ? <Link href={"/products/" + item.productSlug} className="underline-offset-4 hover:underline">{item.productName}</Link>
                 : item.productName}</h2>
               <p className="break-words text-muted-foreground">{item.variantName}</p>
@@ -54,8 +54,8 @@ export default async function CartPage() {
             </div>
           </li>)}
         </ul>
-        <section aria-labelledby="cart-subtotal" className="space-y-3 rounded-2xl bg-card p-5">
-          <h2 id="cart-subtotal" className="flex items-baseline justify-between gap-4 text-2xl"><span>Subtotal</span><span>{formatPrice(cart.subtotal)}</span></h2>
+        <section aria-labelledby="cart-subtotal" className="space-y-3 bg-card p-5 sm:p-6">
+          <h2 id="cart-subtotal" className="flex items-baseline justify-between gap-4 text-xl"><span>Subtotal</span><span>{formatPrice(cart.subtotal)}</span></h2>
           <p className="text-sm text-muted-foreground">Shipping is paid to the courier on delivery. Prices include tax.</p>
           <p className="text-sm text-muted-foreground">Prices and availability are checked when your cart loads or changes. Items are not reserved. Unavailable product prices are excluded.</p>
           <a href="/cart" className="inline-flex min-h-11 items-center text-sm underline underline-offset-4">Refresh prices and availability</a>

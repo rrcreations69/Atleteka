@@ -7,9 +7,9 @@ import type { CatalogCategory, CatalogQuery } from "@/lib/catalog/validation";
 export function CatalogFilters({ base, query, categories, fixedCategory }: {
   base: string; query: CatalogQuery; categories: CatalogCategory[]; fixedCategory: boolean;
 }) {
-  const selectClass = "min-h-11 w-full min-w-0 rounded-xl border-[1.5px] border-input bg-card px-3 py-2 text-base";
+  const selectClass = "min-h-11 w-full min-w-0 rounded-sm border border-input bg-background px-3 py-2 text-base";
   return (
-    <form action={base} method="get" role="search" aria-label="Search and filter products" className="my-6 grid gap-4 rounded-2xl bg-card p-5 sm:grid-cols-2 lg:grid-cols-3">
+    <form action={base} method="get" role="search" aria-label="Search and filter products" className="my-6 grid gap-4 bg-card p-5 sm:grid-cols-2 lg:grid-cols-3">
       <div className="min-w-0 space-y-2">
         <Label htmlFor="catalog-query">Search product names</Label>
         <Input id="catalog-query" name="q" type="search" maxLength={100} defaultValue={query.q} />

@@ -25,7 +25,7 @@ export function VariantSelector({ variants }: { variants: CatalogVariant[] }) {
           {variants.map((variant) => <div key={variant.id}>
             <input type="radio" id={`${group}-${variant.id}`} name={group} value={variant.id} checked={selectedId === variant.id}
               onChange={() => setSelectedId(variant.id)} className="peer sr-only" />
-            <label htmlFor={`${group}-${variant.id}`} className={"inline-flex min-h-12 min-w-14 cursor-pointer items-center justify-center rounded-xl border-[1.5px] border-input bg-card px-4 text-[0.95rem] font-semibold peer-checked:border-foreground peer-checked:bg-foreground peer-checked:text-background peer-focus-visible:outline-2 peer-focus-visible:outline-offset-3 peer-focus-visible:outline-ring" + (variant.inStock ? "" : " text-muted-foreground line-through")}>
+            <label htmlFor={`${group}-${variant.id}`} className={"inline-flex min-h-12 min-w-14 cursor-pointer items-center justify-center rounded-sm border border-input bg-background px-4 text-sm font-semibold peer-checked:border-foreground peer-checked:bg-foreground peer-checked:text-background peer-focus-visible:outline-2 peer-focus-visible:outline-offset-3 peer-focus-visible:outline-ring" + (variant.inStock ? "" : " text-muted-foreground line-through")}>
               {variant.title}<span className="sr-only">{variant.inStock ? "" : " (sold out)"}</span>
             </label>
           </div>)}

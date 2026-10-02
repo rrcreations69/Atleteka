@@ -34,24 +34,29 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
   const product = await loadProduct(slug.data);
   if (!product) notFound();
   return (
-    <Container className="py-6 sm:py-10">
-      <Link href="/shop" className="mb-4 inline-flex min-h-11 items-center gap-1 text-sm font-medium text-muted-foreground hover:text-foreground">
+    <Container className="py-4 sm:py-8">
+      <Link href="/shop" className="eyebrow mb-3 inline-flex min-h-11 items-center gap-1.5 text-[0.6875rem] text-muted-foreground hover:text-foreground">
         <span aria-hidden="true">←</span> Back to shop
       </Link>
-      <div className="grid items-start gap-8 lg:grid-cols-2 lg:gap-14">
+      <div className="grid items-start gap-8 lg:grid-cols-[3fr_2fr] lg:gap-14">
         <ProductGallery images={product.images} />
-        <div className="min-w-0 space-y-6 lg:sticky lg:top-6">
-          <h1 className="text-[2rem] leading-tight sm:text-4xl">{product.name}</h1>
+        <div className="min-w-0 space-y-7 lg:sticky lg:top-6">
+          <h1 className="text-2xl leading-tight sm:text-3xl">{product.name}</h1>
           <VariantSelector variants={product.variants} />
-          <section aria-labelledby="product-description" className="rounded-2xl bg-card p-5">
-            <h2 id="product-description" className="mb-2 font-sans text-base font-semibold [font-variation-settings:normal]">Description</h2>
-            <p className="whitespace-pre-line break-words leading-relaxed text-muted-foreground">{product.description || "No description is available for this product."}</p>
-          </section>
-          <ul className="space-y-2.5 rounded-2xl bg-card p-5 text-sm">
-            <li className="flex items-center gap-2.5"><span aria-hidden="true" className="size-2 rounded-full bg-success" />Secure payment by card, QR Ph or e-wallet</li>
-            <li className="flex items-center gap-2.5"><span aria-hidden="true" className="size-2 rounded-full bg-success" />Delivered anywhere in the Philippines</li>
-            <li className="flex items-center gap-2.5"><span aria-hidden="true" className="size-2 rounded-full bg-success" />Guest checkout, no account needed</li>
-          </ul>
+          <div className="border-t border-border">
+            <section aria-labelledby="product-description" className="border-b border-border py-5">
+              <h2 id="product-description" className="eyebrow mb-3 text-xs tracking-[0.12em]">Description</h2>
+              <p className="whitespace-pre-line break-words leading-relaxed text-muted-foreground">{product.description || "No description is available for this product."}</p>
+            </section>
+            <section aria-labelledby="product-delivery" className="border-b border-border py-5">
+              <h2 id="product-delivery" className="eyebrow mb-3 text-xs tracking-[0.12em]">Delivery &amp; payment</h2>
+              <ul className="space-y-2 text-sm text-muted-foreground">
+                <li>Secure payment by card, QR Ph or e-wallet via PayMongo</li>
+                <li>Delivered anywhere in the Philippines; shipping is paid to the courier on delivery</li>
+                <li>Guest checkout, no account needed</li>
+              </ul>
+            </section>
+          </div>
         </div>
       </div>
     </Container>

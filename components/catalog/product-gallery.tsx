@@ -10,10 +10,10 @@ export function ProductGallery({ images }: { images: CatalogImage[] }) {
   const current = images.find((image) => image.id === selected) ?? images[0];
   return (
     <div className="min-w-0 space-y-3">
-      <ProductImage key={current?.id ?? "empty"} image={current} sizes="(min-width: 1024px) 50vw, 100vw" className="rounded-3xl" />
+      <ProductImage key={current?.id ?? "empty"} image={current} sizes="(min-width: 1024px) 50vw, 100vw" className="" />
       {images.length > 1 && <div className="flex flex-wrap gap-2" role="group" aria-label="Product images">
-        {images.map((image, index) => <button key={image.id} type="button" className={cn("w-16 rounded-xl p-0.5 sm:w-20", current?.id === image.id && "outline-2 outline-offset-2 outline-foreground")} aria-label={`Show image ${index + 1}: ${image.alt}`} aria-pressed={current?.id === image.id} onClick={() => setSelected(image.id)}>
-          <ProductImage image={image} sizes="80px" className="rounded-lg" />
+        {images.map((image, index) => <button key={image.id} type="button" className={cn("w-16 p-0.5 sm:w-20", current?.id === image.id && "outline-1 outline-offset-1 outline-foreground")} aria-label={`Show image ${index + 1}: ${image.alt}`} aria-pressed={current?.id === image.id} onClick={() => setSelected(image.id)}>
+          <ProductImage image={image} sizes="80px" className="" />
         </button>)}
       </div>}
     </div>
