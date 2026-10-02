@@ -49,8 +49,12 @@ export function FeaturedHero({ slides }: { slides: HeroSlide[] }) {
   const next = slides[(active + 1) % slides.length];
 
   return (
-    <section aria-roledescription="carousel" aria-label="Featured pieces" className="relative text-white [--ring:var(--apricot)]">
-      <div ref={track} className="flex snap-x snap-mandatory overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+    <section aria-roledescription="carousel" aria-label="Featured pieces" className="relative text-white [--ring:var(--apricot)]"
+      onKeyDown={(event) => {
+        if (event.key === "ArrowRight") { event.preventDefault(); go(active + 1); }
+        if (event.key === "ArrowLeft") { event.preventDefault(); go(active - 1); }
+      }}>
+      <div ref={track} tabIndex={0} aria-label="Featured pieces, use the left and right arrow keys to browse" className="flex snap-x snap-mandatory overflow-x-auto [scrollbar-width:none] focus-visible:outline-offset-[-4px] [&::-webkit-scrollbar]:hidden">
         {slides.map((slide, index) => <article key={slide.id} data-index={index} role="group" aria-roledescription="slide"
           aria-label={`${index + 1} of ${slides.length}: ${slide.name}`} aria-hidden={index !== active}
           className="relative w-full shrink-0 snap-start overflow-hidden" style={{ backgroundColor: GROUNDS[index % GROUNDS.length] }}>
@@ -72,7 +76,7 @@ export function FeaturedHero({ slides }: { slides: HeroSlide[] }) {
             <div className="relative order-3 flex flex-wrap items-end justify-between gap-6 lg:flex-col lg:items-start lg:justify-center">
               <p className="text-3xl font-semibold text-apricot lg:text-4xl">{slide.price}</p>
               {slide.sizes.length > 0 && <div>
-                <p className="mb-2 text-sm text-white/75">Sizes</p>
+                <p className="mb-2 text-sm text-white/85">Sizes</p>
                 <ul className="flex flex-wrap gap-2">
                   {slide.sizes.map((size) => <li key={size.title} className={cn("inline-flex h-10 min-w-10 items-center justify-center rounded-full px-3 text-sm font-semibold",
                     size.inStock ? "bg-white/15" : "text-white/55 line-through")}>
@@ -98,7 +102,7 @@ export function FeaturedHero({ slides }: { slides: HeroSlide[] }) {
           </div>
           <button type="button" onClick={() => go(active + 1)} className="pointer-events-auto hidden items-center gap-3 rounded-sm bg-white/10 p-2 pr-4 text-left hover:bg-white/15 sm:flex">
             <span className="relative block size-14 shrink-0 rounded-sm bg-photo"><Image src={next.image.url} alt="" fill unoptimized sizes="56px" className="object-contain p-1" /></span>
-            <span className="text-sm"><span className="block text-white/70">Next</span><span className="block font-semibold">{next.name}</span></span>
+            <span className="text-sm"><span className="block text-white/85">Next</span><span className="block font-semibold">{next.name}</span></span>
           </button>
         </div>
       </div>}
