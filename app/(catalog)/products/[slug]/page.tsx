@@ -35,7 +35,7 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
   if (!product) notFound();
   return (
     <Container className="py-4 sm:py-8">
-      <Link href="/shop" className="eyebrow mb-3 inline-flex min-h-11 items-center gap-1.5 text-[0.6875rem] text-muted-foreground hover:text-foreground">
+      <Link href="/shop" className="eyebrow mb-3 inline-flex min-h-11 items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground">
         <span aria-hidden="true">←</span> Back to shop
       </Link>
       <div className="grid items-start gap-8 lg:grid-cols-[3fr_2fr] lg:gap-14">
