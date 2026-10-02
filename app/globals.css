@@ -2,14 +2,13 @@
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
 
-/* "Sunday Market" warm lifestyle theme (design refresh 2026-10-02): cream ground, espresso text,
-   terracotta actions, olive reassurance; Fraunces headings over Figtree. */
+/* "Studio" modern minimal theme (D-DESIGN-02, 2026-10-02): white and ink with warm-gray neutrals,
+   one sans (Instrument Sans), small uppercase spaced labels, near-square corners. */
 @theme inline {
-  --font-sans: var(--font-figtree), ui-sans-serif, system-ui, sans-serif;
-  --font-serif: var(--font-fraunces), Georgia, ui-serif, serif;
-  --text-display: clamp(2.25rem, 5vw, 3.75rem);
-  --text-display--line-height: 1.05;
-  --text-display--letter-spacing: -0.015em;
+  --font-sans: var(--font-instrument), ui-sans-serif, system-ui, sans-serif;
+  --text-display: clamp(2.25rem, 5vw, 3.5rem);
+  --text-display--line-height: 1.04;
+  --text-display--letter-spacing: -0.025em;
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
@@ -25,41 +24,44 @@
   --color-accent: var(--accent);
   --color-accent-foreground: var(--accent-foreground);
   --color-success: var(--success);
-  --color-sand: var(--sand);
+  --color-photo: var(--photo);
   --color-destructive: var(--destructive);
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
-  --radius-sm: calc(var(--radius) - 8px);
-  --radius-md: calc(var(--radius) - 4px);
-  --radius-lg: var(--radius);
-  --radius-xl: calc(var(--radius) + 4px);
-  --radius-2xl: calc(var(--radius) + 8px);
+  /* Near-square corners everywhere; components keep their rounded-* names. */
+  --radius-sm: 2px;
+  --radius-md: 2px;
+  --radius-lg: 2px;
+  --radius-xl: 2px;
+  --radius-2xl: 2px;
+  --radius-3xl: 2px;
 }
 
 :root {
-  --radius: 0.875rem;
-  --background: #f6f1e9;
-  --foreground: #2b2620;
-  --card: #fffdf9;
-  --card-foreground: #2b2620;
-  --popover: #fffdf9;
-  --popover-foreground: #2b2620;
-  --primary: #b5532e;
+  --radius: 2px;
+  --background: #ffffff;
+  --foreground: #111111;
+  /* Paper panels for summaries and filters. */
+  --card: #f5f5f3;
+  --card-foreground: #111111;
+  --popover: #ffffff;
+  --popover-foreground: #111111;
+  --primary: #111111;
   --primary-foreground: #ffffff;
-  --secondary: #2b2620;
-  --secondary-foreground: #f6f1e9;
-  --muted: #efe8dc;
-  --muted-foreground: #6b5f50;
-  --accent: #e8dcc8;
-  --accent-foreground: #2b2620;
-  --success: #5e6b3a;
-  --sand: #e8dcc8;
+  --secondary: #ffffff;
+  --secondary-foreground: #111111;
+  --muted: #f5f5f3;
+  --muted-foreground: #6b6862;
+  --accent: #f0efec;
+  --accent-foreground: #111111;
+  --success: #2f6b3f;
+  --photo: #efeeeb;
   --destructive: #a12d1f;
-  --border: #e3d9c8;
-  /* Form-control borders keep 3:1 against the cream ground (WCAG 1.4.11). */
-  --input: #8f8270;
-  --ring: #2b2620;
+  --border: #e6e4e0;
+  /* Form-control borders keep 3:1 against white (WCAG 1.4.11). */
+  --input: #8f8b84;
+  --ring: #111111;
 }
 
 @layer base {
@@ -74,8 +76,17 @@
     @apply bg-background font-sans text-foreground antialiased;
   }
   h1, h2 {
-    @apply font-serif font-medium;
-    font-variation-settings: "SOFT" 100;
-    letter-spacing: -0.01em;
+    @apply font-semibold;
+    letter-spacing: -0.02em;
+  }
+}
+
+@layer utilities {
+  /* Small uppercase label used for navigation, buttons and section titles. */
+  .eyebrow {
+    font-size: 0.8125rem;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
   }
 }

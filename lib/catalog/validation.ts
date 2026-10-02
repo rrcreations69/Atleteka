@@ -47,12 +47,19 @@ export function publicImageUrl(baseUrl: string, path: string) {
     storagePathSchema.parse(path).split("/").map(encodeURIComponent).join("/"), baseUrl).href;
 }
 
+// Clothing sizes list smallest to largest; other option names keep alphabetical order.
+const SIZE_ORDER = ["XXS", "XS", "S", "M", "L", "XL", "XXL", "XXXL"];
+export function sizeRank(title: string) {
+  const rank = SIZE_ORDER.indexOf(title.trim().toUpperCase());
+  return rank === -1 ? SIZE_ORDER.length : rank;
+}
+
 export function toCatalogProduct(row: ProductRow, stock: Map<string, boolean>, baseUrl: string): CatalogProduct {
   return {
     id: row.id, slug: row.slug, name: row.name, description: row.description,
     variants: row.product_variants.filter((variant) => variant.active).map((variant) => ({
       id: variant.id, title: variant.title, price: variant.price, inStock: stock.get(variant.id) ?? false,
-    })).sort((a, b) => a.title.localeCompare(b.title) || a.id.localeCompare(b.id)),
+    })).sort((a, b) => sizeRank(a.title) - sizeRank(b.title) || a.title.localeCompare(b.title) || a.id.localeCompare(b.id)),
     images: [...row.product_images].sort((a, b) => a.sort_order - b.sort_order || a.id.localeCompare(b.id)).map((image) => ({
       id: image.id, url: publicImageUrl(baseUrl, image.storage_path), alt: image.alt_text || row.name,
     })),

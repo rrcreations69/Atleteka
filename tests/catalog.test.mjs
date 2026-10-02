@@ -41,3 +41,10 @@ test("prices use the user-approved PHP currency and active-variant range",()=>{
  assert.match(priceLabel([a]),/^PHP/);
  assert.match(priceLabel([a,{...a,id:other,price:30}]),/^From PHP/);
 });
+
+test("clothing sizes sort smallest to largest; other options stay alphabetical", async () => {
+ const { sizeRank } = await import("../lib/catalog/validation.ts");
+ const sizes = ["L", "XS", "One size", "M", "XL", "S"].sort((a, b) => sizeRank(a) - sizeRank(b) || a.localeCompare(b));
+ assert.deepEqual(sizes, ["XS", "S", "M", "L", "XL", "One size"]);
+ assert.deepEqual(["Large", "Blue", "Medium"].sort((a, b) => sizeRank(a) - sizeRank(b) || a.localeCompare(b)), ["Blue", "Large", "Medium"]);
+});

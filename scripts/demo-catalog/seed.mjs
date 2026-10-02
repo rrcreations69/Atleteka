@@ -1,0 +1,52 @@
+// Seeds the demo catalog (categories, products, variants, stock, images). Safe to re-run: rows are
+// upserted by slug/SKU and images are only uploaded for products that have none.
+// Usage: node --env-file=.env.local scripts/demo-catalog/seed.mjs [imageDir]
+// Uses the service role key from the environment; it is never printed.
+import { readFile } from "node:fs/promises";
+import path from "node:path";
+import { createClient } from "@supabase/supabase-js";
+import { CATEGORIES, PRODUCTS, RETIRED_CATEGORY_SLUGS, RETIRED_PRODUCT_SLUGS } from "./catalog.mjs";
+
+const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
+if (!url || !key) throw new Error("NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY are required.");
+const imageDir = process.argv[2] ?? path.join(".verification", "demo-catalog");
+const db = createClient(url, key, { auth: { persistSession: false } });
+
+function check(result, what) {
+  if (result.error) throw new Error(`${what}: ${result.error.message}`);
+  return result.data;
+}
+
+const categories = check(await db.from("categories")
+  .upsert(CATEGORIES.map((category) => ({ ...category, active: true })), { onConflict: "slug" })
+  .select("id,slug"), "categories");
+const categoryId = Object.fromEntries(categories.map((category) => [category.slug, category.id]));
+check(await db.from("categories").update({ active: false }).in("slug", RETIRED_CATEGORY_SLUGS), "retire categories");
+check(await db.from("products").update({ status: "inactive" }).in("slug", RETIRED_PRODUCT_SLUGS), "retire fixtures");
+
+for (const item of PRODUCTS) {
+  const [product] = check(await db.from("products")
+    .upsert({ slug: item.slug, name: item.name, description: item.description, status: "active" }, { onConflict: "slug" })
+    .select("id"), `product ${item.slug}`);
+  const variants = check(await db.from("product_variants")
+    .upsert(item.sizes.map((size) => ({ product_id: product.id, sku: `${item.code}-${size === "One size" ? "OS" : size}`, title: size, price: item.price, active: true })), { onConflict: "sku" })
+    .select("id,sku"), `variants ${item.slug}`);
+  check(await db.from("inventory")
+    .upsert(variants.map((variant) => ({ variant_id: variant.id, quantity_on_hand: item.stock[item.sizes.indexOf(variant.sku.endsWith("-OS") ? "One size" : variant.sku.split("-").pop())] })), { onConflict: "variant_id" }),
+  `inventory ${item.slug}`);
+  check(await db.from("product_categories").delete().eq("product_id", product.id), `clear categories ${item.slug}`);
+  check(await db.from("product_categories").insert(item.categories.map((slug) => ({ product_id: product.id, category_id: categoryId[slug] }))), `categories ${item.slug}`);
+
+  const existing = check(await db.from("product_images").select("id").eq("product_id", product.id), `images ${item.slug}`);
+  if (existing.length === 0) {
+    for (const [index, view] of ["front view", "detail"].entries()) {
+      const storagePath = `products/${product.id}/demo-${index + 1}.webp`;
+      const bytes = await readFile(path.join(imageDir, `${item.slug}-${index + 1}.webp`));
+      check(await db.storage.from("product-images").upload(storagePath, bytes, { contentType: "image/webp", upsert: true }), `upload ${item.slug}`);
+      check(await db.from("product_images").insert({ product_id: product.id, storage_path: storagePath, alt_text: `${item.name}, ${view}`, sort_order: index }), `image row ${item.slug}`);
+    }
+  }
+  console.log(`${item.slug}: ${variants.length} sizes, ${existing.length === 0 ? "2 images uploaded" : "images kept"}`);
+}
+console.log(`Done: ${CATEGORIES.length} categories, ${PRODUCTS.length} products.`);

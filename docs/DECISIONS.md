@@ -220,3 +220,11 @@ Status: **Approved** by the user on 2026-10-02 (explicit session replies: reject
 - Tokens in app/globals.css: cream #F6F1E9, card #FFFDF9, espresso #2B2620, terracotta #B5532E (primary actions), olive #5E6B3A (reassurance), sand #E8DCC8; form borders #8F8270 for 3:1 non-text contrast. Pill buttons, rounded cards.
 - Header navigation lists the active categories, with `women` and `men` slugs first (up to five) plus "Shop all"; the home hero shows Shop women / Shop men only when those categories exist. Create them in Admin → Categories to get Men and Women sections.
 - Product page options are a radio group of pills (was a select); a root app/not-found.tsx replaces the framework default 404 page.
+
+## D-DESIGN-02 modern minimal "Studio" design and demo catalog - 2026-10-02
+
+Status: **Approved** by the user on 2026-10-02 (explicit session replies: the warm design "is too feminine"; chose "Modern minimal"; approved the "Studio" mockup with "implement it, add more mock up products and add images for it. make it presentation ready"). Supersedes the look of D-DESIGN-01; its structure (category-driven Women/Men navigation, option pills, root not-found page) stays.
+- Theme: white #FFFFFF, paper #F5F5F3 panels, hairline #E6E4E0, stone #6B6862 secondary text, ink #111111; one font, Instrument Sans (next/font); small uppercase spaced labels; 2 px corners; black rectangular buttons; no serif, pastels or pills.
+- Home: Women/Men hero tiles and category tiles use a product photo from that category (categories have no image field); picks prefer category-specific, signature products and avoid repeats.
+- Clothing sizes sort XS → XL (other option names stay alphabetical).
+- **Demo catalog (presentation only):** scripts/demo-catalog seeds 6 categories (Women, Men, Tops, Bottoms, Outerwear, Accessories) and 14 products with sizes, stock and 2 generated flat-lay illustrations each (generate-images.mjs, sharp; no third-party photos). Development fixtures and the hoodies / m02-training categories were set inactive, not deleted. Replace the demo products and illustrations with real products and photos before launch.

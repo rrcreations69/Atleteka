@@ -15,7 +15,7 @@ export function OrderStatusForm({ orderId, next }: { orderId: string; next: Orde
       <input type="hidden" name="orderId" value={orderId} />
       <div className="space-y-2"><Label htmlFor="order-next-status">Change status to</Label>
         <select id="order-next-status" name="status" value={status} onChange={(event) => setStatus(event.target.value as OrderStatus)}
-          className="min-h-11 w-full min-w-0 rounded-xl border-[1.5px] border-input bg-card px-3">
+          className="min-h-11 w-full min-w-0 rounded-sm border border-input bg-background px-3">
           {next.map((value) => <option key={value} value={value}>{orderStatusLabel[value]}</option>)}
         </select></div>
       {status === "shipped" && <>

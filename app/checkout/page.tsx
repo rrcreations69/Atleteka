@@ -28,7 +28,7 @@ export default async function CheckoutPage({ searchParams }: { searchParams: Pro
   const cancelled = (await searchParams).payment === "cancelled";
   const result = await loadCheckout();
   if ("error" in result) return <Container className="space-y-5 py-12">
-    <h1 className="text-4xl">Checkout</h1>
+    <h1 className="text-3xl">Checkout</h1>
     <p role="status">{result.error}</p>
     {result.identityError && <p><Link href="/login" className="underline underline-offset-4">Sign in</Link></p>}
     <Link href="/cart" className="underline underline-offset-4">Return to cart</Link>
@@ -36,8 +36,8 @@ export default async function CheckoutPage({ searchParams }: { searchParams: Pro
     <p><Link href="/shop" className="underline underline-offset-4">Browse products</Link></p>
   </Container>;
   return <Container className="space-y-6 py-8 sm:py-12">
-    <Link href="/cart" className="inline-flex min-h-11 items-center gap-1 text-sm font-medium text-muted-foreground hover:text-foreground"><span aria-hidden="true">←</span> Return to cart</Link>
-    <h1 className="text-4xl sm:text-5xl">Checkout</h1>
+    <Link href="/cart" className="eyebrow inline-flex min-h-11 items-center gap-1.5 text-[0.6875rem] text-muted-foreground hover:text-foreground"><span aria-hidden="true">←</span> Return to cart</Link>
+    <h1 className="text-3xl sm:text-4xl">Checkout</h1>
     {cancelled && <p role="status" className="rounded-2xl bg-card p-4">Payment cancelled. You have not been charged, and your cart is unchanged.</p>}
     <CheckoutForm initialQuote={result.quote} addresses={result.addresses} account={result.account} />
   </Container>;
