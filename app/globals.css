@@ -2,8 +2,9 @@
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
 
-/* "Studio" modern minimal theme (D-DESIGN-02, 2026-10-02): white and ink with warm-gray neutrals,
-   one sans (Instrument Sans), small uppercase spaced labels, near-square corners. */
+/* "Studio" modern minimal layout (D-DESIGN-02) in the navy and crimson palette (D-DESIGN-03, 2026-10-02):
+   midnight ink #181A2F, navy #242E49, slate #37415C, crimson #B4182D actions, wine #54162B hover,
+   apricot #FDA481 accents on dark surfaces only (it fails contrast on white). */
 @theme inline {
   --font-sans: var(--font-instrument), ui-sans-serif, system-ui, sans-serif;
   --text-display: clamp(2.25rem, 5vw, 3.5rem);
@@ -26,6 +27,9 @@
   --color-success: var(--success);
   --color-photo: var(--photo);
   --color-destructive: var(--destructive);
+  --color-navy: var(--navy);
+  --color-wine: var(--wine);
+  --color-apricot: var(--apricot);
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
@@ -41,27 +45,30 @@
 :root {
   --radius: 2px;
   --background: #ffffff;
-  --foreground: #111111;
-  /* Paper panels for summaries and filters. */
-  --card: #f5f5f3;
-  --card-foreground: #111111;
+  --foreground: #181a2f;
+  /* Cool slate-tinted paper for summaries and filters. */
+  --card: #f3f4f7;
+  --card-foreground: #181a2f;
   --popover: #ffffff;
-  --popover-foreground: #111111;
-  --primary: #111111;
+  --popover-foreground: #181a2f;
+  --primary: #b4182d;
   --primary-foreground: #ffffff;
   --secondary: #ffffff;
-  --secondary-foreground: #111111;
-  --muted: #f5f5f3;
-  --muted-foreground: #6b6862;
-  --accent: #f0efec;
-  --accent-foreground: #111111;
+  --secondary-foreground: #181a2f;
+  --muted: #f3f4f7;
+  --muted-foreground: #37415c;
+  --accent: #eceef3;
+  --accent-foreground: #181a2f;
   --success: #2f6b3f;
-  --photo: #efeeeb;
-  --destructive: #a12d1f;
-  --border: #e6e4e0;
+  --photo: #eceef1;
+  --destructive: #b4182d;
+  --border: #e3e5eb;
   /* Form-control borders keep 3:1 against white (WCAG 1.4.11). */
-  --input: #8f8b84;
-  --ring: #111111;
+  --input: #7d8499;
+  --ring: #181a2f;
+  --navy: #242e49;
+  --wine: #54162b;
+  --apricot: #fda481;
 }
 
 @layer base {

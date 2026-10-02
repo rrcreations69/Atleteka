@@ -53,17 +53,17 @@ export default async function HomePage() {
     <>
       {lead.length > 0 ? <section aria-labelledby="home-heading" className={"grid " + (lead.length > 1 ? "sm:grid-cols-2" : "")}>
         <h1 id="home-heading" className="sr-only">Atleteka: everyday clothing for women and men</h1>
-        {lead.map((category) => <Link key={category.id} href={`/categories/${category.slug}`} className="group relative block bg-[#2a2927]">
+        {lead.map((category) => <Link key={category.id} href={`/categories/${category.slug}`} className="group relative block bg-foreground">
           <ProductImage image={category.cover} sizes="(min-width: 640px) 50vw, 100vw" className="aspect-[4/5] opacity-90 group-hover:opacity-100 sm:aspect-[3/4] lg:aspect-[4/5] lg:max-h-[46rem]" />
-          <span aria-hidden="true" className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-black/55 to-transparent" />
+          <span aria-hidden="true" className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-[#181a2f]/75 to-transparent" />
           <span className="absolute bottom-6 left-5 text-white sm:bottom-9 sm:left-9">
             <span className="block text-4xl font-semibold tracking-[-0.02em] sm:text-5xl">{category.name}</span>
             <span className={buttonVariants({ variant: "inverse", className: "pointer-events-none mt-4" })}>Shop {category.name.toLowerCase()}</span>
           </span>
         </Link>)}
-      </section> : <section className="bg-foreground text-background">
+      </section> : <section className="bg-navy text-background">
         <Container className="py-20 sm:py-28">
-          <p className="eyebrow text-xs">New season</p>
+          <p className="eyebrow text-xs text-apricot">New season</p>
           <h1 className="mt-4 max-w-2xl text-display">Everyday pieces, made to last.</h1>
           <Link href="/shop" className={buttonVariants({ variant: "inverse", className: "mt-8" })}>Shop the collection</Link>
         </Container>
@@ -72,7 +72,7 @@ export default async function HomePage() {
       <Container className="mt-14 sm:mt-20">
         <div className="mb-6 flex items-end justify-between gap-4">
           <div>
-            <p className="eyebrow text-xs text-muted-foreground">The collection</p>
+            <p className="eyebrow text-xs text-primary">The collection</p>
             <h2 className="mt-2 text-2xl sm:text-3xl">Everyday pieces, made to last.</h2>
           </div>
           <Link href="/shop" className="inline-flex min-h-11 shrink-0 items-center text-sm font-semibold underline underline-offset-4">View all</Link>
