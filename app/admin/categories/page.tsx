@@ -1,6 +1,5 @@
-import { AdminNav } from "@/components/admin/admin-nav";
+import { AdminShell, adminPanel } from "@/components/admin/admin-nav";
 import { CategoryForm } from "@/components/admin/forms";
-import { Container } from "@/components/layout/container";
 import { listAdminCategories } from "@/lib/admin/data";
 
 export const dynamic = "force-dynamic";
@@ -8,15 +7,16 @@ export const metadata = { title: "Categories | Admin | Atleteka" };
 
 export default async function AdminCategoriesPage() {
   const categories = await listAdminCategories();
-  return <Container className="space-y-8 py-10">
-    <AdminNav />
-    <h1 className="text-3xl font-semibold">Categories</h1>
-    <p className="text-sm text-muted-foreground">Inactive categories are hidden from the shop. Categories are never deleted, so products keep their links.</p>
-    {categories.length === 0 && <p role="status">No categories yet.</p>}
-    <div className="space-y-4">{categories.map((category) => <CategoryForm key={category.id} category={category} />)}</div>
-    <section aria-labelledby="new-category" className="space-y-4">
-      <h2 id="new-category" className="text-xl font-semibold">Create category</h2>
-      <CategoryForm />
-    </section>
-  </Container>;
+  return <AdminShell title="Categories" description={<p>Inactive categories are hidden from the shop. Categories are never deleted, so products keep their links.</p>}>
+    <div className="grid gap-10 xl:grid-cols-[minmax(0,1fr)_22rem]">
+      <div className="space-y-4">
+        {categories.length === 0 && <p role="status" className="bg-card px-6 py-12 text-center text-muted-foreground">No categories yet.</p>}
+        {categories.map((category) => <CategoryForm key={category.id} category={category} />)}
+      </div>
+      <section aria-labelledby="new-category" className={adminPanel + " self-start"}>
+        <h2 id="new-category" className="text-lg">Create category</h2>
+        <CategoryForm />
+      </section>
+    </div>
+  </AdminShell>;
 }

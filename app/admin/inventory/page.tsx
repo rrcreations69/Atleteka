@@ -1,7 +1,6 @@
 import Link from "next/link";
-import { AdminNav } from "@/components/admin/admin-nav";
+import { AdminShell } from "@/components/admin/admin-nav";
 import { StockForm } from "@/components/admin/forms";
-import { Container } from "@/components/layout/container";
 import { listInventory } from "@/lib/admin/data";
 
 export const dynamic = "force-dynamic";
@@ -9,20 +8,24 @@ export const metadata = { title: "Inventory | Admin | Atleteka" };
 
 export default async function AdminInventoryPage() {
   const variants = await listInventory();
-  return <Container className="space-y-8 py-10">
-    <AdminNav />
-    <h1 className="text-3xl font-semibold">Inventory</h1>
-    <p className="text-sm text-muted-foreground">Set the number on hand for each option. If stock changed since this page loaded (for example, a sale), the save is refused so nothing is overwritten.</p>
-    {variants.length === 0 ? <p role="status">No product options yet.</p> : <ul className="space-y-4">
-      {variants.map((variant) => <li key={variant.id} className="space-y-2 rounded-lg border border-border p-4">
-        <p className="break-words"><Link href={`/admin/products/${variant.products.id}`} className="font-medium underline underline-offset-4">{variant.products.name}</Link>
-          {" · "}{variant.title} · SKU {variant.sku}</p>
-        <p className="text-sm text-muted-foreground">
-          On hand: {variant.inventory ?? "no stock row"}
-          {!variant.active || variant.products.status !== "active" ? " · not for sale (option or product inactive)" : ""}
-        </p>
-        <StockForm variantId={variant.id} current={variant.inventory} label={`${variant.products.name} ${variant.title}`} />
-      </li>)}
-    </ul>}
-  </Container>;
+  return <AdminShell title="Inventory" description={<p>Set the number on hand for each option. If stock changed since this page loaded (for example, a sale), the save is refused so nothing is overwritten.</p>}>
+    {variants.length === 0 ? <p role="status" className="bg-card px-6 py-12 text-center text-muted-foreground">No product options yet.</p>
+      : <ul className="border-t border-border">
+        {variants.map((variant) => {
+          const forSale = variant.active && variant.products.status === "active";
+          const out = forSale && !variant.inventory;
+          return <li key={variant.id} className="grid gap-3 border-b border-border py-4 md:grid-cols-[minmax(0,1fr)_auto] md:items-center sm:px-3">
+            <div className="min-w-0 space-y-1">
+              <p className="break-words"><Link href={"/admin/products/" + variant.products.id} className="font-semibold underline-offset-4 hover:underline">{variant.products.name}</Link>
+                <span className="text-muted-foreground"> · {variant.title}</span></p>
+              <p className="break-words text-sm text-muted-foreground">
+                SKU {variant.sku} · On hand: <span className={out ? "font-semibold text-destructive" : "font-semibold text-foreground"}>{variant.inventory ?? "no stock row"}</span>
+                {!forSale ? " · not for sale (option or product inactive)" : ""}
+              </p>
+            </div>
+            <StockForm variantId={variant.id} current={variant.inventory} label={variant.products.name + " " + variant.title} />
+          </li>;
+        })}
+      </ul>}
+  </AdminShell>;
 }
