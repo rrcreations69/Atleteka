@@ -5,9 +5,13 @@ import { withSentryConfig } from "@sentry/nextjs/config";
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const productImages = supabaseUrl && URL.canParse(supabaseUrl) ? new URL(supabaseUrl) : null;
 
+// Preview deployments use their own branch URL (a Vercel system variable) when NEXT_PUBLIC_APP_URL is not set for them.
+const branchUrl = process.env.VERCEL_BRANCH_URL;
+
 const nextConfig: NextConfig = {
   // The repository maintains its own PRD-derived agent instructions.
   agentRules: false,
+  env: { NEXT_PUBLIC_APP_URL: process.env.NEXT_PUBLIC_APP_URL || (branchUrl ? `https://${branchUrl}` : "") },
   images: {
     remotePatterns: productImages ? [{
       protocol: productImages.protocol === "http:" ? "http" : "https", hostname: productImages.hostname,

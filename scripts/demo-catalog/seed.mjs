@@ -15,7 +15,7 @@ if (!url || !key) throw new Error("NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE
 const args = process.argv.slice(2);
 const replaceImages = args.includes("--replace-images");
 const imageDir = args.find((arg) => !arg.startsWith("--")) ?? path.join(".verification", "demo-catalog");
-const IMAGE_VERSION = "v2";
+const IMAGE_VERSION = "v3";
 const db = createClient(url, key, { auth: { persistSession: false } });
 
 function check(result, what) {
@@ -47,6 +47,7 @@ for (const item of PRODUCTS) {
   if (replaceImages && existing.length > 0) {
     for (const row of existing.slice(0, 2)) {
       const storagePath = `products/${product.id}/demo-${IMAGE_VERSION}-${row.sort_order + 1}.webp`;
+      check(await db.from("product_images").update({ alt_text: `${item.name}, ${row.sort_order === 0 ? "front view" : "detail"}` }).eq("id", row.id), `alt ${item.slug}`);
       if (row.storage_path === storagePath) continue;
       const bytes = await readFile(path.join(imageDir, `${item.slug}-${row.sort_order + 1}.webp`));
       check(await db.storage.from("product-images").upload(storagePath, bytes, { contentType: "image/webp", upsert: true }), `upload ${item.slug}`);
