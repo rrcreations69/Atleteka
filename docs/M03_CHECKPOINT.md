@@ -64,4 +64,4 @@ Resume (single remaining check): keep rrai.creatives+customer@gmail.com (custome
 
 PASS. On production (https://atleteka.vercel.app), on the user's own phone: the user opened /login?mode=recover in the phone browser, requested one reset for rrai.creatives+customer@gmail.com, copied the email link (long-press) from the Gmail app into the same phone browser, set a new password and landed on the account page signed in. The user reported each step working. A reset requested earlier the same day from Claude's in-app browser was not used (its link only works in the browser that requested it).
 
-With this, every M03 acceptance check has passed. The PRD workbook still shows M03 and M07 In Progress; changing it needs the user's approval. The +customer test account is kept until the user decides.
+With this, every M03 acceptance check has passed. With the user's approval (2026-10-05), PRD.xlsx 07_ROADMAP E7 (M03) and E11 (M07) are now Done and the 15_DASHBOARD caches read 8 Done / 8 In Progress / 1 Not Started (47.06%). The +customer test account is kept for demos (user decision).

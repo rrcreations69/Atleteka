@@ -11,23 +11,23 @@ What still stands between demo mode and a real launch (all need the user):
 2. Live PayMongo key, live webhook and its secret in Vercel Production.
 3. A verified Resend domain and EMAIL_FROM (confirmations currently reach one test address).
 4. Rotate the database password; enable Supabase leaked-password protection.
-5. ~~The deferred M03 password-reset check~~ passed on 2026-10-05 (M03_CHECKPOINT.md); M03 and M07 can now close in the workbook with the user's approval.
-6. Then close M03 and M07-M16 in PRD.xlsx and here.
+5. ~~The deferred M03 password-reset check~~ passed on 2026-10-05 (M03_CHECKPOINT.md); M03 and M07 are Done in the workbook (user-approved 2026-10-05).
+6. Then close M08-M16 in PRD.xlsx and here.
 
 History before 2026-10-05: M00-M02, M04-M06 verified per their checkpoints; M03 implemented with one browser/email check deferred; M07-P01, M08-P01 (PayMongo replaces Stripe), M09-P01, M11-P01, M12-P01, M13-P01 and M14-P01 approved; M15 review done with two fixes deployed.
 
-The "Workbook status" column mirrors PRD.xlsx 07_ROADMAP exactly; it was last changed by the user-authorized 2026-09-25 status correction and still lists M16 as Not Started. The "Actual status" column is the verified state on 2026-10-05.
+The "Workbook status" column mirrors PRD.xlsx 07_ROADMAP exactly; it was last changed on 2026-10-05 (user-approved: M03 and M07 Done) and still lists M16 as Not Started. The "Actual status" column is the verified state on 2026-10-05.
 
 | ID | Milestone | Priority | Dependency | Workbook status | Actual status (2026-10-05) | Deliverables | Definition of Done / Acceptance Criteria | Owner | Estimate |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | M00 | Repository & engineering baseline | P0 | None | Done | Done | Next.js TS app; Tailwind; shadcn; lint/typecheck; env example; AGENTS.md/AI rules | App runs locally; lint/typecheck pass; secrets excluded; conventions documented. | Eng | S |
 | M01 | Design system & shell | P0 | M00 | Done | Done | Typography, spacing, header/footer, buttons/cards/forms, responsive container | Consistent layout on mobile/desktop; reusable primitives; no feature business logic yet. | Frontend | S |
 | M02 | Supabase & schema | P0 | M00 | Done | Done | Supabase project config, migrations, data model, seed script | Schema matches PRD; migrations reproducible; seed creates usable catalog data. | Backend | M |
-| M03 | Authentication & authorization | P0 | M02 | In Progress | Done: every check passed (password reset verified 2026-10-05) | Login/register/session, profiles, customer/admin roles, RLS | Customer/admin access tests pass; privilege escalation blocked. | Backend | M |
+| M03 | Authentication & authorization | P0 | M02 | Done | Done: every check passed (password reset verified 2026-10-05) | Login/register/session, profiles, customer/admin roles, RLS | Customer/admin access tests pass; privilege escalation blocked. | Backend | M |
 | M04 | Catalog | P0 | M01,M02 | Done | Done | Shop, category, product detail, images, variants, availability | Active catalog renders from DB; invalid/inactive routes handled; responsive. | Full Stack | M |
 | M05 | Search & filters | P1 | M04 | Done | Done | Basic search/category/availability filtering | URL/state predictable; no overbuilt search service. | Full Stack | S |
 | M06 | Cart | P0 | M04 | Done | Done | Add/update/remove, persistence, subtotal display, empty/error/loading states. Database/RLS, cookie, Server Actions, UI and guest/account browser flows verified on 2026-09-23. | Variant-aware; positive integer quantity within stock; current server prices/subtotal. Secure 30-day hashed guest identity; separate account carts, no merge. Complete only after end-to-end verification. | Full Stack | M |
-| M07 | Checkout foundation | P0 | M03,M06 | In Progress | Done: its M03 dependency is verified (2026-10-05) | PH address/account reuse, authoritative PHP merchandise quote, discount validation; M03 dependency verification incomplete | Current prices/stock and single coupon validated server-side; tax included; shipping/final payable total pending; account addresses isolated. | Backend | M |
+| M07 | Checkout foundation | P0 | M03,M06 | Done | Done: its M03 dependency is verified (2026-10-05) | PH address/account reuse, authoritative PHP merchandise quote, discount validation; M03 dependency verification incomplete | Current prices/stock and single coupon validated server-side; tax included; shipping/final payable total pending; account addresses isolated. | Backend | M |
 | M08 | PayMongo payment | P0 | M07 | In Progress | Built, tested end to end, live in demo mode | PayMongo hosted checkout session and safe metadata; merchandise-only charge (shipping paid to courier on delivery) | Client cannot choose price/total; test payment can complete. | Backend | M |
 | M09 | Webhook & order creation | P0 | M08 | In Progress | Built, tested end to end, live in demo mode | Signature verification, idempotency, order snapshots, payment state, inventory adjustment | Duplicate webhook safe; browser close after pay still produces correct order; no double inventory deduction. | Backend | L |
 | M10 | Customer account | P1 | M03,M09 | In Progress | Built, tested end to end, live in demo mode | Order history/detail, addresses, settings | Users only see own data; empty/loading/error states included. | Full Stack | M |
@@ -53,7 +53,7 @@ A plan or created files alone do not establish completion. Required functionalit
 
 ## Dashboard and status preservation
 
-15_DASHBOARD cached results after the 2026-09-25 status correction (workbook statuses only; they predate M08-M16 progress, see "Current state"): 17 total, 6 Done, 2 In Progress, 0 Blocked, 9 Not Started (35.29% complete). Formulas are unchanged and the workbook recalculates fully on load. Read milestone checkpoints for actual execution history. Native Excel recalculation was not exercised.
+15_DASHBOARD cached results updated 2026-10-05 with M03 and M07 Done: 17 total, 8 Done, 8 In Progress, 0 Blocked, 1 Not Started (47.06% complete). Earlier (2026-09-25 status correction, workbook statuses only): 17 total, 6 Done, 2 In Progress, 0 Blocked, 9 Not Started (35.29% complete). Formulas are unchanged and the workbook recalculates fully on load. Read milestone checkpoints for actual execution history. Native Excel recalculation was not exercised.
 
 ## User-story traceability
 
