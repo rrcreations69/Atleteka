@@ -1,6 +1,7 @@
-import Link from "next/link";
 import { notFound } from "next/navigation";
-import { Container } from "@/components/layout/container";
+import { AccountShell } from "@/components/account/account-shell";
+import { orderDate, orderNumber } from "@/components/account/order-rows";
+import { StatusBadge } from "@/components/ui/status-badge";
 import { getOwnOrder, orderStatusLabel } from "@/lib/account/orders";
 import { requireIdentity } from "@/lib/auth/session";
 import { formatPrice } from "@/lib/catalog/validation";
@@ -8,57 +9,62 @@ import { formatPrice } from "@/lib/catalog/validation";
 export const dynamic = "force-dynamic";
 export const metadata = { title: "Order | Atleteka" };
 
+const notice = "border-l-2 bg-card p-4 text-sm";
+
 export default async function OrderPage({ params }: { params: Promise<{ id: string }> }) {
-  const { user } = await requireIdentity();
+  const { user, profile } = await requireIdentity();
   // Someone else's order and a nonexistent one look the same: not found.
   const order = await getOwnOrder(user.id, (await params).id);
   if (!order) notFound();
   const address = order.shipping_address;
-  const placed = new Intl.DateTimeFormat("en-PH", { dateStyle: "long", timeStyle: "short", timeZone: "Asia/Manila" }).format(new Date(order.created_at));
-  return <Container className="space-y-8 py-10 sm:py-16">
-    <Link href="/account/orders" className="inline-flex min-h-11 items-center underline underline-offset-4">Back to your orders</Link>
-    <div className="space-y-2">
-      <h1 className="text-3xl font-semibold">Order details</h1>
-      <p className="text-sm text-muted-foreground">Placed {placed} · Order {order.id.slice(0, 8).toUpperCase()}</p>
-      <p><span className="font-medium">Status:</span> {orderStatusLabel(order.status)} · Paid</p>
-      {order.status === "shipped" || order.status === "delivered" ? (order.courier || order.tracking_number) && <p className="text-sm">
-        Courier: {order.courier ?? "not specified"}{order.tracking_number ? <> · Tracking number: <span className="break-all">{order.tracking_number}</span></> : null}
-      </p> : null}
-      {order.status === "cancelled" && <p role="status" className="rounded-md border border-border p-3 text-sm">
-        This order was cancelled. If you were charged, the refund is handled through the payment provider; contact us if you have questions.
-      </p>}
-      {order.status === "needs_review" && <p role="status" className="rounded-md border border-border p-3 text-sm">
-        We need to check this order before shipping it (for example, an item sold out while you were paying). We will contact you by email.
-      </p>}
-    </div>
-    <div className="grid gap-8 lg:grid-cols-2">
-      <section aria-labelledby="order-items" className="min-w-0 space-y-4">
-        <h2 id="order-items" className="text-xl font-semibold">Items</h2>
-        <ul className="space-y-3">
-          {order.order_items.map((item) => <li key={item.id} className="break-words">
-            <p>{item.product_name} · {item.variant_name} × {item.quantity}</p>
-            <p className="text-sm text-muted-foreground">{formatPrice(item.unit_price)} each · SKU {item.sku}</p>
-            <p>{formatPrice(item.line_total)}</p>
+  const shipped = order.status === "shipped" || order.status === "delivered";
+  const discounted = Number(order.discount_total) > 0;
+  return <AccountShell title={"Order " + orderNumber(order.id)} isAdmin={profile.role === "admin"} back={{ href: "/account/orders", label: "All orders" }}
+    description={<p>Placed {orderDate(order.created_at, "long")}</p>}
+    actions={<StatusBadge status={order.status} label={orderStatusLabel(order.status)} className="mb-1" />}>
+    {order.status === "cancelled" && <p role="status" className={notice + " border-foreground"}>
+      This order was cancelled. If you were charged, the refund is handled through the payment provider; contact us if you have questions.
+    </p>}
+    {order.status === "needs_review" && <p role="status" className={notice + " border-destructive"}>
+      We need to check this order before shipping it (for example, an item sold out while you were paying). We will contact you by email.
+    </p>}
+    <div className="grid gap-10 xl:grid-cols-[minmax(0,1fr)_20rem]">
+      <section aria-labelledby="order-items" className="min-w-0 space-y-2">
+        <h2 id="order-items" className="text-xl">Items</h2>
+        <ul className="border-t border-border">
+          {order.order_items.map((item) => <li key={item.id} className="flex items-start justify-between gap-4 border-b border-border py-4">
+            <div className="min-w-0 space-y-1">
+              <p className="break-words font-semibold">{item.product_name}</p>
+              <p className="break-words text-sm text-muted-foreground">{item.variant_name} · Qty {item.quantity}</p>
+              <p className="break-words text-xs text-muted-foreground">{formatPrice(item.unit_price)} each · SKU {item.sku}</p>
+            </div>
+            <p className="shrink-0 font-semibold tabular-nums">{formatPrice(item.line_total)}</p>
           </li>)}
         </ul>
       </section>
-      <section aria-labelledby="order-summary" className="min-w-0 space-y-5 rounded-lg border border-border p-5">
-        <h2 id="order-summary" className="text-xl font-semibold">Summary</h2>
-        <dl className="space-y-3">
-          <div><dt>Subtotal</dt><dd>{formatPrice(order.subtotal)}</dd></div>
-          <div><dt>Discount</dt><dd>{formatPrice(order.discount_total)}</dd></div>
-          <div><dt>Tax</dt><dd>Included in prices</dd></div>
-          <div><dt>Shipping</dt><dd>Paid to the courier on delivery (not included)</dd></div>
-          <div className="font-semibold"><dt>Amount paid</dt><dd>{formatPrice(order.grand_total)}</dd></div>
-        </dl>
-        <div className="border-t border-border pt-4">
-          <h3 className="font-medium">Delivery address</h3>
-          <address className="not-italic break-words text-sm">
-            {address.name}<br />{address.line1}{address.line2 ? <><br />{address.line2}</> : null}<br />
+      <div className="space-y-4">
+        <section aria-labelledby="order-summary" className="space-y-4 bg-card p-5 sm:p-6">
+          <h2 id="order-summary" className="text-lg">Summary</h2>
+          <dl className="space-y-3 text-sm">
+            <div className="flex justify-between gap-4"><dt className="text-muted-foreground">Subtotal</dt><dd className="tabular-nums">{formatPrice(order.subtotal)}</dd></div>
+            {discounted && <div className="flex justify-between gap-4"><dt className="text-muted-foreground">Discount</dt><dd className="tabular-nums text-success">−{formatPrice(order.discount_total)}</dd></div>}
+            <div className="flex justify-between gap-4"><dt className="text-muted-foreground">Shipping</dt><dd className="text-right">Paid to the courier on delivery</dd></div>
+            <div className="flex items-baseline justify-between gap-4 border-t border-border pt-4 text-base font-semibold"><dt>Amount paid</dt><dd className="text-xl tabular-nums">{formatPrice(order.grand_total)}</dd></div>
+          </dl>
+          <p className="text-xs text-muted-foreground">Prices include tax.</p>
+        </section>
+        <section aria-labelledby="order-delivery" className="space-y-3 bg-card p-5 sm:p-6">
+          <h2 id="order-delivery" className="text-lg">Delivery</h2>
+          <address className="break-words text-sm not-italic leading-relaxed">
+            <span className="font-semibold">{address.name}</span><br />{address.line1}{address.line2 ? <><br />{address.line2}</> : null}<br />
             {address.city}, {address.region} {address.postal_code}<br />Philippines
           </address>
-        </div>
-      </section>
+          {shipped && (order.courier || order.tracking_number) && <dl className="space-y-2 border-t border-border pt-3 text-sm">
+            <div className="flex justify-between gap-4"><dt className="text-muted-foreground">Courier</dt><dd className="text-right">{order.courier ?? "Not specified"}</dd></div>
+            {order.tracking_number && <div className="flex justify-between gap-4"><dt className="text-muted-foreground">Tracking number</dt><dd className="break-all text-right font-semibold">{order.tracking_number}</dd></div>}
+          </dl>}
+        </section>
+      </div>
     </div>
-  </Container>;
+  </AccountShell>;
 }
