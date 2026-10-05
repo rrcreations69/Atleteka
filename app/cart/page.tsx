@@ -1,7 +1,9 @@
 import Link from "next/link";
 import { Container } from "@/components/layout/container";
-import { CartForm } from "@/components/cart/cart-form";
+import { QuantityStepper, RemoveItemButton } from "@/components/cart/cart-line-controls";
+import { ProductImage } from "@/components/catalog/product-image";
 import { getCart, CartAccessError } from "@/lib/cart/data";
+import { getProductThumbnails } from "@/lib/catalog/data";
 import { formatPrice } from "@/lib/catalog/validation";
 import { buttonVariants } from "@/components/ui/button";
 
@@ -22,46 +24,87 @@ export default async function CartPage() {
     </Container>;
   }
   const { cart, kind } = result;
-  return (
-    <Container className="max-w-3xl space-y-6 py-8 sm:py-12">
-      <div className="space-y-3">
-        <h1 className="text-3xl sm:text-4xl">Cart</h1>
-        <p className="text-sm text-muted-foreground">{kind === "guest"
-          ? "Your guest cart is saved in this browser for 30 days. Signing in opens your separate account cart."
-          : "This is your account cart. Your guest cart stays separate in this browser."}</p>
-      </div>
-      {cart.items.length === 0 ? <div className="space-y-5 bg-card p-10 text-center">
-        <p className="text-lg">Your cart is empty.</p>
+  const count = cart.items.reduce((total, item) => total + item.quantity, 0);
+  const blocked = cart.items.some((item) => !item.quantityValid);
+  const thumbnails = await getProductThumbnails(cart.items.flatMap((item) => item.productSlug ? [item.productSlug] : [])).catch(() => new Map());
+
+  if (cart.items.length === 0) return (
+    <Container className="py-8 sm:py-12">
+      <h1 className="text-3xl sm:text-4xl">Cart</h1>
+      <div className="mt-8 flex flex-col items-center gap-5 bg-card px-6 py-16 text-center">
+        <svg aria-hidden="true" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="text-muted-foreground">
+          <path d="M6 7h12l-1 13H7L6 7z" /><path d="M9 7a3 3 0 0 1 6 0" />
+        </svg>
+        <div className="space-y-1.5">
+          <p className="text-lg font-semibold">Your cart is empty</p>
+          <p className="text-muted-foreground">Items you add will appear here.</p>
+        </div>
         <Link href="/shop" className={buttonVariants()}>Browse products</Link>
-      </div> : <>
-        <ul className="border-t border-border">
-          {cart.items.map((item) => <li key={item.variantId} className="grid gap-5 border-b border-border py-6 sm:grid-cols-[1fr_auto]">
-            <div className="min-w-0 space-y-2">
-              <h2 className="break-words text-base font-semibold tracking-normal">{item.productSlug
-                ? <Link href={"/products/" + item.productSlug} className="underline-offset-4 hover:underline">{item.productName}</Link>
-                : item.productName}</h2>
-              <p className="break-words text-muted-foreground">{item.variantName}</p>
-              <p>Unit price: {item.unitPrice === null ? "Unavailable" : formatPrice(item.unitPrice)}</p>
-              <p>Quantity: {item.quantity}</p>
-              <p className="font-medium">Line total: {item.lineTotal === null ? "Unavailable" : formatPrice(item.lineTotal)}</p>
-              {!item.quantityValid && <p role="status" className="text-sm text-destructive">{item.available
-                ? "The saved quantity exceeds current stock. Reduce the quantity or remove this item."
-                : "This option is unavailable. Remove it or check again later."}</p>}
-            </div>
-            <div className="space-y-4">
-              <CartForm key={item.variantId + ":" + item.quantity} variantId={item.variantId} quantity={item.quantity} operation="set" disabled={!item.available} />
-              <CartForm variantId={item.variantId} operation="remove" />
-            </div>
-          </li>)}
+      </div>
+    </Container>
+  );
+
+  return (
+    <Container className="py-8 sm:py-12">
+      <div className="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-2 border-b border-border pb-5">
+        <h1 className="text-3xl sm:text-4xl">Cart <span className="text-muted-foreground">({count} {count === 1 ? "item" : "items"})</span></h1>
+        <Link href="/shop" className="inline-flex min-h-11 items-center text-sm underline underline-offset-4">Continue shopping</Link>
+      </div>
+
+      <div className="mt-2 grid gap-10 lg:grid-cols-[minmax(0,1fr)_22rem] lg:gap-14">
+        <ul aria-label="Cart items">
+          {cart.items.map((item) => {
+            const label = item.productName + " · " + item.variantName;
+            const image = item.productSlug ? thumbnails.get(item.productSlug) : undefined;
+            const name = item.productSlug
+              ? <Link href={"/products/" + item.productSlug} className="underline-offset-4 hover:underline">{item.productName}</Link>
+              : item.productName;
+            return <li key={item.variantId} className="grid grid-cols-[5.5rem_minmax(0,1fr)] gap-4 border-b border-border py-6 sm:grid-cols-[7rem_minmax(0,1fr)] sm:gap-6">
+              <ProductImage image={image} shape="portrait" sizes="112px" className={item.available ? undefined : "opacity-60"} />
+              <div className="flex min-w-0 flex-col gap-3">
+                <div className="flex items-start justify-between gap-4">
+                  <div className="min-w-0 space-y-1">
+                    <h2 className="break-words text-base font-semibold tracking-normal">{name}</h2>
+                    <p className="break-words text-sm text-muted-foreground">{item.variantName}</p>
+                    <p className="text-sm text-muted-foreground">{item.unitPrice === null ? "Price unavailable" : formatPrice(item.unitPrice) + " each"}</p>
+                  </div>
+                  <p className="shrink-0 text-right font-semibold tabular-nums">
+                    <span className="sr-only">Line total: </span>{item.lineTotal === null ? "Unavailable" : formatPrice(item.lineTotal)}
+                  </p>
+                </div>
+                {!item.quantityValid && <p role="status" className="border-l-2 border-destructive pl-3 text-sm text-destructive">{item.available
+                  ? "Not enough stock for this quantity. Lower it or remove this item."
+                  : "This option is unavailable. Remove it or check again later."}</p>}
+                <div className="mt-auto flex flex-wrap items-start justify-between gap-x-4 gap-y-2">
+                  <QuantityStepper key={item.variantId + ":" + item.quantity} variantId={item.variantId} quantity={item.quantity} productLabel={label} disabled={!item.available} />
+                  <RemoveItemButton variantId={item.variantId} productLabel={label} />
+                </div>
+              </div>
+            </li>;
+          })}
         </ul>
-        <section aria-labelledby="cart-subtotal" className="space-y-3 bg-card p-5 sm:p-6">
-          <h2 id="cart-subtotal" className="flex items-baseline justify-between gap-4 text-xl"><span>Subtotal</span><span>{formatPrice(cart.subtotal)}</span></h2>
-          <p className="text-sm text-muted-foreground">Shipping is paid to the courier on delivery. Prices include tax.</p>
-          <p className="text-sm text-muted-foreground">Prices and availability are checked when your cart loads or changes. Items are not reserved. Unavailable product prices are excluded.</p>
-          <a href="/cart" className="inline-flex min-h-11 items-center text-sm underline underline-offset-4">Refresh prices and availability</a>
-        </section>
-        <div className="flex flex-col gap-3 sm:flex-row"><Link href="/checkout" className={buttonVariants({ className: "sm:flex-1" })}>Continue to checkout</Link><Link href="/shop" className={buttonVariants({ variant: "outline" })}>Continue shopping</Link></div>
-      </>}
+
+        <aside aria-labelledby="order-summary" className="lg:pt-6">
+          <div className="space-y-5 bg-card p-5 sm:p-6 lg:sticky lg:top-8">
+            <h2 id="order-summary" className="text-lg">Order summary</h2>
+            <dl className="space-y-3 text-sm">
+              <div className="flex justify-between gap-4"><dt className="text-muted-foreground">Items</dt><dd className="tabular-nums">{count}</dd></div>
+              <div className="flex justify-between gap-4"><dt className="text-muted-foreground">Shipping</dt><dd className="text-right">Paid to the courier on delivery</dd></div>
+              <div className="flex items-baseline justify-between gap-4 border-t border-border pt-4 text-base font-semibold"><dt>Subtotal</dt><dd className="text-xl tabular-nums">{formatPrice(cart.subtotal)}</dd></div>
+            </dl>
+            <p className="text-xs text-muted-foreground">Prices include tax. Unavailable items are excluded.</p>
+            {blocked && <p role="status" className="text-sm text-destructive">Fix the items marked above before checking out.</p>}
+            <Link href="/checkout" className={buttonVariants({ className: "w-full" })}>Checkout</Link>
+            <div className="space-y-2 border-t border-border pt-4 text-xs text-muted-foreground">
+              <p>Prices and availability are checked when your cart loads or changes. Items are not reserved.</p>
+              <p>{kind === "guest"
+                ? "Guest cart, saved in this browser for 30 days. Signing in opens your separate account cart."
+                : "Account cart. Your guest cart stays separate in this browser."}</p>
+              <a href="/cart" className="inline-flex min-h-11 items-center underline underline-offset-4 hover:text-foreground">Refresh prices and availability</a>
+            </div>
+          </div>
+        </aside>
+      </div>
     </Container>
   );
 }
