@@ -1,10 +1,10 @@
 import Link from "next/link";
 import { Container } from "@/components/layout/container";
-import { ProductGrid } from "@/components/catalog/product-grid";
-import { ProductImage } from "@/components/catalog/product-image";
-import { buttonVariants } from "@/components/ui/button";
-import { BrandStatement, ClosingCta, Faq, HowItWorks, WhyUs, type ShopLink } from "@/components/home/landing-sections";
-import { FeaturedHero, type HeroSlide } from "@/components/home/featured-hero";
+import Image from "next/image";
+import { Faq } from "@/components/home/landing-sections";
+import { ColorHero, type HeroSlide } from "@/components/home/color-hero";
+import { moodVars } from "@/lib/home-moods";
+import { HomeProductCard } from "@/components/home/home-product-card";
 import { getCategories, getProducts } from "@/lib/catalog/data";
 import { PAGE_SIZE, catalogQuerySchema, priceLabel, type CatalogCategory, type CatalogImage, type CatalogProduct } from "@/lib/catalog/validation";
 import { brand } from "@/lib/brand";
@@ -14,12 +14,13 @@ export const revalidate = 60;
 
 const LEAD = ["women", "men"];
 const firstQuery = catalogQuerySchema.parse({});
+const pill = "inline-flex min-h-12 items-center rounded-full bg-black px-7 text-sm font-semibold text-white group-hover:bg-[#2d2d2d]";
 
 type Covered = CatalogCategory & { cover?: CatalogImage };
 
 // Categories have no images, so each cover is a product photo: prefer products specific to the
 // category (fewest category memberships), then the signature (highest-priced) piece. Photos are
-// not repeated, and the Women/Men heroes avoid two products from the same clothing type.
+// not repeated, and the Women/Men tiles avoid two products from the same clothing type.
 async function withCovers(categories: CatalogCategory[]): Promise<Covered[]> {
   const listings = await Promise.all(categories.map((category) => getProducts(firstQuery, category.id)));
   const groups = new Map<string, string[]>();
@@ -49,16 +50,15 @@ function firstSentence(text: string) {
   return (paragraph.match(/^.*?[.!?](?=\s|$)/)?.[0] ?? paragraph).trim();
 }
 
-// Featured hero: the five highest-priced in-stock pieces with a photo.
+// Featured hero: the highest-priced in-stock pieces with a photo, one per color mood.
 function featuredSlides(products: CatalogProduct[]): HeroSlide[] {
   const top = (product: CatalogProduct) => Math.max(...product.variants.map((variant) => variant.price));
   return products.filter((product) => product.images.length > 0 && product.variants.some((variant) => variant.inStock))
-    .sort((a, b) => top(b) - top(a)).slice(0, 5)
+    .sort((a, b) => top(b) - top(a)).slice(0, brand.heroMoods.length)
     .map((product) => ({
       id: product.id, slug: product.slug, name: product.name, price: priceLabel(product.variants),
       // First sentence of the description keeps the hero copy short.
       blurb: firstSentence(product.description),
-      sizes: product.variants.map((variant) => ({ title: variant.title, inStock: variant.inStock })),
       image: product.images[0],
     }));
 }
@@ -76,55 +76,52 @@ export default async function HomePage() {
   const others = covered.filter((category) => !LEAD.includes(category.slug));
   const products = listing?.products.slice(0, 8) ?? [];
   const slides = featuredSlides(catalog);
-  const shopLinks: ShopLink[] = lead.length > 0
-    ? lead.map((category) => ({ href: `/categories/${category.slug}`, label: `Shop ${category.name.toLowerCase()}` }))
-    : [{ href: "/shop", label: "Shop the collection" }];
   return (
-    <>
+    // The hero sets the --home-* mood variables on this canvas; the first mood is the server-rendered default.
+    <div data-home-canvas style={moodVars(brand.heroMoods[0])} className="flex-1 bg-[var(--home-page)] pb-16 motion-safe:transition-colors motion-safe:duration-700 sm:pb-24">
       <h1 className="sr-only">{brand.name}: {brand.tagline}</h1>
-      <FeaturedHero slides={slides} />
-      {lead.length > 0 ? <section aria-label="Shop by department" className={"grid " + (lead.length > 1 ? "sm:grid-cols-2" : "")}>
-        {lead.map((category) => <Link key={category.id} href={`/categories/${category.slug}`} className="group relative block bg-foreground">
-          <ProductImage image={category.cover} sizes="(min-width: 640px) 50vw, 100vw" className="aspect-[4/3] opacity-90 group-hover:opacity-100 lg:aspect-[16/10]" />
-          <span aria-hidden="true" className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-[#181a2f]/75 to-transparent" />
-          <span className="absolute bottom-6 left-5 text-white sm:bottom-9 sm:left-9">
-            <span className="block text-4xl font-semibold tracking-[-0.02em] sm:text-5xl">{category.name}</span>
-            <span className={buttonVariants({ variant: "inverse", className: "pointer-events-none mt-4" })}>Shop {category.name.toLowerCase()}</span>
-          </span>
-        </Link>)}
-      </section> : null}
+      <ColorHero slides={slides} />
 
-      <BrandStatement />
-
-      <Container className="mt-16 sm:mt-24">
-        <div className="mb-6 flex items-end justify-between gap-4">
-          <div>
-            <p className="eyebrow text-xs text-primary">The collection</p>
-            <h2 className="mt-2 text-2xl sm:text-3xl">Pieces for every day.</h2>
-          </div>
+      <Container className="mt-12 sm:mt-16">
+        <div className="mb-5 flex items-end justify-between gap-4">
+          <h2 className="text-2xl">Shop the collection</h2>
           <Link href="/shop" className="inline-flex min-h-11 shrink-0 items-center text-sm font-semibold underline underline-offset-4">View all</Link>
         </div>
-        <ProductGrid products={products} headingLevel={3} />
+        <ul className="grid grid-cols-2 gap-x-3 gap-y-8 lg:grid-cols-4">
+          {products.map((product) => <li key={product.id} className="min-w-0"><HomeProductCard product={product} /></li>)}
+        </ul>
       </Container>
 
+      {lead.length > 0 && <Container className="mt-14 sm:mt-20">
+        <section aria-label="Shop by department" className={"grid gap-3 " + (lead.length > 1 ? "sm:grid-cols-2" : "")}>
+          {lead.map((category) => <Link key={category.id} href={`/categories/${category.slug}`}
+            className="group relative block aspect-[4/5] overflow-hidden bg-[var(--home-tile)] motion-safe:transition-colors motion-safe:duration-700">
+            {category.cover && <span className="absolute inset-x-[10%] bottom-[30%] top-[6%]"><Image src={category.cover.url} alt="" fill sizes="(min-width: 640px) 40vw, 80vw" className="object-contain" /></span>}
+            <span className="absolute bottom-7 left-6 sm:bottom-9 sm:left-9">
+              <span className="font-display block text-[clamp(3rem,6vw,5.5rem)] font-medium uppercase leading-[0.9]">{category.name}</span>
+              <span className={pill + " mt-4"}>Shop {category.name.toLowerCase()}</span>
+            </span>
+          </Link>)}
+        </section>
+      </Container>}
 
-      {others.length > 0 && <Container className="mt-16 sm:mt-24">
-        <p className="eyebrow text-xs text-primary">Categories</p>
-        <h2 className="mb-6 mt-2 text-2xl sm:text-3xl">Shop by category.</h2>
-        <ul className="grid grid-cols-2 gap-x-2 gap-y-6 sm:gap-x-3 lg:grid-cols-4">
+      {others.length > 0 && <Container className="mt-14 sm:mt-20">
+        <h2 className="mb-5 text-2xl">Shop by category</h2>
+        <ul className="grid grid-cols-2 gap-3 lg:grid-cols-4">
           {others.map((category) => <li key={category.id}>
-            <Link href={`/categories/${category.slug}`} className="group block">
-              <ProductImage image={category.cover} shape="square" sizes="(min-width: 1024px) 25vw, 50vw" />
-              <span className="mt-2.5 block text-sm font-semibold group-hover:underline group-hover:underline-offset-4">{category.name} <span aria-hidden="true">→</span></span>
+            <Link href={`/categories/${category.slug}`}
+              className="group relative block aspect-[3/4] overflow-hidden bg-[var(--home-chip)] motion-safe:transition-colors motion-safe:duration-700">
+              {category.cover && <span className="absolute inset-x-[12%] bottom-[36%] top-[8%]"><Image src={category.cover.url} alt="" fill sizes="(min-width: 1024px) 20vw, 40vw" className="object-contain" /></span>}
+              <span className="absolute bottom-4 left-4 sm:bottom-5 sm:left-5">
+                <span className="font-display block text-2xl font-medium uppercase leading-none sm:text-3xl">{category.name}</span>
+                <span className="mt-3 inline-flex min-h-10 items-center rounded-full bg-black px-5 text-xs font-semibold text-white group-hover:bg-[#2d2d2d]">Shop {category.name.toLowerCase()}</span>
+              </span>
             </Link>
           </li>)}
         </ul>
       </Container>}
 
-      <WhyUs />
-      <HowItWorks />
       <Faq />
-      <ClosingCta links={shopLinks} />
-    </>
+    </div>
   );
 }

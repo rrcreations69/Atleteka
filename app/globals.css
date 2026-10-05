@@ -7,6 +7,7 @@
    apricot #FDA481 accents on dark surfaces only (it fails contrast on white). */
 @theme inline {
   --font-sans: var(--font-instrument), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-jost), Futura, "Trebuchet MS", sans-serif;
   --text-display: clamp(2.25rem, 5vw, 3.5rem);
   --text-display--line-height: 1.04;
   --text-display--letter-spacing: -0.025em;
@@ -69,6 +70,11 @@
   --navy: #242e49;
   --wine: #54162b;
   --apricot: #fda481;
+}
+
+/* Home hero progress bar (D-DESIGN-05). */
+@keyframes hero-fill {
+  to { width: 100%; }
 }
 
 @layer base {

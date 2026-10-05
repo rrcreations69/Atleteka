@@ -258,3 +258,11 @@ Status: **Approved** by the user on 2026-10-05 (explicit session reply: "Approve
 - Product pages show up to four other active products that share the most categories with the current one, in stock first, topped up with the newest active products when the categories are small (lib/catalog/data.ts getRelatedProducts).
 - Public catalog data only; no tracking, personalization, behavioral data, new tables or services. Any failure hides the section.
 - Still out of scope: personalized or behavior-based recommendations, "frequently bought together", and any recommendation service.
+
+## D-DESIGN-05 color-mood home page - 2026-10-05
+
+Status: **Proposed**, built on branch feat/color-hero-home at the user's request ("build v3 into the real store on a branch") after reviewing mock-ups based on the Nike-inspired DESIGN.md (previews/nike-style-home-v3.html, outside the repo). Approval is the user's merge decision. Home page only; the header, footer and every other page keep D-DESIGN-02/03.
+- Hero (components/home/color-hero.tsx): the four highest-priced in-stock products with a photo, each on one of four brand "moods" from lib/brand.ts heroMoods (indigo, sand, espresso, sage), the store name oversized behind the garment, name, first sentence of the description, price and Shop now. It advances every 6 s while at least half on screen and not paused (Pause/Play button, progress bars that also select a slide, arrow keys); reduced motion starts it paused. This replaces D-DESIGN-04's no-autoplay carousel.
+- The rest of the home page takes the active mood's light tints (page, product tiles, category tiles), so the page changes color with the hero; the moods are code settings, so no schema change. A per-product color chosen in Admin would need a schema change and its own approval.
+- Sections: hero, Shop the collection (8 products, second photo on hover or focus), Women/Men tiles, Shop by category, FAQ. Removed: brand statement band, Why Atleteka, How it works, closing call to action (and brand.statement).
+- Type: Jost (next/font, a free Futura-like face) for the oversized display text; Instrument Sans everywhere else. Buttons on the home page are black or mood-colored pills.
