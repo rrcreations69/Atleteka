@@ -70,7 +70,7 @@ export function FeaturedHero({ slides }: { slides: HeroSlide[] }) {
             </div>
             <div className="relative order-1 mx-auto aspect-[4/5] w-full max-w-[17rem] sm:max-w-xs lg:order-2 lg:max-w-[24rem]">
               <span aria-hidden="true" className="absolute left-1/2 top-1/2 aspect-square w-[88%] -translate-x-1/2 -translate-y-1/2 rounded-full bg-white/[0.09]" />
-              <Image src={slide.image.url} alt={slide.image.alt} fill unoptimized priority={index === 0}
+              <Image src={slide.image.url} alt={slide.image.alt} fill priority={index === 0}
                 sizes="(min-width: 1024px) 40vw, 80vw" className="object-contain drop-shadow-[0_30px_40px_rgba(0,0,0,0.35)]" />
             </div>
             <div className="relative order-3 flex flex-wrap items-end justify-between gap-6 lg:flex-col lg:items-start lg:justify-center">
@@ -101,7 +101,7 @@ export function FeaturedHero({ slides }: { slides: HeroSlide[] }) {
             <p aria-live="polite" className="ml-1 text-sm tabular-nums text-white/80">{active + 1} of {slides.length}</p>
           </div>
           <button type="button" onClick={() => go(active + 1)} className="pointer-events-auto hidden items-center gap-3 rounded-sm bg-white/10 p-2 pr-4 text-left hover:bg-white/15 sm:flex">
-            <span className="relative block size-14 shrink-0 rounded-sm bg-photo"><Image src={next.image.url} alt="" fill unoptimized sizes="56px" className="object-contain p-1" /></span>
+            <span className="relative block size-14 shrink-0 rounded-sm bg-photo"><Image src={next.image.url} alt="" fill sizes="56px" className="object-contain p-1" /></span>
             <span className="text-sm"><span className="block text-white/85">Next</span><span className="block font-semibold">{next.name}</span></span>
           </button>
         </div>
