@@ -12,7 +12,7 @@ Read this section first; everything below it is history. Verify against the code
 
 ## Open items (user's call; set aside items stay parked until the user raises them)
 1. Before launch: real products and photos; PayMongo live key, live webhook and its secret in Vercel Production; verified Resend domain and EMAIL_FROM (no domain yet, guest-checkout soft launch per M16-P01); rotate the database password; enable Supabase leaked-password protection.
-2. Set aside by the user: M03 password-reset retry; PayMongo live keys (deliberately after the sale).
+2. Set aside by the user: PayMongo live keys (deliberately after the sale). The M03 password reset passed on 2026-10-05 on the user's phone (M03_CHECKPOINT.md).
 3. Pitch preparation (next): a demo walkthrough script and a one-page feature sheet for the buyer.
 4. Not yet checked on production: signed-in account and admin pages (verified on a local production build; phone width checked at about 660 px only).
 5. Paperwork: PRD decision-log rows for D-DESIGN-01 to 04, D-REL-01 and later UI decisions; close milestones in the PRD once launch items are done.
