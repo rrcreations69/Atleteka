@@ -59,3 +59,9 @@ Findings:
 Paused 2026-09-25 ~6:00 PM PHT at the user's choice: recovery requests at 5:03–5:55 PM all returned 429 (the built-in mailer limit, stricter than 2/hour in practice). M03 and M07 remain In Progress; the workbook is unchanged.
 
 Resume (single remaining check): keep rrai.creatives+customer@gmail.com (customer) and rrai.creatives+admin@gmail.com (admin, to be kept). Start the production server; in the Claude browser pane open /login?mode=recover and request **one** reset for +customer. The user sends **only the pkce_ token**, never the URL (Discord previews consume links). Build `https://vaqkikxksbblgspdeiap.supabase.co/auth/v1/verify?token=<token>&type=recovery&redirect_to=http://localhost:3000/login`, fetch it with `curl --max-redirs 0`, and open the Location `?code=` URL in the pane (it holds the PKCE verifier). Expect /login?mode=reset; the user sets a new password and lands on /account. If this passes, set M03 and M07 to Done (07_ROADMAP!E7 (M03) and E11 (M07) plus dashboard caches, via direct XML), then delete the +customer account.
+
+## Password reset verified - 2026-10-05
+
+PASS. On production (https://atleteka.vercel.app), on the user's own phone: the user opened /login?mode=recover in the phone browser, requested one reset for rrai.creatives+customer@gmail.com, copied the email link (long-press) from the Gmail app into the same phone browser, set a new password and landed on the account page signed in. The user reported each step working. A reset requested earlier the same day from Claude's in-app browser was not used (its link only works in the browser that requested it).
+
+With this, every M03 acceptance check has passed. The PRD workbook still shows M03 and M07 In Progress; changing it needs the user's approval. The +customer test account is kept until the user decides.
