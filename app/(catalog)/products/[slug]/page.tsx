@@ -25,7 +25,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const image = product.images[0];
   return {
     title: { absolute: title }, description, alternates: { canonical: path },
-    openGraph: { ...openGraphDefaults, title, description, url: path, images: image ? [{ url: image.url, alt: image.alt }] : undefined },
+    openGraph: { ...openGraphDefaults, title, description, url: path, ...(image ? { images: [{ url: image.url, alt: image.alt }] } : {}) },
   };
 }
 
