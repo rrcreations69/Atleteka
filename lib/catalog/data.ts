@@ -4,6 +4,7 @@ import { createPublicSupabaseClient } from "@/lib/supabase/public";
 import { getAuthConfig } from "@/lib/supabase/config";
 import {
   PAGE_SIZE, catalogQuerySchema, literalSearchPattern, slugSchema, productSchema, categorySchema, availabilitySchema, toCatalogProduct,
+  imageSchema, publicImageUrl, type CatalogImage,
   type ProductRow, type CatalogProduct, type CatalogQuery,
 } from "./validation";
 
@@ -78,4 +79,22 @@ export async function getProduct(slug: string) {
   if (error) throw new Error("Product could not be loaded.");
   if (!data) return null;
   return (await withAvailability([productSchema.parse(data)]))[0];
+}
+
+// First image per active product, for cart thumbnails. Public catalog data only; any failure
+// returns no thumbnails so the cart still renders.
+export async function getProductThumbnails(slugs: string[]) {
+  const thumbnails = new Map<string, CatalogImage>();
+  const unique = [...new Set(slugs)].map((slug) => slugSchema.parse(slug)).slice(0, 100);
+  if (unique.length === 0) return thumbnails;
+  const { data, error } = await createPublicSupabaseClient().from("products")
+    .select("slug,name,product_images(id,storage_path,alt_text,sort_order)").in("slug", unique).eq("status", "active");
+  if (error) return thumbnails;
+  const rows = z.array(z.object({ slug: slugSchema, name: z.string().min(1), product_images: z.array(imageSchema) })).safeParse(data);
+  if (!rows.success) return thumbnails;
+  for (const row of rows.data) {
+    const image = [...row.product_images].sort((a, b) => a.sort_order - b.sort_order || a.id.localeCompare(b.id))[0];
+    if (image) thumbnails.set(row.slug, { id: image.id, url: publicImageUrl(getAuthConfig().url, image.storage_path), alt: image.alt_text || row.name });
+  }
+  return thumbnails;
 }
