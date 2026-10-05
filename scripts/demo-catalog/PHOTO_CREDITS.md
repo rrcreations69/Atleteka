@@ -6,17 +6,17 @@ photos before launch.
 
 | Product slug | Photo | Photographer |
 | --- | --- | --- |
-| relaxed-linen-shirt | https://unsplash.com/photos/lziP7ZPtghg | Tian Dayong |
+| relaxed-linen-top | https://unsplash.com/photos/lziP7ZPtghg | Tian Dayong |
 | wide-leg-trousers | https://unsplash.com/photos/Ok9zDSlE2bI | Engin Akyurt |
 | ribbed-knit-tank | https://unsplash.com/photos/y2WnRJssfZw | Engin Akyurt |
-| cotton-midi-skirt | https://unsplash.com/photos/A-h203miYWo | Engin Akyurt |
-| cropped-denim-jacket | https://unsplash.com/photos/kckQZ0w7Cnc | Azamat Zhanisov |
+| polka-dot-midi-skirt | https://unsplash.com/photos/A-h203miYWo | Engin Akyurt |
+| classic-denim-jacket | https://unsplash.com/photos/kckQZ0w7Cnc | Azamat Zhanisov |
 | everyday-crew-tee-women | https://unsplash.com/photos/4rUYuwJ2vGw | Mockupbee |
 | oxford-button-down | https://unsplash.com/photos/HGqPrIJAOBY | Neakasa |
 | heavyweight-crew-tee | https://unsplash.com/photos/Cs4GVbMqKGY | Ryan Hoffman |
-| relaxed-chino | https://unsplash.com/photos/FyEmB8uwiO8 | Engin Akyurt |
-| utility-overshirt | https://unsplash.com/photos/RqYTuWkTdEs | Santhosh Kumar |
+| stretch-twill-pants | https://unsplash.com/photos/FyEmB8uwiO8 | Engin Akyurt |
+| chambray-print-shirt | https://unsplash.com/photos/RqYTuWkTdEs | Santhosh Kumar |
 | pique-polo | https://unsplash.com/photos/yvHUKW3G7iI | Christian Agbede |
-| drawstring-shorts | https://unsplash.com/photos/Ks4ie7DCt-g | Engin Akyurt |
+| paperbag-shorts | https://unsplash.com/photos/Ks4ie7DCt-g | Engin Akyurt |
 | canvas-tote-bag | https://unsplash.com/photos/smTDI-z1rlY | Brando Makes Branding |
 | cotton-bucket-hat | https://unsplash.com/photos/WasjFbEQy38 | OTTO CAP |
