@@ -4,8 +4,9 @@ import { notFound } from "next/navigation";
 import { cache } from "react";
 import { Container } from "@/components/layout/container";
 import { ProductGallery } from "@/components/catalog/product-gallery";
+import { ProductGrid } from "@/components/catalog/product-grid";
 import { VariantSelector } from "@/components/catalog/variant-selector";
-import { getProduct } from "@/lib/catalog/data";
+import { getProduct, getRelatedProducts } from "@/lib/catalog/data";
 import { slugSchema } from "@/lib/catalog/validation";
 import { openGraphDefaults } from "@/lib/seo";
 import { brand } from "@/lib/brand";
@@ -34,6 +35,7 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
   if (!slug.success) notFound();
   const product = await loadProduct(slug.data);
   if (!product) notFound();
+  const related = await getRelatedProducts(product.id);
   return (
     <Container className="py-4 sm:py-8">
       <Link href="/shop" className="eyebrow mb-3 inline-flex min-h-11 items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground">
@@ -60,6 +62,10 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
           </div>
         </div>
       </div>
+      {related.length > 0 && <section aria-labelledby="related-heading" className="mt-16 border-t border-border pt-10 sm:mt-24">
+        <h2 id="related-heading" className="mb-6 text-2xl sm:text-3xl">You may also like</h2>
+        <ProductGrid products={related} headingLevel={3} />
+      </section>}
     </Container>
   );
 }

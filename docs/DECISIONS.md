@@ -251,3 +251,10 @@ User request: "review the ui/ux of my website and fix that needed fix" (reviewed
 ## Cart count badge - 2026-10-05
 
 Approved by explicit user instruction ("add the cart count badge"), resolving the item deferred in the UI/UX review. The header cart icon is a client component (components/layout/cart-link.tsx) showing the total quantity in a crimson badge (hidden at zero, "99+" cap; aria-label "Cart, N items"). It reads the count through a read-only Server Action, getCartCount (lib/cart/actions.ts), after the page loads, on navigation, when the tab becomes visible and after any cart change (CartForm dispatches "atleteka:cart-changed"). Pages stay cacheable (home is still static with 60 s revalidation) because the count never runs during server rendering. Any failure shows no badge.
+
+## D-REL-01 "You may also like" on product pages - 2026-10-05
+
+Status: **Approved** by the user on 2026-10-05 (explicit session reply: "Approve it as a recorded decision"), after Claude flagged that the scope non-goals (AGENTS.md, PRD 02_SCOPE) exclude "recommendations". This is a bounded exception, not a recommendation engine:
+- Product pages show up to four other active products that share the most categories with the current one, in stock first, topped up with the newest active products when the categories are small (lib/catalog/data.ts getRelatedProducts).
+- Public catalog data only; no tracking, personalization, behavioral data, new tables or services. Any failure hides the section.
+- Still out of scope: personalized or behavior-based recommendations, "frequently bought together", and any recommendation service.
