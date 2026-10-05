@@ -29,6 +29,17 @@ The merchant selected PHP as the single catalog currency. Prices come from activ
 
 Catalog image rows use a path inside the public `product-images` Supabase bucket. Supply alt_text and sort_order on product_images. No merchant photographs are included in the development seed; those products show an image fallback. M04 creates the read bucket but no application upload or storage-write policy. Authorized media upload workflows belong to M11.
 
+## Rebranding the store
+
+Everything that names the store or sets its brand colors lives in `lib/brand.ts`:
+
+- `name`: header and footer wordmark, browser tab titles ("Cart | <name>"), order emails, the PayMongo checkout and link previews.
+- `logo`: optional. Put the file in `public/` (for example `public/logo.svg`) and set `{ src: "/logo.svg", width, height }` at its displayed size. The footer is dark, so add `footerSrc` with a light version; without it the footer shows the name as text.
+- `tagline`, `description`, `announcement`, `footerBlurb`, `statement`: the home page and footer copy and the default search description.
+- `colors`: ink (text and dark surfaces), navy, slate, primary (main buttons), primaryHover and accent (small highlights on dark surfaces). Keep enough contrast: white text sits on `primary`, `ink` and `navy`.
+
+Run `npm run build` after editing. Not covered by this file: the product catalog (Admin), the remaining home page copy in `components/home/landing-sections.tsx`, and the font (`app/layout.tsx`).
+
 ## Quality checks
 
 ```sh

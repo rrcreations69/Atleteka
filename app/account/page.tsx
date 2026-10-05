@@ -8,7 +8,7 @@ import { getSavedAddresses } from "@/lib/checkout/data";
 import { createSupabaseClient } from "@/lib/supabase/server";
 
 export const dynamic = "force-dynamic";
-export const metadata = { title: "Your account | Atleteka" };
+export const metadata = { title: "Your account" };
 
 const panel = "space-y-4 bg-card p-5 sm:p-6";
 const panelLink = "inline-flex min-h-11 items-center text-sm underline underline-offset-4";

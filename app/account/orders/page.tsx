@@ -6,7 +6,7 @@ import { listOwnOrders } from "@/lib/account/orders";
 import { requireIdentity } from "@/lib/auth/session";
 
 export const dynamic = "force-dynamic";
-export const metadata = { title: "Your orders | Atleteka" };
+export const metadata = { title: "Your orders" };
 
 export default async function OrdersPage() {
   const { user, profile } = await requireIdentity();

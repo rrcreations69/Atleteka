@@ -2,8 +2,9 @@ import { redirect } from "next/navigation";
 import { AuthCard } from "@/components/auth/auth-card";
 import { AuthForm } from "@/components/auth/auth-form";
 import { getIdentity } from "@/lib/auth/session";
+import { brand } from "@/lib/brand";
 
-export const metadata = { title: "Sign in | Atleteka" };
+export const metadata = { title: "Sign in" };
 
 export default async function LoginPage({ searchParams }: {
   searchParams: Promise<Record<string, string | string[] | undefined>>;
@@ -16,7 +17,7 @@ export default async function LoginPage({ searchParams }: {
   const formMode = expired ? "recover" : mode;
   const title = formMode === "recover" ? "Reset your password" : formMode === "reset" ? "Choose a new password" : "Sign in";
   return (
-    <AuthCard title={title} description={formMode === "recover" ? "Enter your email to request a password reset link." : formMode === "reset" ? "Enter and confirm your new password." : "Welcome back to Atleteka."}>
+    <AuthCard title={title} description={formMode === "recover" ? "Enter your email to request a password reset link." : formMode === "reset" ? "Enter and confirm your new password." : "Welcome back to " + brand.name + "."}>
       {(params.error === "link" || expired) && <p role="alert" className="mb-5 text-sm text-destructive">This link is invalid or expired. Request a new link and open it in the same browser.</p>}
       <AuthForm key={formMode} mode={formMode} />
     </AuthCard>

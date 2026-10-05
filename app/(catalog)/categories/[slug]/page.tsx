@@ -5,6 +5,7 @@ import { CatalogListing } from "@/components/catalog/catalog-listing";
 import { getCategory } from "@/lib/catalog/data";
 import { catalogQuerySchema, slugSchema, type CatalogSearchParams } from "@/lib/catalog/validation";
 import { openGraphDefaults } from "@/lib/seo";
+import { brand } from "@/lib/brand";
 
 export const dynamic = "force-dynamic";
 
@@ -13,11 +14,11 @@ const loadCategory = cache(getCategory);
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const slug = slugSchema.safeParse((await params).slug);
   const category = slug.success ? await loadCategory(slug.data) : null;
-  if (!category) return { title: "Category not found | Atleteka" };
-  const title = `${category.name} | Atleteka`;
-  const description = `Shop ${category.name} at Atleteka.`;
+  if (!category) return { title: "Category not found" };
+  const title = `${category.name} | ${brand.name}`;
+  const description = `Shop ${category.name} at ${brand.name}.`;
   const path = `/categories/${category.slug}`;
-  return { title, description, alternates: { canonical: path }, openGraph: { ...openGraphDefaults, title, description, url: path } };
+  return { title: { absolute: title }, description, alternates: { canonical: path }, openGraph: { ...openGraphDefaults, title, description, url: path } };
 }
 
 export default async function CategoryPage({ params, searchParams }: {

@@ -8,6 +8,7 @@ import { VariantSelector } from "@/components/catalog/variant-selector";
 import { getProduct } from "@/lib/catalog/data";
 import { slugSchema } from "@/lib/catalog/validation";
 import { openGraphDefaults } from "@/lib/seo";
+import { brand } from "@/lib/brand";
 
 export const dynamic = "force-dynamic";
 
@@ -17,13 +18,13 @@ const loadProduct = cache(getProduct);
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const slug = slugSchema.safeParse((await params).slug);
   const product = slug.success ? await loadProduct(slug.data) : null;
-  if (!product) return { title: "Product not found | Atleteka" };
-  const title = `${product.name} | Atleteka`;
-  const description = product.description.replace(/\s+/g, " ").trim().slice(0, 160) || `Shop ${product.name} at Atleteka.`;
+  if (!product) return { title: "Product not found" };
+  const title = `${product.name} | ${brand.name}`;
+  const description = product.description.replace(/\s+/g, " ").trim().slice(0, 160) || `Shop ${product.name} at ${brand.name}.`;
   const path = `/products/${product.slug}`;
   const image = product.images[0];
   return {
-    title, description, alternates: { canonical: path },
+    title: { absolute: title }, description, alternates: { canonical: path },
     openGraph: { ...openGraphDefaults, title, description, url: path, images: image ? [{ url: image.url, alt: image.alt }] : undefined },
   };
 }

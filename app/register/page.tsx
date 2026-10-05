@@ -3,7 +3,7 @@ import { AuthCard } from "@/components/auth/auth-card";
 import { AuthForm } from "@/components/auth/auth-form";
 import { getIdentity } from "@/lib/auth/session";
 
-export const metadata = { title: "Create an account | Atleteka" };
+export const metadata = { title: "Create an account" };
 
 export default async function RegisterPage() {
   if (await getIdentity()) redirect("/account");

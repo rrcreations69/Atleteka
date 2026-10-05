@@ -5,7 +5,7 @@ import { listAdminOrders } from "@/lib/admin/orders";
 import { requireAdmin } from "@/lib/auth/session";
 
 export const dynamic = "force-dynamic";
-export const metadata = { title: "Admin | Atleteka" };
+export const metadata = { title: "Admin" };
 
 export default async function AdminPage() {
   const { user } = await requireAdmin();

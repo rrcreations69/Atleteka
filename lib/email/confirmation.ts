@@ -3,6 +3,7 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 import { z } from "zod";
 import { getAuthConfig } from "@/lib/supabase/config";
 import { buildOrderConfirmation } from "./order-confirmation";
+import { brand } from "@/lib/brand";
 import { sendEmail } from "./resend";
 
 const money = z.union([z.number(), z.string()]).transform(String);
@@ -32,7 +33,7 @@ export async function sendOrderConfirmation(service: SupabaseClient, orderId: st
       productName: item.product_name, variantName: item.variant_name, sku: item.sku,
       quantity: item.quantity, unitPrice: item.unit_price, lineTotal: item.line_total,
     })),
-  }, getAuthConfig().appUrl);
+  }, getAuthConfig().appUrl, brand.name);
   await sendEmail({ to: order.email, ...email, idempotencyKey: `order-confirmation-${order.id}` });
   // Only the first successful sender stamps it; a concurrent duplicate was already absorbed by Resend.
   await service.from("orders").update({ confirmation_email_sent_at: new Date().toISOString() })

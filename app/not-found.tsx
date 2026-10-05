@@ -2,7 +2,7 @@ import Link from "next/link";
 import { Container } from "@/components/layout/container";
 import { buttonVariants } from "@/components/ui/button";
 
-export const metadata = { title: "Page not found | Atleteka" };
+export const metadata = { title: "Page not found" };
 
 export default function NotFound() {
   return (

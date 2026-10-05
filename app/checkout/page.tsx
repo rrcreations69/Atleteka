@@ -7,7 +7,7 @@ import { getProductThumbnails } from "@/lib/catalog/data";
 import { quoteError, quoteSchema } from "@/lib/checkout/validation";
 
 export const dynamic = "force-dynamic";
-export const metadata = { title: "Checkout | Atleteka" };
+export const metadata = { title: "Checkout" };
 
 async function loadCheckout() {
   try {

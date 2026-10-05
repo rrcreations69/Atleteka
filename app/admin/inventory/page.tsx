@@ -4,7 +4,7 @@ import { StockForm } from "@/components/admin/forms";
 import { listInventory } from "@/lib/admin/data";
 
 export const dynamic = "force-dynamic";
-export const metadata = { title: "Inventory | Admin | Atleteka" };
+export const metadata = { title: "Inventory | Admin" };
 
 export default async function AdminInventoryPage() {
   const variants = await listInventory();

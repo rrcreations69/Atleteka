@@ -4,7 +4,7 @@ import { SettingsForm } from "@/components/account/settings-form";
 import { requireIdentity } from "@/lib/auth/session";
 
 export const dynamic = "force-dynamic";
-export const metadata = { title: "Settings | Atleteka" };
+export const metadata = { title: "Settings" };
 
 export default async function SettingsPage() {
   const { user, profile } = await requireIdentity();

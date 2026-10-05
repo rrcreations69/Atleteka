@@ -2,6 +2,8 @@ import Link from "next/link";
 import { Container } from "@/components/layout/container";
 import { CartLink } from "@/components/layout/cart-link";
 import { NavLinks } from "@/components/layout/nav-links";
+import { Wordmark } from "@/components/layout/wordmark";
+import { brand } from "@/lib/brand";
 import { getCategories } from "@/lib/catalog/data";
 import type { CatalogCategory } from "@/lib/catalog/validation";
 
@@ -30,14 +32,14 @@ export async function SiteHeader() {
   const categoryLinks = categories.map((category) => ({ href: `/categories/${category.slug}`, label: category.name }));
   return (
     <header id="top" className="border-b border-border bg-background">
-      <p className="eyebrow bg-foreground px-4 py-2.5 text-center text-xs font-medium text-apricot">Nationwide delivery · Shipping paid on delivery</p>
+      <p className="eyebrow bg-foreground px-4 py-2.5 text-center text-xs font-medium text-apricot">{brand.announcement}</p>
       <Container className="grid min-h-16 grid-cols-[1fr_auto] items-center gap-4 py-2 lg:grid-cols-[1fr_auto_1fr]">
         <nav aria-label="Main navigation" className="hidden items-center gap-6 lg:flex">
           {/* Desktop shows two categories (three from xl) so the centered logo never collides. */}
           <NavLinks links={[home, ...categoryLinks.slice(0, 3).map((link, index) => index === 2 ? { ...link, className: "hidden xl:inline-flex" } : link), shopAll]} className={navLink} />
         </nav>
-        <Link href="/" aria-label="Atleteka home" className="inline-flex min-h-11 items-center pl-[0.32em] text-lg font-bold uppercase tracking-[0.32em] lg:justify-self-center">
-          Atleteka
+        <Link href="/" aria-label={brand.name + " home"} className="inline-flex min-h-11 items-center text-lg lg:justify-self-center">
+          <Wordmark />
         </Link>
         <div className="flex items-center justify-end">
           <Link href="/search" aria-label="Search" className={iconLink}>

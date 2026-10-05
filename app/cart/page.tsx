@@ -8,7 +8,7 @@ import { formatPrice } from "@/lib/catalog/validation";
 import { buttonVariants } from "@/components/ui/button";
 
 export const dynamic = "force-dynamic";
-export const metadata = { title: "Cart | Atleteka" };
+export const metadata = { title: "Cart" };
 
 export default async function CartPage() {
   let result;

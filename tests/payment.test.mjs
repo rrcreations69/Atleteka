@@ -38,14 +38,14 @@ test("totals below the PayMongo PHP 1.00 minimum are refused", () => {
  assert.equal(planPayment(quote({ couponCode: "BIG", discountTotal: "500.00", merchandiseTotal: "1.00" })).total, 100);
 });
 test("line items are itemized without a discount", () => {
- assert.deepEqual(checkoutLineItems(planPayment(quote())), [{ name: "Shirt · M", amount: 25050, quantity: 2, currency: "PHP" }]);
+ assert.deepEqual(checkoutLineItems(planPayment(quote()), "Atleteka"), [{ name: "Shirt · M", amount: 25050, quantity: 2, currency: "PHP" }]);
 });
 test("a discount becomes one exact line, never a negative or rounded line", () => {
- const items = checkoutLineItems(planPayment(quote({ couponCode: "SAVE", discountTotal: "50.10", merchandiseTotal: "450.90" })));
+ const items = checkoutLineItems(planPayment(quote({ couponCode: "SAVE", discountTotal: "50.10", merchandiseTotal: "450.90" })), "Atleteka");
  assert.equal(items.length, 1); assert.equal(items[0].amount, 45090); assert.equal(items[0].quantity, 1);
  assert.match(items[0].description, /Shirt · M × 2\. Coupon SAVE applied: −PHP 50\.10 from PHP 501\.00\./);
  const many = { id: quote().cart.id, items: Array.from({ length: 20 }, (_, i) => item({ variantId: `33333333-3333-4333-8333-${String(i).padStart(12, "0")}`, productName: "Very long product name ".repeat(3) })), subtotal: "10020.00" };
- const long = checkoutLineItems(planPayment(quote({ cart: many, subtotal: "10020.00", couponCode: "X", discountTotal: "20.00", merchandiseTotal: "10000.00" })));
+ const long = checkoutLineItems(planPayment(quote({ cart: many, subtotal: "10020.00", couponCode: "X", discountTotal: "20.00", merchandiseTotal: "10000.00" })), "Atleteka");
  assert.ok(long[0].description.length <= 255); assert.equal(long[0].amount, 1000000);
 });
 test("the amount shown on the Pay button must equal the re-quoted total", () => {
