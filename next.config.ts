@@ -1,9 +1,22 @@
 import type { NextConfig } from "next";
 import { withSentryConfig } from "@sentry/nextjs/config";
 
+// Product photos live in the public Supabase Storage bucket; next/image resizes them to the size shown.
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+const productImages = supabaseUrl && URL.canParse(supabaseUrl) ? new URL(supabaseUrl) : null;
+
 const nextConfig: NextConfig = {
   // The repository maintains its own PRD-derived agent instructions.
   agentRules: false,
+  images: {
+    remotePatterns: productImages ? [{
+      protocol: productImages.protocol === "http:" ? "http" : "https", hostname: productImages.hostname,
+      pathname: "/storage/v1/object/public/product-images/**",
+    }] : [],
+    formats: ["image/avif", "image/webp"],
+    // Uploaded images get a new storage path, so a resized copy never goes stale.
+    minimumCacheTTL: 2678400,
+  },
   // M15 hardening: the site can never be framed (clickjacking) and responses are not MIME-sniffed.
   async headers() {
     return [{
