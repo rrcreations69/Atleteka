@@ -8,15 +8,15 @@ import { cn } from "@/lib/utils";
 type Action = (state: AdminState, form: FormData) => Promise<AdminState>;
 
 /** Shared admin form: disables while pending and announces the result. Field errors render via `fields`. */
-export function ActionForm({ action, submitLabel, pendingLabel = "Saving…", children, className, variant, encType }: {
-  action: Action; submitLabel: string; pendingLabel?: string; className?: string;
+export function ActionForm({ action, submitLabel, pendingLabel = "Saving…", children, className, fieldsetClassName, variant, encType }: {
+  action: Action; submitLabel: string; pendingLabel?: string; className?: string; fieldsetClassName?: string;
   variant?: "default" | "outline"; encType?: "multipart/form-data";
   children: ReactNode | ((errors: Record<string, string>) => ReactNode);
 }) {
   const [state, formAction, pending] = useActionState<AdminState, FormData>(action, {});
   const errors = state.errors ?? {};
   return <form action={formAction} encType={encType} className={cn("space-y-3", className)}>
-    <fieldset disabled={pending} className="min-w-0 space-y-3">
+    <fieldset disabled={pending} className={cn("min-w-0 space-y-3", fieldsetClassName)}>
       {typeof children === "function" ? children(errors) : children}
       <Button type="submit" variant={variant}>{pending ? pendingLabel : submitLabel}</Button>
     </fieldset>

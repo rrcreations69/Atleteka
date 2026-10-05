@@ -1,9 +1,20 @@
-import Link from "next/link";
+import type { ReactNode } from "react";
+import { SectionShell } from "@/components/layout/section-shell";
 
-const links = [["/admin", "Admin home"], ["/admin/products", "Products"], ["/admin/categories", "Categories"], ["/admin/inventory", "Inventory"], ["/admin/orders", "Orders"]] as const;
-
-export function AdminNav() {
-  return <nav aria-label="Admin" className="flex flex-wrap gap-x-5 gap-y-1 border-b border-border pb-3">
-    {links.map(([href, label]) => <Link key={href} href={href} className="inline-flex min-h-11 items-center underline underline-offset-4">{label}</Link>)}
-  </nav>;
+/** Admin page frame: the shared signed-in layout with admin navigation. */
+export function AdminShell({ title, description, back, actions, children }: {
+  title: string; description?: ReactNode; back?: { href: string; label: string }; actions?: ReactNode; children: ReactNode;
+}) {
+  return <SectionShell eyebrow="Admin" navLabel="Admin" title={title} description={description} actions={actions} back={back} links={[
+    { href: "/admin", label: "Dashboard", exact: true },
+    { href: "/admin/orders", label: "Orders" },
+    { href: "/admin/products", label: "Products" },
+    { href: "/admin/inventory", label: "Inventory" },
+    { href: "/admin/categories", label: "Categories" },
+    { href: "/account", label: "Your account", exact: true },
+  ]}>{children}</SectionShell>;
 }
+
+export const adminPanel = "space-y-4 bg-card p-5 sm:p-6";
+export const adminWhen = (value: string) =>
+  new Intl.DateTimeFormat("en-PH", { dateStyle: "medium", timeStyle: "short", timeZone: "Asia/Manila" }).format(new Date(value));
