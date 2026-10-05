@@ -9,7 +9,7 @@ export const metadata = { title: "Settings | Atleteka" };
 export default async function SettingsPage() {
   const { user, profile } = await requireIdentity();
   return <AccountShell title="Settings" isAdmin={profile.role === "admin"}>
-    <div className="max-w-xl divide-y divide-border border-y border-border">
+    <div className="max-w-xl divide-y divide-border border-b border-border [&>section:first-child]:pt-0">
       <section aria-labelledby="settings-name" className="space-y-4 py-6">
         <div className="space-y-1">
           <h2 id="settings-name" className="text-lg">Name</h2>

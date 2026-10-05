@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { notFound } from "next/navigation";
 import { AccountShell } from "@/components/account/account-shell";
 import { orderDate, orderNumber } from "@/components/account/order-rows";
@@ -20,10 +19,9 @@ export default async function OrderPage({ params }: { params: Promise<{ id: stri
   const address = order.shipping_address;
   const shipped = order.status === "shipped" || order.status === "delivered";
   const discounted = Number(order.discount_total) > 0;
-  return <AccountShell title={"Order " + orderNumber(order.id)} isAdmin={profile.role === "admin"}
+  return <AccountShell title={"Order " + orderNumber(order.id)} isAdmin={profile.role === "admin"} back={{ href: "/account/orders", label: "All orders" }}
     description={<p>Placed {orderDate(order.created_at, "long")}</p>}
     actions={<StatusBadge status={order.status} label={orderStatusLabel(order.status)} className="mb-1" />}>
-    <Link href="/account/orders" className="eyebrow -mt-4 inline-flex min-h-11 items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground"><span aria-hidden="true">←</span> All orders</Link>
     {order.status === "cancelled" && <p role="status" className={notice + " border-foreground"}>
       This order was cancelled. If you were charged, the refund is handled through the payment provider; contact us if you have questions.
     </p>}
