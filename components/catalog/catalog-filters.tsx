@@ -7,7 +7,7 @@ import { SORT_OPTIONS, type CatalogCategory, type CatalogQuery } from "@/lib/cat
 export function CatalogFilters({ base, query, categories, fixedCategory }: {
   base: string; query: CatalogQuery; categories: CatalogCategory[]; fixedCategory: boolean;
 }) {
-  const selectClass = "min-h-12 w-full min-w-0 rounded-sm border border-input bg-background px-3 py-2 text-base lg:text-sm";
+  const selectClass = "min-h-12 w-full min-w-0 rounded-sm border border-input bg-field px-3 py-2 text-base lg:text-sm";
   return (
     <form action={base} method="get" role="search" aria-label="Search and filter products"
       className="grid grid-cols-2 gap-2 lg:grid-cols-[minmax(0,1fr)_11rem_11rem_11rem_auto]">

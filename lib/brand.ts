@@ -18,11 +18,19 @@ export const brand = {
   announcement: "Nationwide delivery · Shipping paid on delivery",
   /** Short text under the name in the footer. */
   footerBlurb: "Everyday clothing for women and men, made to last. Philippines · PHP.",
-  /** Home page brand section. */
-  statement: {
-    heading: "Everyday pieces, made to last.",
-    body: "Wardrobe staples for women and men: easy shirts, honest trousers and layers you'll reach for every day. Simple to shop, delivered anywhere in the Philippines.",
-  },
+  /**
+   * Home page color moods (D-DESIGN-05). The featured products in the home hero take these in turn, and the
+   * rest of the home page takes the active mood's light tints. `field` is the hero background, `word` the
+   * giant wordmark behind the garment, `text` the hero text and button color (keep strong contrast with
+   * `field`), and `page`, `tile`, `chip` the page, product tile and category tile tints (keep them light:
+   * the text on them is near-black).
+   */
+  heroMoods: [
+    { name: "Indigo", field: "#1d2a40", word: "#2c3d5c", text: "#ffffff", page: "#e8edf5", tile: "#d6dfec", chip: "#c3d0e3" },
+    { name: "Sand", field: "#ddd6b8", word: "#c2b78a", text: "#1d1c12", page: "#f6f2e4", tile: "#ebe4ca", chip: "#ddd3b0" },
+    { name: "Espresso", field: "#3a2e1f", word: "#4d3d29", text: "#ffffff", page: "#f4ece2", tile: "#e8dacb", chip: "#dac6b0" },
+    { name: "Sage", field: "#cfdcc9", word: "#a9bfa1", text: "#142019", page: "#edf3ea", tile: "#dce8d8", chip: "#c8d9c2" },
+  ],
   /**
    * Brand colors. Keep enough contrast: `ink` and `primary` carry white or black text, and `accent` is only
    * used on dark (ink/navy) backgrounds.
@@ -40,7 +48,9 @@ export const brand = {
 /** CSS variables for the brand colors; the root layout applies them on top of app/globals.css. */
 export function brandColorCss() {
   const c = brand.colors;
-  return `:root{--foreground:${c.ink};--card-foreground:${c.ink};--popover-foreground:${c.ink};--secondary-foreground:${c.ink};` +
+  const m = brand.heroMoods[0];
+  return `:root{--home-field:${m.field};--home-word:${m.word};--home-text:${m.text};--home-page:${m.page};--home-tile:${m.tile};--home-chip:${m.chip};` +
+    `--foreground:${c.ink};--card-foreground:${c.ink};--popover-foreground:${c.ink};--secondary-foreground:${c.ink};` +
     `--accent-foreground:${c.ink};--ring:${c.ink};--navy:${c.navy};--muted-foreground:${c.slate};--primary:${c.primary};` +
     `--wine:${c.primaryHover};--apricot:${c.accent}}`;
 }

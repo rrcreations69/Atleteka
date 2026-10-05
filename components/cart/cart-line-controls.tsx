@@ -52,7 +52,7 @@ export function QuantityStepper({ variantId, quantity, productLabel, disabled = 
           aria-invalid={state.error ? true : undefined} aria-describedby={state.error ? id + "-error" : undefined}
           onChange={(event) => setDraft(event.target.value.replace(/\D/g, "").slice(0, 10))}
           onBlur={commit} onKeyDown={(event) => { if (event.key === "Enter") { event.preventDefault(); commit(); } }}
-          className="h-11 w-12 border-x border-input bg-background text-center text-base tabular-nums text-foreground disabled:bg-muted" />
+          className="h-11 w-12 border-x border-input bg-field text-center text-base tabular-nums text-foreground disabled:bg-muted" />
         <button type="button" className={stepButton} aria-label="Increase quantity"
           disabled={pending || disabled} onClick={() => submit("set", quantity + 1)}>
           <span aria-hidden="true">+</span>

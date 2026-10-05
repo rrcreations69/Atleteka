@@ -7,6 +7,7 @@
    apricot #FDA481 accents on dark surfaces only (it fails contrast on white). */
 @theme inline {
   --font-sans: var(--font-instrument), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-jost), Futura, "Trebuchet MS", sans-serif;
   --text-display: clamp(2.25rem, 5vw, 3.5rem);
   --text-display--line-height: 1.04;
   --text-display--letter-spacing: -0.025em;
@@ -26,6 +27,7 @@
   --color-accent-foreground: var(--accent-foreground);
   --color-success: var(--success);
   --color-photo: var(--photo);
+  --color-field: var(--field);
   --color-destructive: var(--destructive);
   --color-navy: var(--navy);
   --color-wine: var(--wine);
@@ -33,21 +35,22 @@
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
-  /* Near-square corners everywhere; components keep their rounded-* names. */
-  --radius-sm: 2px;
-  --radius-md: 2px;
-  --radius-lg: 2px;
-  --radius-xl: 2px;
-  --radius-2xl: 2px;
-  --radius-3xl: 2px;
+  /* Soft corners on controls and badges (D-DESIGN-05); product tiles stay square and buttons are pills. */
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --radius-2xl: 16px;
+  --radius-3xl: 16px;
 }
 
 :root {
-  --radius: 2px;
-  --background: #ffffff;
+  --radius: 8px;
+  /* Surfaces follow the active color mood (D-DESIGN-05): lib/brand.ts heroMoods supplies the --home-*
+     values (first mood by default; the home hero switches them), so every page wears the same tint. */
+  --background: var(--home-page);
   --foreground: #181a2f;
-  /* Cool slate-tinted paper for summaries and filters. */
-  --card: #f3f4f7;
+  --card: var(--home-tile);
   --card-foreground: #181a2f;
   --popover: #ffffff;
   --popover-foreground: #181a2f;
@@ -55,20 +58,27 @@
   --primary-foreground: #ffffff;
   --secondary: #ffffff;
   --secondary-foreground: #181a2f;
-  --muted: #f3f4f7;
+  --muted: var(--home-tile);
   --muted-foreground: #37415c;
-  --accent: #eceef3;
+  --accent: var(--home-chip);
   --accent-foreground: #181a2f;
   --success: #2f6b3f;
-  --photo: #eceef1;
+  --photo: var(--home-tile);
+  /* Form fields, auth cards and tags stay white on the tinted page. */
+  --field: #ffffff;
   --destructive: #b4182d;
   --border: #e3e5eb;
-  /* Form-control borders keep 3:1 against white (WCAG 1.4.11). */
+  /* Form-control borders keep 3:1 against white and the light mood tints (WCAG 1.4.11). */
   --input: #7d8499;
   --ring: #181a2f;
   --navy: #242e49;
   --wine: #54162b;
   --apricot: #fda481;
+}
+
+/* Home hero progress bar (D-DESIGN-05). */
+@keyframes hero-fill {
+  to { width: 100%; }
 }
 
 @layer base {
@@ -82,9 +92,18 @@
   body {
     @apply bg-background font-sans text-foreground antialiased;
   }
+  @media (prefers-reduced-motion: no-preference) {
+    body { transition: background-color 0.7s ease; }
+  }
   h1, h2 {
     @apply font-semibold;
     letter-spacing: -0.02em;
+  }
+  /* Page titles use the display face of the home page (D-DESIGN-05). */
+  h1 {
+    font-family: var(--font-display);
+    font-weight: 500;
+    letter-spacing: -0.01em;
   }
 }
 

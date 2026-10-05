@@ -35,10 +35,11 @@ Everything that names the store or sets its brand colors lives in `lib/brand.ts`
 
 - `name`: header and footer wordmark, browser tab titles ("Cart | <name>"), order emails, the PayMongo checkout and link previews.
 - `logo`: optional. Put the file in `public/` (for example `public/logo.svg`) and set `{ src: "/logo.svg", width, height }` at its displayed size. The footer is dark, so add `footerSrc` with a light version; without it the footer shows the name as text.
-- `tagline`, `description`, `announcement`, `footerBlurb`, `statement`: the home page and footer copy and the default search description.
+- `tagline`, `description`, `announcement`, `footerBlurb`: the home page and footer copy and the default search description.
+- `heroMoods`: the four color moods the home hero cycles through (hero background, wordmark, text, and the page, tile and category tints that follow it). Keep `text` in strong contrast with `field`, and the three tints light.
 - `colors`: ink (text and dark surfaces), navy, slate, primary (main buttons), primaryHover and accent (small highlights on dark surfaces). Keep enough contrast: white text sits on `primary`, `ink` and `navy`.
 
-Run `npm run build` after editing. Not covered by this file: the product catalog (Admin), the remaining home page copy in `components/home/landing-sections.tsx`, and the font (`app/layout.tsx`).
+Run `npm run build` after editing. Not covered by this file: the product catalog (Admin), the home page FAQ in `components/home/landing-sections.tsx`, and the fonts (`app/layout.tsx`).
 
 ## Quality checks
 
