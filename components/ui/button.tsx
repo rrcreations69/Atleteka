@@ -6,6 +6,7 @@ const variants = {
   secondary: "border-transparent bg-secondary text-secondary-foreground hover:bg-secondary/90",
   outline: "border-foreground bg-transparent text-foreground hover:bg-accent",
   inverse: "border-transparent bg-background text-foreground hover:bg-accent",
+  ink: "border-transparent bg-foreground text-background hover:bg-navy",
 };
 
 type ButtonVariant = keyof typeof variants;

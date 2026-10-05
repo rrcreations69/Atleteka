@@ -58,7 +58,8 @@ function AddedToCart({ itemLabel, quantity }: { itemLabel?: string; quantity: nu
         </div>
       </div>
       <div className="mt-4 grid grid-cols-2 gap-2">
-        <Link href="/checkout" className={buttonVariants({ className: "px-3" })}>Checkout</Link>
+        {/* Ink, not crimson: Add to cart stays the only crimson action in view. */}
+        <Link href="/checkout" className={buttonVariants({ variant: "ink", className: "px-3" })}>Checkout</Link>
         <Link href="/cart" className={buttonVariants({ variant: "outline", className: "px-3" })}>View cart</Link>
       </div>
     </div>
