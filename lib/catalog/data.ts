@@ -4,7 +4,7 @@ import { createPublicSupabaseClient } from "@/lib/supabase/public";
 import { getAuthConfig } from "@/lib/supabase/config";
 import {
   PAGE_SIZE, catalogQuerySchema, literalSearchPattern, slugSchema, productSchema, categorySchema, availabilitySchema, toCatalogProduct,
-  imageSchema, publicImageUrl, type CatalogImage,
+  imageSchema, publicImageUrl, sortByPrice, type CatalogImage,
   type ProductRow, type CatalogProduct, type CatalogQuery,
 } from "./validation";
 
@@ -39,22 +39,23 @@ export async function getProducts(input: CatalogQuery, categoryId?: string) {
   const createQuery = () => {
     let query = createPublicSupabaseClient().from("products")
       .select(productColumns + (categoryId ? ",product_categories!inner(category_id)" : ""), { count: "exact" })
-      .eq("status", "active").order("name").order("id");
+      .eq("status", "active");
+    query = queryInput.sort === "newest" ? query.order("created_at", { ascending: false }).order("id") : query.order("name").order("id");
     if (categoryId) query = query.eq("product_categories.category_id", z.uuid().parse(categoryId));
     if (queryInput.q) query = query.filter("name", "imatch", literalSearchPattern(queryInput.q));
     return query;
   };
-  if (queryInput.availability !== "in-stock") {
+  const priceSort = queryInput.sort === "price-asc" || queryInput.sort === "price-desc";
+  if (queryInput.availability !== "in-stock" && !priceSort) {
     const { data, count, error } = await createQuery().range(start, start + PAGE_SIZE - 1);
     if (error?.code === "PGRST103") return null;
     if (error || count === null) throw new Error("Products could not be loaded.");
     return { products: await withAvailability(z.array(productSchema).parse(data)), total: z.number().int().nonnegative().parse(count) };
   }
 
-  // Apply availability before pagination, including matches beyond the API row limit.
-  // Keep only the requested page; all stock reads use the existing public booleans.
-  const products: CatalogProduct[] = [];
-  let total = 0;
+  // The in-stock filter and price sorting need every match (availability and price live on the options),
+  // including matches beyond the API row limit; then keep only the requested page.
+  let matches: CatalogProduct[] = [];
   for (let offset = 0; ; ) {
     const { data, count, error } = await createQuery().range(offset, offset + 99);
     if (error?.code === "PGRST103") break;
@@ -62,15 +63,15 @@ export async function getProducts(input: CatalogQuery, categoryId?: string) {
     const rows = z.array(productSchema).parse(data);
     const matchCount = z.number().int().nonnegative().parse(count);
     for (const product of await withAvailability(rows)) {
-      if (!product.variants.some((variant) => variant.inStock)) continue;
-      if (total >= start && products.length < PAGE_SIZE) products.push(product);
-      total++;
+      if (queryInput.availability === "in-stock" && !product.variants.some((variant) => variant.inStock)) continue;
+      matches.push(product);
     }
     offset += rows.length;
     if (offset >= matchCount) break;
     if (rows.length === 0) throw new Error("Products could not be loaded.");
   }
-  return { products, total };
+  if (priceSort) matches = sortByPrice(matches, queryInput.sort === "price-asc" ? "asc" : "desc");
+  return { products: matches.slice(start, start + PAGE_SIZE), total: matches.length };
 }
 
 export async function getProduct(slug: string) {
@@ -112,4 +113,34 @@ export async function getSitemapEntries() {
       .map((row) => ({ slug: row.slug, updatedAt: new Date(row.updated_at) })),
     categories: z.array(z.object({ slug: slugSchema })).parse(categories.data).map((row) => row.slug),
   };
+}
+
+// "You may also like": other active products sharing the most categories with this one, in-stock first, topped up
+// with other active products when the categories are small. Any failure returns none so the page still renders.
+export async function getRelatedProducts(productId: string, limit = 4) {
+  try {
+    const client = createPublicSupabaseClient();
+    const id = z.uuid().parse(productId);
+    const links = await client.from("product_categories").select("category_id").eq("product_id", id);
+    if (links.error) return [];
+    const categoryIds = z.array(z.object({ category_id: z.uuid() })).parse(links.data).map((row) => row.category_id);
+    const rows: ProductRow[] = [];
+    if (categoryIds.length) {
+      const { data, error } = await client.from("products").select(productColumns + ",product_categories!inner(category_id)")
+        .eq("status", "active").neq("id", id).in("product_categories.category_id", categoryIds).order("name").limit(24);
+      // The inner join returns only the shared categories, so their count ranks closer matches first.
+      if (!error) rows.push(...z.array(productSchema.extend({ product_categories: z.array(z.object({ category_id: z.uuid() })) })).parse(data)
+        .sort((a, b) => b.product_categories.length - a.product_categories.length || a.name.localeCompare(b.name)));
+    }
+    if (rows.length < limit) {
+      const { data, error } = await client.from("products").select(productColumns).eq("status", "active").neq("id", id)
+        .order("created_at", { ascending: false }).limit(limit * 3);
+      if (!error) for (const row of z.array(productSchema).parse(data)) if (!rows.some((r) => r.id === row.id)) rows.push(row);
+    }
+    const products = await withAvailability(rows);
+    const inStock = (product: CatalogProduct) => product.variants.some((variant) => variant.inStock);
+    return [...products.filter(inStock), ...products.filter((product) => !inStock(product))].slice(0, limit);
+  } catch {
+    return [];
+  }
 }

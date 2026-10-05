@@ -71,9 +71,24 @@ export const catalogQuerySchema = z.object({
   q: z.string().trim().max(100).regex(/^[^\x00-\x1f\x7f]*$/).default(""),
   category: z.union([z.literal(""), slugSchema]).default(""),
   availability: z.enum(["", "all", "in-stock"]).default("all").transform((value) => value || "all"),
+  sort: z.enum(["", "name", "price-asc", "price-desc", "newest"]).default("name").transform((value) => value || "name"),
   page: z.union([z.string().regex(/^[1-9]\d*$/), z.number()]).pipe(pageSchema).default(1),
 });
 export type CatalogQuery = z.infer<typeof catalogQuerySchema>;
+export const SORT_OPTIONS = [
+  { value: "name", label: "Name A–Z" }, { value: "price-asc", label: "Lowest price" },
+  { value: "price-desc", label: "Highest price" }, { value: "newest", label: "Newest" },
+] as const;
+
+/** Lowest active option price, used for price sorting; products without a price sort last either way. */
+export function sortByPrice(products: CatalogProduct[], direction: "asc" | "desc") {
+  const price = (product: CatalogProduct) => product.variants.length ? Math.min(...product.variants.map((variant) => variant.price)) : null;
+  return [...products].sort((a, b) => {
+    const pa = price(a), pb = price(b);
+    if (pa === null || pb === null) return pa === pb ? 0 : pa === null ? 1 : -1;
+    return (direction === "asc" ? pa - pb : pb - pa) || a.name.localeCompare(b.name) || a.id.localeCompare(b.id);
+  });
+}
 export type CatalogSearchParams = Record<string, string | string[] | undefined>;
 
 // Escape PostgreSQL regex syntax so search input is always literal text.
@@ -86,6 +101,7 @@ export function catalogHref(base: string, query: CatalogQuery) {
   if (query.q) params.set("q", query.q);
   if (query.category) params.set("category", query.category);
   if (query.availability === "in-stock") params.set("availability", query.availability);
+  if (query.sort !== "name") params.set("sort", query.sort);
   if (query.page > 1) params.set("page", String(query.page));
   return base + (params.size ? "?" + params.toString() : "");
 }
