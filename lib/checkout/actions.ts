@@ -18,7 +18,7 @@ export async function calculateCheckout(_state: CheckoutState, form: FormData): 
       catch { return { error: "Your address could not be saved. Please try again." }; }
       revalidatePath("/checkout");
     }
-    return { quote, message: kind === "account" ? "Address saved to your account. Merchandise total updated." : "Address checked. Merchandise total updated." };
+    return { quote, message: kind === "account" ? "Address saved to your account. Your total is confirmed." : "Address and total confirmed." };
   } catch (error) {
     return { error: error instanceof CartAccessError ? error.message : "We could not calculate your total. Please try again." };
   }

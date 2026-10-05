@@ -11,7 +11,7 @@ export async function startPayment(_state: CheckoutState, form: FormData): Promi
   const input = parseCheckoutForm(form);
   if (!input.success) return { error: "Check the highlighted fields.", errors: input.errors };
   const expected = form.getAll("expectedTotal");
-  if (expected.length !== 1 || typeof expected[0] !== "string") return { error: "Check the merchandise total again before paying." };
+  if (expected.length !== 1 || typeof expected[0] !== "string") return { error: "Confirm your total again before paying." };
   let url: string;
   try {
     const { client, kind } = await createCartClient();
@@ -55,7 +55,7 @@ export async function startPayment(_state: CheckoutState, form: FormData): Promi
     if (error instanceof PaymentQuoteError) {
       return { error: error.message === "Total is below the minimum charge."
         ? "This total is too low to pay online. Remove the coupon or add an item."
-        : "Your cart changed. Check the merchandise total again before paying." };
+        : "Your cart changed. Confirm your total again before paying." };
     }
     return { error: "We could not start the payment. Please try again." };
   }
