@@ -11,7 +11,7 @@ export function SectionShell({ eyebrow, title, description, links, navLabel, act
 }) {
   return <Container className="py-8 sm:py-12">
     <div className="grid gap-8 lg:grid-cols-[12rem_minmax(0,1fr)] lg:gap-14">
-      <aside className="space-y-6 lg:pt-1">
+      <aside className="min-w-0 space-y-6 lg:pt-1">
         <p className="eyebrow hidden text-xs text-muted-foreground lg:block">{eyebrow}</p>
         <SideNav label={navLabel} links={links} />
         <form action={logout} className="hidden lg:block">
