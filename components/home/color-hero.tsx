@@ -39,11 +39,11 @@ export function ColorHero({ slides }: { slides: HeroSlide[] }) {
     return () => observer.disconnect();
   }, []);
 
-  // The page around the hero takes the active mood.
+  // The whole site takes the active mood; it stays on <html> while the visitor browses other pages,
+  // and a fresh page load starts again from the first mood (lib/brand.ts).
   useEffect(() => {
-    const canvas = section.current?.closest<HTMLElement>("[data-home-canvas]");
-    if (!canvas) return;
-    for (const [key, value] of Object.entries(moodVars(brand.heroMoods[active % brand.heroMoods.length]))) canvas.style.setProperty(key, String(value));
+    const root = document.documentElement;
+    for (const [key, value] of Object.entries(moodVars(brand.heroMoods[active % brand.heroMoods.length]))) root.style.setProperty(key, String(value));
   }, [active]);
 
   useEffect(() => {

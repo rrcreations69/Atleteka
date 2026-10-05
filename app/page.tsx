@@ -3,8 +3,7 @@ import { Container } from "@/components/layout/container";
 import Image from "next/image";
 import { Faq } from "@/components/home/landing-sections";
 import { ColorHero, type HeroSlide } from "@/components/home/color-hero";
-import { moodVars } from "@/lib/home-moods";
-import { HomeProductCard } from "@/components/home/home-product-card";
+import { ProductGrid } from "@/components/catalog/product-grid";
 import { getCategories, getProducts } from "@/lib/catalog/data";
 import { PAGE_SIZE, catalogQuerySchema, priceLabel, type CatalogCategory, type CatalogImage, type CatalogProduct } from "@/lib/catalog/validation";
 import { brand } from "@/lib/brand";
@@ -77,8 +76,7 @@ export default async function HomePage() {
   const products = listing?.products.slice(0, 8) ?? [];
   const slides = featuredSlides(catalog);
   return (
-    // The hero sets the --home-* mood variables on this canvas; the first mood is the server-rendered default.
-    <div data-home-canvas style={moodVars(brand.heroMoods[0])} className="flex-1 bg-[var(--home-page)] pb-16 motion-safe:transition-colors motion-safe:duration-700 sm:pb-24">
+    <div className="flex-1 pb-16 sm:pb-24">
       <h1 className="sr-only">{brand.name}: {brand.tagline}</h1>
       <ColorHero slides={slides} />
 
@@ -87,15 +85,13 @@ export default async function HomePage() {
           <h2 className="text-2xl">Shop the collection</h2>
           <Link href="/shop" className="inline-flex min-h-11 shrink-0 items-center text-sm font-semibold underline underline-offset-4">View all</Link>
         </div>
-        <ul className="grid grid-cols-2 gap-x-3 gap-y-8 lg:grid-cols-4">
-          {products.map((product) => <li key={product.id} className="min-w-0"><HomeProductCard product={product} /></li>)}
-        </ul>
+        <ProductGrid products={products} headingLevel={3} />
       </Container>
 
       {lead.length > 0 && <Container className="mt-14 sm:mt-20">
         <section aria-label="Shop by department" className={"grid gap-3 " + (lead.length > 1 ? "sm:grid-cols-2" : "")}>
           {lead.map((category) => <Link key={category.id} href={`/categories/${category.slug}`}
-            className="group relative block aspect-[4/5] overflow-hidden bg-[var(--home-tile)] motion-safe:transition-colors motion-safe:duration-700">
+            className="group relative block aspect-[4/5] overflow-hidden bg-card motion-safe:transition-colors motion-safe:duration-700">
             {category.cover && <span className="absolute inset-x-[10%] bottom-[30%] top-[6%]"><Image src={category.cover.url} alt="" fill sizes="(min-width: 640px) 40vw, 80vw" className="object-contain" /></span>}
             <span className="absolute bottom-7 left-6 sm:bottom-9 sm:left-9">
               <span className="font-display block text-[clamp(3rem,6vw,5.5rem)] font-medium uppercase leading-[0.9]">{category.name}</span>
@@ -110,7 +106,7 @@ export default async function HomePage() {
         <ul className="grid grid-cols-2 gap-3 lg:grid-cols-4">
           {others.map((category) => <li key={category.id}>
             <Link href={`/categories/${category.slug}`}
-              className="group relative block aspect-[3/4] overflow-hidden bg-[var(--home-chip)] motion-safe:transition-colors motion-safe:duration-700">
+              className="group relative block aspect-[3/4] overflow-hidden bg-accent motion-safe:transition-colors motion-safe:duration-700">
               {category.cover && <span className="absolute inset-x-[12%] bottom-[36%] top-[8%]"><Image src={category.cover.url} alt="" fill sizes="(min-width: 1024px) 20vw, 40vw" className="object-contain" /></span>}
               <span className="absolute bottom-4 left-4 sm:bottom-5 sm:left-5">
                 <span className="font-display block text-2xl font-medium uppercase leading-none sm:text-3xl">{category.name}</span>

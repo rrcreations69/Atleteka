@@ -48,7 +48,9 @@ export const brand = {
 /** CSS variables for the brand colors; the root layout applies them on top of app/globals.css. */
 export function brandColorCss() {
   const c = brand.colors;
-  return `:root{--foreground:${c.ink};--card-foreground:${c.ink};--popover-foreground:${c.ink};--secondary-foreground:${c.ink};` +
+  const m = brand.heroMoods[0];
+  return `:root{--home-field:${m.field};--home-word:${m.word};--home-text:${m.text};--home-page:${m.page};--home-tile:${m.tile};--home-chip:${m.chip};` +
+    `--foreground:${c.ink};--card-foreground:${c.ink};--popover-foreground:${c.ink};--secondary-foreground:${c.ink};` +
     `--accent-foreground:${c.ink};--ring:${c.ink};--navy:${c.navy};--muted-foreground:${c.slate};--primary:${c.primary};` +
     `--wine:${c.primaryHover};--apricot:${c.accent}}`;
 }

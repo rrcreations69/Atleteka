@@ -56,7 +56,7 @@ export function CheckoutForm({ initialQuote, addresses, account, thumbnails }: {
       </div>
       {account && addresses.length > 0 && <div className="space-y-2">
         <Label htmlFor="saved-address">Use a saved address</Label>
-        <select id="saved-address" value={selected} className="min-h-12 w-full min-w-0 rounded-sm border border-input bg-background px-4"
+        <select id="saved-address" value={selected} className="min-h-12 w-full min-w-0 rounded-sm border border-input bg-field px-4"
           onChange={(event) => {
             setSelected(event.target.value);
             setAddress(addresses.find((item) => item.id === event.target.value) ?? blank);
@@ -88,7 +88,7 @@ export function CheckoutForm({ initialQuote, addresses, account, thumbnails }: {
           {quote.cart.items.map((item) => <li key={item.variantId} className="grid grid-cols-[3.5rem_minmax(0,1fr)_auto] items-start gap-x-4">
             <div className="relative">
               <ProductImage image={item.productSlug ? thumbnails[item.productSlug] : undefined} sizes="56px" className="[&_div]:p-1 [&_div]:text-[0.75rem]" />
-              <span className="absolute -right-2 -top-2 flex min-w-5 items-center justify-center rounded-full bg-foreground px-1.5 text-xs font-semibold leading-5 text-background">
+              <span className="absolute -right-2 -top-2 flex min-w-5 items-center justify-center rounded-full bg-foreground px-1.5 text-xs font-semibold leading-5 text-white">
                 <span className="sr-only">Quantity </span>{item.quantity}
               </span>
             </div>
