@@ -19,8 +19,6 @@ export const metadata: Metadata = {
   title: { default: brand.name, template: `%s | ${brand.name}` },
   description: brand.description,
   openGraph: openGraphDefaults,
-  // Avoid an implicit favicon request until branding is defined.
-  icons: { icon: "data:," },
 };
 
 export default function RootLayout({

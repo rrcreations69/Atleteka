@@ -98,3 +98,18 @@ export async function getProductThumbnails(slugs: string[]) {
   }
   return thumbnails;
 }
+
+// Active product and category URLs for sitemap.xml (public catalog data only).
+export async function getSitemapEntries() {
+  const client = createPublicSupabaseClient();
+  const [products, categories] = await Promise.all([
+    client.from("products").select("slug,updated_at").eq("status", "active").order("slug").limit(5000),
+    client.from("categories").select("slug").eq("active", true).order("slug").limit(1000),
+  ]);
+  if (products.error || categories.error) throw new Error("Sitemap entries could not be loaded.");
+  return {
+    products: z.array(z.object({ slug: slugSchema, updated_at: z.string() })).parse(products.data)
+      .map((row) => ({ slug: row.slug, updatedAt: new Date(row.updated_at) })),
+    categories: z.array(z.object({ slug: slugSchema })).parse(categories.data).map((row) => row.slug),
+  };
+}
