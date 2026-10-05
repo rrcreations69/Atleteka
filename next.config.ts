@@ -32,6 +32,14 @@ const nextConfig: NextConfig = {
       ],
     }];
   },
+  // Demo products renamed to match their photos (2026-10-05); old links keep working.
+  async redirects() {
+    return [
+      ["relaxed-linen-shirt", "relaxed-linen-top"], ["cotton-midi-skirt", "polka-dot-midi-skirt"],
+      ["cropped-denim-jacket", "classic-denim-jacket"], ["relaxed-chino", "stretch-twill-pants"],
+      ["utility-overshirt", "chambray-print-shirt"], ["drawstring-shorts", "paperbag-shorts"],
+    ].map(([from, to]) => ({ source: `/products/${from}`, destination: `/products/${to}`, permanent: true }));
+  },
   experimental: {
     // Admin product images are up to 4 MB (M11-P01); the action itself rejects anything larger.
     serverActions: { bodySizeLimit: "5mb" },
