@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Container } from "@/components/layout/container";
+import { CartLink } from "@/components/layout/cart-link";
 import { NavLinks } from "@/components/layout/nav-links";
 import { getCategories } from "@/lib/catalog/data";
 import type { CatalogCategory } from "@/lib/catalog/validation";
@@ -43,9 +44,7 @@ export async function SiteHeader() {
           <Link href="/account" aria-label="Account" className={iconLink}>
             <svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><circle cx="12" cy="8" r="4" /><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6" /></svg>
           </Link>
-          <Link href="/cart" aria-label="Cart" className={iconLink}>
-            <svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M5 8h14v13H5z" /><path d="M9 8V6a3 3 0 0 1 6 0v2" /></svg>
-          </Link>
+          <CartLink className={iconLink} />
         </div>
       </Container>
       <nav aria-label="Shop by category" className="border-t border-border lg:hidden">

@@ -1,7 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { CartAccessError, createCartClient } from "./data";
+import { CartAccessError, createCartClient, getCart } from "./data";
 import { cartSchema, parseCartForm, type CartState } from "./validation";
 
 export async function changeCart(_state: CartState, form: FormData): Promise<CartState> {
@@ -25,4 +25,15 @@ export async function changeCart(_state: CartState, form: FormData): Promise<Car
   }
   revalidatePath("/cart");
   return { message: input.operation === "add" ? "Added to cart." : input.operation === "remove" ? "Item removed." : "Quantity updated." };
+}
+
+// Item count for the header badge. Read-only (never creates a cart or sets a cookie); any failure
+// shows no badge rather than breaking the header. Called from the client so pages stay cacheable.
+export async function getCartCount(): Promise<number> {
+  try {
+    const { cart } = await getCart();
+    return cart.items.reduce((total, item) => total + item.quantity, 0);
+  } catch {
+    return 0;
+  }
 }

@@ -1,7 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { useActionState, useId, useState } from "react";
+import { useActionState, useEffect, useId, useState } from "react";
+import { CART_CHANGED } from "@/components/layout/cart-link";
 import { changeCart } from "@/lib/cart/actions";
 import type { CartState } from "@/lib/cart/validation";
 import { Button, buttonVariants } from "@/components/ui/button";
@@ -16,6 +17,10 @@ export function CartForm({ variantId, quantity = 1, operation, disabled = false,
   const [state, action, pending] = useActionState<CartState, FormData>(changeCart, {});
   // The quantity actually submitted, for the confirmation summary.
   const [addedQuantity, setAddedQuantity] = useState(quantity);
+  // Tell the header badge to refresh after a successful add, update or remove.
+  useEffect(() => {
+    if (state.message) window.dispatchEvent(new Event(CART_CHANGED));
+  }, [state]);
   const id = useId();
   const label = operation === "add" ? "Add to cart" : operation === "set" ? "Update quantity" : "Remove";
   return (
