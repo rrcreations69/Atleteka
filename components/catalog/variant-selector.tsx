@@ -4,7 +4,7 @@ import { useId, useState } from "react";
 import { CartForm } from "@/components/cart/cart-form";
 import { formatPrice, priceLabel, type CatalogVariant } from "@/lib/catalog/validation";
 
-export function VariantSelector({ variants }: { variants: CatalogVariant[] }) {
+export function VariantSelector({ variants, productName }: { variants: CatalogVariant[]; productName: string }) {
   const [selectedId, setSelectedId] = useState(variants.length === 1 ? variants[0].id : "");
   const selected = variants.find((variant) => variant.id === selectedId);
   const group = useId();
@@ -32,7 +32,8 @@ export function VariantSelector({ variants }: { variants: CatalogVariant[] }) {
         </div>
       </fieldset>}
       {variants.length === 0 && <p className="text-sm text-muted-foreground">This product is currently unavailable.</p>}
-      <CartForm key={selectedId} variantId={selectedId} operation="add" disabled={!selected?.inStock} />
+      <CartForm key={selectedId} variantId={selectedId} operation="add" disabled={!selected?.inStock}
+        itemLabel={selected ? (variants.length > 1 ? `${productName} · ${selected.title}` : productName) : undefined} />
     </div>
   );
 }

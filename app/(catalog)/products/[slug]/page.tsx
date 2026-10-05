@@ -42,7 +42,7 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
         <ProductGallery images={product.images} />
         <div className="min-w-0 space-y-7 lg:sticky lg:top-6">
           <h1 className="text-2xl leading-tight sm:text-3xl">{product.name}</h1>
-          <VariantSelector variants={product.variants} />
+          <VariantSelector variants={product.variants} productName={product.name} />
           <div className="border-t border-border">
             <section aria-labelledby="product-description" className="border-b border-border py-5">
               <h2 id="product-description" className="eyebrow mb-3 text-xs tracking-[0.12em]">Description</h2>
