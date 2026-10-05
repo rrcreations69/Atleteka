@@ -33,7 +33,11 @@ export async function sendOrderConfirmation(service: SupabaseClient, orderId: st
       productName: item.product_name, variantName: item.variant_name, sku: item.sku,
       quantity: item.quantity, unitPrice: item.unit_price, lineTotal: item.line_total,
     })),
-  }, getAuthConfig().appUrl, brand.name);
+  }, getAuthConfig().appUrl, {
+    name: brand.name, ink: brand.colors.ink, primary: brand.colors.primary,
+    // Email apps need an absolute image URL, and Gmail does not show SVG: use a PNG or JPG logo.
+    logoUrl: brand.logo ? new URL(brand.logo.src, getAuthConfig().appUrl).href : null,
+  });
   await sendEmail({ to: order.email, ...email, idempotencyKey: `order-confirmation-${order.id}` });
   // Only the first successful sender stamps it; a concurrent duplicate was already absorbed by Resend.
   await service.from("orders").update({ confirmation_email_sent_at: new Date().toISOString() })
