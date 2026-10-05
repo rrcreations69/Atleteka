@@ -25,14 +25,16 @@ const navLink = "eyebrow inline-flex min-h-11 shrink-0 items-center text-xs hove
 
 export async function SiteHeader() {
   const categories = await navCategories();
-  const links = [...categories.map((category) => ({ href: `/categories/${category.slug}`, label: category.name })), { href: "/shop", label: "Shop all" }];
+  const home = { href: "/", label: "Home" };
+  const shopAll = { href: "/shop", label: "Shop all" };
+  const categoryLinks = categories.map((category) => ({ href: `/categories/${category.slug}`, label: category.name }));
   return (
     <header id="top" className="border-b border-border bg-background">
       <p className="eyebrow bg-foreground px-4 py-2.5 text-center text-xs font-medium text-apricot">Nationwide delivery · Shipping paid on delivery</p>
       <Container className="grid min-h-16 grid-cols-[1fr_auto] items-center gap-4 py-2 lg:grid-cols-[1fr_auto_1fr]">
-        <nav aria-label="Main navigation" className="hidden items-center gap-7 lg:flex">
-          {/* Desktop shows the first three categories so the centered logo never collides. */}
-          <NavLinks links={[...links.slice(0, Math.min(3, links.length - 1)), links[links.length - 1]]} className={navLink} />
+        <nav aria-label="Main navigation" className="hidden items-center gap-6 lg:flex">
+          {/* Desktop shows two categories (three from xl) so the centered logo never collides. */}
+          <NavLinks links={[home, ...categoryLinks.slice(0, 3).map((link, index) => index === 2 ? { ...link, className: "hidden xl:inline-flex" } : link), shopAll]} className={navLink} />
         </nav>
         <Link href="/" aria-label="Atleteka home" className="inline-flex min-h-11 items-center pl-[0.32em] text-lg font-bold uppercase tracking-[0.32em] lg:justify-self-center">
           Atleteka
@@ -50,7 +52,7 @@ export async function SiteHeader() {
       <nav aria-label="Shop by category" className="border-t border-border lg:hidden">
         {/* The fade at the right edge hints that the row scrolls sideways. */}
         <Container className="flex gap-6 overflow-x-auto pr-10 [mask-image:linear-gradient(to_right,black_85%,transparent)] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-          <NavLinks links={links} className={navLink} />
+          <NavLinks links={[home, ...categoryLinks, shopAll]} className={navLink} />
         </Container>
       </nav>
     </header>
