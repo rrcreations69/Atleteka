@@ -4,29 +4,39 @@ Derived from PRD.xlsx 07_ROADMAP!A3:I20. Read 08_USER_STORIES and 11_TEST_MATRIX
 
 ## Current state
 
-M00-M02 are verified. M03 is implemented but its browser auth verification remains incomplete (see M03_CHECKPOINT.md). M04 is verified (see M04_CHECKPOINT.md). The user authorized M05 on 2026-09-21; M05 search and filters are complete and verified (see M05_CHECKPOINT.md). M06 is complete and verified following approval of M06-P01; see M06_CHECKPOINT.md. The user authorized M07 on 2026-09-23; M07-P01 and merchant rules are approved. Checkout implementation is present and final verification is recorded in CURRENT.md. The M03 dependency remains incompletely verified (one check left). On 2026-09-25 the user authorized M08 with M03/M07 still open and approved M08-P01 (PayMongo replaces Stripe; merchandise-only charge, shipping paid to the courier on delivery). M08 is In Progress. M09 (M09-P01 approved 2026-09-28), M10, M11 (M11-P01), M12 (M12-P01), M13 (M13-P01) and M14 (M14-P01) are In Progress with functional acceptance passed. M15 (security review) is In Progress: review done and two fixes deployed; the deferred M03 reset check remains. M16 is unstarted.
+Updated 2026-10-05. **The project is in M16 (QA & launch), the last milestone.** Every feature milestone (M00-M15) is built, tested end to end and live on https://atleteka.vercel.app in demo mode (PayMongo test keys; see CURRENT.md "START HERE"). The final QA pass and end-to-end critical path passed on 2026-09-30, production has run `main` since 2026-10-02 (M16-P01 soft launch), and every page was redesigned in the Studio style on 2026-10-05 (#13-#24).
 
-The table below reflects workbook statuses after the user-authorized 2026-09-25 status correction: M00, M01, M02, M04, M05 and M06 are Done (verified per their checkpoints); M03 and M07 are In Progress (M03 browser/email verification incomplete; M07 open only for that dependency). M08 became In Progress with M08-P01 on 2026-09-25. Verified execution history is recorded above and in milestone checkpoints.
+What still stands between demo mode and a real launch (all need the user):
+1. Real products and photos (the 14 demo products are placeholders).
+2. Live PayMongo key, live webhook and its secret in Vercel Production.
+3. A verified Resend domain and EMAIL_FROM (confirmations currently reach one test address).
+4. Rotate the database password; enable Supabase leaked-password protection.
+5. The deferred M03 password-reset check (the only reason M03, and M07 through its dependency, stay open).
+6. Then close M03 and M07-M16 in PRD.xlsx and here.
 
-| ID | Milestone | Priority | Dependency | Workbook status | Deliverables | Definition of Done / Acceptance Criteria | Owner | Estimate |
-| --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| M00 | Repository & engineering baseline | P0 | None | Done | Next.js TS app; Tailwind; shadcn; lint/typecheck; env example; AGENTS.md/AI rules | App runs locally; lint/typecheck pass; secrets excluded; conventions documented. | Eng | S |
-| M01 | Design system & shell | P0 | M00 | Done | Typography, spacing, header/footer, buttons/cards/forms, responsive container | Consistent layout on mobile/desktop; reusable primitives; no feature business logic yet. | Frontend | S |
-| M02 | Supabase & schema | P0 | M00 | Done | Supabase project config, migrations, data model, seed script | Schema matches PRD; migrations reproducible; seed creates usable catalog data. | Backend | M |
-| M03 | Authentication & authorization | P0 | M02 | In Progress | Login/register/session, profiles, customer/admin roles, RLS | Customer/admin access tests pass; privilege escalation blocked. | Backend | M |
-| M04 | Catalog | P0 | M01,M02 | Done | Shop, category, product detail, images, variants, availability | Active catalog renders from DB; invalid/inactive routes handled; responsive. | Full Stack | M |
-| M05 | Search & filters | P1 | M04 | Done | Basic search/category/availability filtering | URL/state predictable; no overbuilt search service. | Full Stack | S |
-| M06 | Cart | P0 | M04 | Done | Add/update/remove, persistence, subtotal display, empty/error/loading states. Database/RLS, cookie, Server Actions, UI and guest/account browser flows verified on 2026-09-23. | Variant-aware; positive integer quantity within stock; current server prices/subtotal. Secure 30-day hashed guest identity; separate account carts, no merge. Complete only after end-to-end verification. | Full Stack | M |
-| M07 | Checkout foundation | P0 | M03,M06 | In Progress | PH address/account reuse, authoritative PHP merchandise quote, discount validation; M03 dependency verification incomplete | Current prices/stock and single coupon validated server-side; tax included; shipping/final payable total pending; account addresses isolated. | Backend | M |
-| M08 | PayMongo payment | P0 | M07 | In Progress | PayMongo hosted checkout session and safe metadata; merchandise-only charge (shipping paid to courier on delivery) | Client cannot choose price/total; test payment can complete. | Backend | M |
-| M09 | Webhook & order creation | P0 | M08 | In Progress | Signature verification, idempotency, order snapshots, payment state, inventory adjustment | Duplicate webhook safe; browser close after pay still produces correct order; no double inventory deduction. | Backend | L |
-| M10 | Customer account | P1 | M03,M09 | In Progress | Order history/detail, addresses, settings | Users only see own data; empty/loading/error states included. | Full Stack | M |
-| M11 | Admin products/categories/inventory | P1 | M03,M04 | In Progress | Admin CRUD/archive and stock management | All mutations admin-only; images validated; no destructive accidental deletion. | Full Stack | L |
-| M12 | Admin orders | P1 | M09 | In Progress | Order list/detail and fulfillment status updates | Payment status protected; fulfillment updates auditable enough for MVP. | Full Stack | M |
-| M13 | Transactional email | P1 | M09 | In Progress | Order confirmation email | Sent once per paid order event; failure is logged without corrupting order. | Backend | S |
-| M14 | Observability & analytics | P1 | M00 | In Progress | Sentry; basic analytics | Production errors visible; no secrets/PII leakage in logs. | Eng | S |
-| M15 | Security & abuse review | P0 | M03-M14 | In Progress | RLS review, price tampering, role abuse, upload validation, webhook replay checks | Critical abuse cases in test matrix pass. | Security | M |
-| M16 | QA & launch | P0 | M15 | Not Started | E2E critical path, performance/accessibility sanity, production env/deploy | Launch checklist complete; critical P0/P1 defects closed. | Team | M |
+History before 2026-10-05: M00-M02, M04-M06 verified per their checkpoints; M03 implemented with one browser/email check deferred; M07-P01, M08-P01 (PayMongo replaces Stripe), M09-P01, M11-P01, M12-P01, M13-P01 and M14-P01 approved; M15 review done with two fixes deployed.
+
+The "Workbook status" column mirrors PRD.xlsx 07_ROADMAP exactly; it was last changed by the user-authorized 2026-09-25 status correction and still lists M16 as Not Started. The "Actual status" column is the verified state on 2026-10-05.
+
+| ID | Milestone | Priority | Dependency | Workbook status | Actual status (2026-10-05) | Deliverables | Definition of Done / Acceptance Criteria | Owner | Estimate |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| M00 | Repository & engineering baseline | P0 | None | Done | Done | Next.js TS app; Tailwind; shadcn; lint/typecheck; env example; AGENTS.md/AI rules | App runs locally; lint/typecheck pass; secrets excluded; conventions documented. | Eng | S |
+| M01 | Design system & shell | P0 | M00 | Done | Done | Typography, spacing, header/footer, buttons/cards/forms, responsive container | Consistent layout on mobile/desktop; reusable primitives; no feature business logic yet. | Frontend | S |
+| M02 | Supabase & schema | P0 | M00 | Done | Done | Supabase project config, migrations, data model, seed script | Schema matches PRD; migrations reproducible; seed creates usable catalog data. | Backend | M |
+| M03 | Authentication & authorization | P0 | M02 | In Progress | Built and live; deferred password-reset email check open | Login/register/session, profiles, customer/admin roles, RLS | Customer/admin access tests pass; privilege escalation blocked. | Backend | M |
+| M04 | Catalog | P0 | M01,M02 | Done | Done | Shop, category, product detail, images, variants, availability | Active catalog renders from DB; invalid/inactive routes handled; responsive. | Full Stack | M |
+| M05 | Search & filters | P1 | M04 | Done | Done | Basic search/category/availability filtering | URL/state predictable; no overbuilt search service. | Full Stack | S |
+| M06 | Cart | P0 | M04 | Done | Done | Add/update/remove, persistence, subtotal display, empty/error/loading states. Database/RLS, cookie, Server Actions, UI and guest/account browser flows verified on 2026-09-23. | Variant-aware; positive integer quantity within stock; current server prices/subtotal. Secure 30-day hashed guest identity; separate account carts, no merge. Complete only after end-to-end verification. | Full Stack | M |
+| M07 | Checkout foundation | P0 | M03,M06 | In Progress | Built and live; open only for the M03 dependency | PH address/account reuse, authoritative PHP merchandise quote, discount validation; M03 dependency verification incomplete | Current prices/stock and single coupon validated server-side; tax included; shipping/final payable total pending; account addresses isolated. | Backend | M |
+| M08 | PayMongo payment | P0 | M07 | In Progress | Built, tested end to end, live in demo mode | PayMongo hosted checkout session and safe metadata; merchandise-only charge (shipping paid to courier on delivery) | Client cannot choose price/total; test payment can complete. | Backend | M |
+| M09 | Webhook & order creation | P0 | M08 | In Progress | Built, tested end to end, live in demo mode | Signature verification, idempotency, order snapshots, payment state, inventory adjustment | Duplicate webhook safe; browser close after pay still produces correct order; no double inventory deduction. | Backend | L |
+| M10 | Customer account | P1 | M03,M09 | In Progress | Built, tested end to end, live in demo mode | Order history/detail, addresses, settings | Users only see own data; empty/loading/error states included. | Full Stack | M |
+| M11 | Admin products/categories/inventory | P1 | M03,M04 | In Progress | Built, tested end to end, live in demo mode | Admin CRUD/archive and stock management | All mutations admin-only; images validated; no destructive accidental deletion. | Full Stack | L |
+| M12 | Admin orders | P1 | M09 | In Progress | Built, tested end to end, live in demo mode | Order list/detail and fulfillment status updates | Payment status protected; fulfillment updates auditable enough for MVP. | Full Stack | M |
+| M13 | Transactional email | P1 | M09 | In Progress | Built, tested end to end, live in demo mode | Order confirmation email | Sent once per paid order event; failure is logged without corrupting order. | Backend | S |
+| M14 | Observability & analytics | P1 | M00 | In Progress | Built, tested end to end, live in demo mode | Sentry; basic analytics | Production errors visible; no secrets/PII leakage in logs. | Eng | S |
+| M15 | Security & abuse review | P0 | M03-M14 | In Progress | Review done, fixes deployed; deferred M03 check open | RLS review, price tampering, role abuse, upload validation, webhook replay checks | Critical abuse cases in test matrix pass. | Security | M |
+| M16 | QA & launch | P0 | M15 | Not Started | In progress: QA and E2E passed 2026-09-30, live since 2026-10-02, redesign 2026-10-05; launch items open | E2E critical path, performance/accessibility sanity, production env/deploy | Launch checklist complete; critical P0/P1 defects closed. | Team | M |
 
 ## Verified milestone history
 
@@ -43,7 +53,7 @@ A plan or created files alone do not establish completion. Required functionalit
 
 ## Dashboard and status preservation
 
-15_DASHBOARD cached results after the 2026-09-25 status correction: 17 total, 6 Done, 2 In Progress, 0 Blocked, 9 Not Started (35.29% complete). Formulas are unchanged and the workbook recalculates fully on load. Read milestone checkpoints for actual execution history. Native Excel recalculation was not exercised.
+15_DASHBOARD cached results after the 2026-09-25 status correction (workbook statuses only; they predate M08-M16 progress, see "Current state"): 17 total, 6 Done, 2 In Progress, 0 Blocked, 9 Not Started (35.29% complete). Formulas are unchanged and the workbook recalculates fully on load. Read milestone checkpoints for actual execution history. Native Excel recalculation was not exercised.
 
 ## User-story traceability
 
