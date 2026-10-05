@@ -103,7 +103,7 @@ export default async function HomePage() {
           </div>
           <Link href="/shop" className="inline-flex min-h-11 shrink-0 items-center text-sm font-semibold underline underline-offset-4">View all</Link>
         </div>
-        <ProductGrid products={products} />
+        <ProductGrid products={products} headingLevel={3} />
       </Container>
 
 
