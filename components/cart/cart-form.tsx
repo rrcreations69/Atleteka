@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useActionState, useEffect, useId, useState } from "react";
+import { useActionState, useId, useState } from "react";
 import { CART_CHANGED } from "@/components/layout/cart-link";
 import { changeCart } from "@/lib/cart/actions";
 import type { CartState } from "@/lib/cart/validation";
@@ -9,18 +9,22 @@ import { Button, buttonVariants } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
+// Tells the header badge to refresh as soon as the server confirms a change. Done here rather than in
+// an effect because a successful update or remove re-renders the cart and replaces this form first.
+async function changeCartAndNotify(previous: CartState, form: FormData): Promise<CartState> {
+  const result = await changeCart(previous, form);
+  if (result.message) window.dispatchEvent(new Event(CART_CHANGED));
+  return result;
+}
+
 export function CartForm({ variantId, quantity = 1, operation, disabled = false, itemLabel }: {
   variantId: string; quantity?: number; operation: "add" | "set" | "remove"; disabled?: boolean;
   /** Shown in the add-to-cart confirmation, e.g. "Heavyweight Crew Tee · M". */
   itemLabel?: string;
 }) {
-  const [state, action, pending] = useActionState<CartState, FormData>(changeCart, {});
+  const [state, action, pending] = useActionState<CartState, FormData>(changeCartAndNotify, {});
   // The quantity actually submitted, for the confirmation summary.
   const [addedQuantity, setAddedQuantity] = useState(quantity);
-  // Tell the header badge to refresh after a successful add, update or remove.
-  useEffect(() => {
-    if (state.message) window.dispatchEvent(new Event(CART_CHANGED));
-  }, [state]);
   const id = useId();
   const label = operation === "add" ? "Add to cart" : operation === "set" ? "Update quantity" : "Remove";
   return (
