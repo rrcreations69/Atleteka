@@ -5,7 +5,7 @@ import { getSavedAddresses } from "@/lib/checkout/data";
 import { createSupabaseClient } from "@/lib/supabase/server";
 
 export const dynamic = "force-dynamic";
-export const metadata = { title: "Saved addresses | Atleteka" };
+export const metadata = { title: "Saved addresses" };
 
 export default async function AddressesPage() {
   const { profile } = await requireIdentity();

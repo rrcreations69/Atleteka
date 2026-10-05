@@ -2,7 +2,7 @@ import Link from "next/link";
 import { Container } from "@/components/layout/container";
 import { buttonVariants } from "@/components/ui/button";
 
-export const metadata = { title: "Payment submitted | Atleteka" };
+export const metadata = { title: "Payment submitted" };
 
 const steps = [
   ["We confirm your payment", "PayMongo tells us once your payment goes through. Your order is final only after this confirmation."],

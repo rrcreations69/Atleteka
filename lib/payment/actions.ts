@@ -6,6 +6,7 @@ import { addressSchema, parseCheckoutForm, quoteError, quoteSchema, type Checkou
 import { getAuthConfig } from "@/lib/supabase/config";
 import { createCheckoutSession } from "./paymongo";
 import { checkoutLineItems, PaymentQuoteError, planPayment } from "./session";
+import { brand } from "@/lib/brand";
 
 export async function startPayment(_state: CheckoutState, form: FormData): Promise<CheckoutState> {
   const input = parseCheckoutForm(form);
@@ -26,8 +27,8 @@ export async function startPayment(_state: CheckoutState, form: FormData): Promi
     const cartId = quote.cart.id ?? "";
     const { appUrl } = getAuthConfig();
     const session = await createCheckoutSession({
-      line_items: checkoutLineItems(plan),
-      description: "Atleteka merchandise. Shipping is not included: you pay the courier directly on delivery.",
+      line_items: checkoutLineItems(plan, brand.name),
+      description: brand.name + " merchandise. Shipping is not included: you pay the courier directly on delivery.",
       reference_number: cartId,
       // The webhook re-reads these from PayMongo's copy of the session (lib/payment/webhook.ts); strings only.
       metadata: {

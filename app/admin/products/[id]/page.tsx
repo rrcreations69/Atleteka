@@ -5,7 +5,7 @@ import { ImageEditForms, ImageUploadForm, ProductCategoriesForm, ProductDetailsF
 import { getAdminProduct, listAdminCategories } from "@/lib/admin/data";
 
 export const dynamic = "force-dynamic";
-export const metadata = { title: "Edit product | Admin | Atleteka" };
+export const metadata = { title: "Edit product | Admin" };
 
 export default async function AdminProductPage({ params }: { params: Promise<{ id: string }> }) {
   const product = await getAdminProduct((await params).id);

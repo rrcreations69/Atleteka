@@ -4,7 +4,7 @@ import { NewProductForm } from "@/components/admin/forms";
 import { listAdminProducts } from "@/lib/admin/data";
 
 export const dynamic = "force-dynamic";
-export const metadata = { title: "Products | Admin | Atleteka" };
+export const metadata = { title: "Products | Admin" };
 
 const activeOptions = (variants: { active: boolean }[]) => {
   const count = variants.filter((variant) => variant.active).length;

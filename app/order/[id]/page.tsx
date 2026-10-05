@@ -7,7 +7,7 @@ import { requireIdentity } from "@/lib/auth/session";
 import { formatPrice } from "@/lib/catalog/validation";
 
 export const dynamic = "force-dynamic";
-export const metadata = { title: "Order | Atleteka" };
+export const metadata = { title: "Order" };
 
 const notice = "border-l-2 bg-card p-4 text-sm";
 

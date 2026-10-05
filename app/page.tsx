@@ -3,10 +3,11 @@ import { Container } from "@/components/layout/container";
 import { ProductGrid } from "@/components/catalog/product-grid";
 import { ProductImage } from "@/components/catalog/product-image";
 import { buttonVariants } from "@/components/ui/button";
-import { BrandStatement, ClosingCta, Faq, HowItWorks, WhyAtleteka, type ShopLink } from "@/components/home/landing-sections";
+import { BrandStatement, ClosingCta, Faq, HowItWorks, WhyUs, type ShopLink } from "@/components/home/landing-sections";
 import { FeaturedHero, type HeroSlide } from "@/components/home/featured-hero";
 import { getCategories, getProducts } from "@/lib/catalog/data";
 import { PAGE_SIZE, catalogQuerySchema, priceLabel, type CatalogCategory, type CatalogImage, type CatalogProduct } from "@/lib/catalog/validation";
+import { brand } from "@/lib/brand";
 
 // Catalog content refreshes at most once a minute.
 export const revalidate = 60;
@@ -80,7 +81,7 @@ export default async function HomePage() {
     : [{ href: "/shop", label: "Shop the collection" }];
   return (
     <>
-      <h1 className="sr-only">Atleteka: everyday clothing for women and men</h1>
+      <h1 className="sr-only">{brand.name}: {brand.tagline}</h1>
       <FeaturedHero slides={slides} />
       {lead.length > 0 ? <section aria-label="Shop by department" className={"grid " + (lead.length > 1 ? "sm:grid-cols-2" : "")}>
         {lead.map((category) => <Link key={category.id} href={`/categories/${category.slug}`} className="group relative block bg-foreground">
@@ -120,7 +121,7 @@ export default async function HomePage() {
         </ul>
       </Container>}
 
-      <WhyAtleteka />
+      <WhyUs />
       <HowItWorks />
       <Faq />
       <ClosingCta links={shopLinks} />

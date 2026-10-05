@@ -7,7 +7,7 @@ import { formatPrice } from "@/lib/catalog/validation";
 import { nextStatuses, orderStatusLabel, orderStatusSchema } from "@/lib/orders/status";
 
 export const dynamic = "force-dynamic";
-export const metadata = { title: "Order | Admin | Atleteka" };
+export const metadata = { title: "Order | Admin" };
 
 const label = (value: string) => { const parsed = orderStatusSchema.safeParse(value); return parsed.success ? orderStatusLabel[parsed.data] : value; };
 const row = "flex justify-between gap-4";

@@ -18,7 +18,8 @@ export function orderNumber(id: string) {
   return id.slice(0, 8).toUpperCase();
 }
 
-export function buildOrderConfirmation(order: ConfirmationOrder, appUrl: string) {
+/** `storeName` comes from lib/brand.ts via the caller, so this module stays free of app imports. */
+export function buildOrderConfirmation(order: ConfirmationOrder, appUrl: string, storeName: string) {
   const number = orderNumber(order.id);
   const link = order.accountOrder ? new URL(`/order/${order.id}`, appUrl).href : null;
   const hasDiscount = Number(order.discountTotal) > 0;
@@ -56,5 +57,5 @@ export function buildOrderConfirmation(order: ConfirmationOrder, appUrl: string)
   ${link ? `<p><a href="${escapeHtml(link)}">View your order</a></p>` : ""}
 </body></html>`;
 
-  return { subject: `Your Atleteka order ${number}`, text, html };
+  return { subject: `Your ${storeName} order ${number}`, text, html };
 }

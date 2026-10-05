@@ -3,7 +3,7 @@ import { CategoryForm } from "@/components/admin/forms";
 import { listAdminCategories } from "@/lib/admin/data";
 
 export const dynamic = "force-dynamic";
-export const metadata = { title: "Categories | Admin | Atleteka" };
+export const metadata = { title: "Categories | Admin" };
 
 export default async function AdminCategoriesPage() {
   const categories = await listAdminCategories();

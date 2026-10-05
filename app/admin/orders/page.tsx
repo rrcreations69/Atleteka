@@ -7,7 +7,7 @@ import { orderStatusLabel, orderStatusSchema, orderStatuses } from "@/lib/orders
 import { cn } from "@/lib/utils";
 
 export const dynamic = "force-dynamic";
-export const metadata = { title: "Orders | Admin | Atleteka" };
+export const metadata = { title: "Orders | Admin" };
 
 const tab = "eyebrow inline-flex min-h-11 shrink-0 items-center border-b-2 border-transparent text-xs text-muted-foreground hover:text-foreground";
 

@@ -54,14 +54,15 @@ const peso = (centavos: number) => `PHP ${(centavos / 100).toFixed(2)}`;
  * PayMongo has no coupon object and rejects negative lines. Without a discount the lines are itemized;
  * with one, a single line carries the exact discounted total so no per-item rounding is needed.
  */
-export function checkoutLineItems(plan: PaymentPlan) {
+/** `storeName` names the single discounted line; it comes from lib/brand.ts via the caller. */
+export function checkoutLineItems(plan: PaymentPlan, storeName: string) {
   if (plan.discount === 0) {
     return plan.lines.map((line) => ({ name: line.name, amount: line.unitAmount, quantity: line.quantity, currency: "PHP" as const }));
   }
   const items = plan.lines.map((line) => `${line.name} × ${line.quantity}`).join(", ");
   const description = `${items}. Coupon ${plan.couponCode ?? ""} applied: −${peso(plan.discount)} from ${peso(plan.subtotal)}.`;
   return [{
-    name: "Atleteka order (merchandise after discount)", amount: plan.total, quantity: 1, currency: "PHP" as const,
+    name: storeName + " order (merchandise after discount)", amount: plan.total, quantity: 1, currency: "PHP" as const,
     description: description.length > DESCRIPTION_LIMIT ? description.slice(0, DESCRIPTION_LIMIT - 1) + "…" : description,
   }];
 }

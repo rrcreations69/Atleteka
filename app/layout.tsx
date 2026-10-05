@@ -6,6 +6,7 @@ import { SiteHeader } from "@/components/layout/site-header";
 import { SiteFooter } from "@/components/layout/site-footer";
 import { openGraphDefaults } from "@/lib/seo";
 import "./globals.css";
+import { brand, brandColorCss } from "@/lib/brand";
 
 // Self-hosted at build time by next/font (no runtime request to Google).
 const instrument = Instrument_Sans({ subsets: ["latin"], variable: "--font-instrument", display: "swap" });
@@ -14,8 +15,9 @@ const appUrl = process.env.NEXT_PUBLIC_APP_URL;
 // Core SEO metadata (PRD 02_SCOPE): title, description, canonical base and OpenGraph basics.
 export const metadata: Metadata = {
   metadataBase: appUrl && URL.canParse(appUrl) ? new URL(appUrl) : undefined,
-  title: "Atleteka",
-  description: "Comfortable, well-made clothing for women and men, delivered across the Philippines.",
+  // Pages set a short title ("Cart"); the template adds the store name.
+  title: { default: brand.name, template: `%s | ${brand.name}` },
+  description: brand.description,
   openGraph: openGraphDefaults,
   // Avoid an implicit favicon request until branding is defined.
   icons: { icon: "data:," },
@@ -26,6 +28,8 @@ export default function RootLayout({
 }: Readonly<{ children: ReactNode }>) {
   return (
     <html lang="en" className={instrument.variable}>
+      {/* Brand colors from lib/brand.ts, applied over the defaults in globals.css. */}
+      <head><style dangerouslySetInnerHTML={{ __html: brandColorCss() }} /></head>
       <body className="flex min-h-svh flex-col">
         <a
           href="#main-content"

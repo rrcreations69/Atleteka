@@ -2,6 +2,7 @@ import Link from "next/link";
 import type { ReactNode } from "react";
 import { Container } from "@/components/layout/container";
 import { buttonVariants } from "@/components/ui/button";
+import { brand } from "@/lib/brand";
 
 // Static home page sections. Copy states only what the store actually does (D-DESIGN-04).
 
@@ -12,11 +13,11 @@ export function BrandStatement() {
     <section aria-labelledby="brand-heading" className="bg-navy text-background [--ring:var(--apricot)]">
       <Container className="grid gap-8 py-16 sm:py-24 lg:grid-cols-[3fr_2fr] lg:items-end">
         <div>
-          <p className="eyebrow text-xs text-apricot">Atleteka</p>
-          <h2 id="brand-heading" className="mt-4 max-w-2xl text-display">Everyday pieces, made to last.</h2>
+          <p className="eyebrow text-xs text-apricot">{brand.name}</p>
+          <h2 id="brand-heading" className="mt-4 max-w-2xl text-display">{brand.statement.heading}</h2>
         </div>
         <div className="space-y-6">
-          <p className="max-w-md text-lg leading-relaxed text-[#cfd3de]">Wardrobe staples for women and men: easy shirts, honest trousers and layers you&apos;ll reach for every day. Simple to shop, delivered anywhere in the Philippines.</p>
+          <p className="max-w-md text-lg leading-relaxed text-[#cfd3de]">{brand.statement.body}</p>
           <Link href="/shop" className={buttonVariants()}>Shop the collection</Link>
         </div>
       </Container>
@@ -37,11 +38,11 @@ const REASONS: { title: string; body: string; glyph: ReactNode }[] = [
     glyph: <svg {...icon}><path d="M3 7h11v9H3zM14 10h4l3 3v3h-7" /><circle cx="7" cy="17.5" r="1.5" /><circle cx="17" cy="17.5" r="1.5" /></svg> },
 ];
 
-export function WhyAtleteka() {
+export function WhyUs() {
   return (
     <section aria-labelledby="why-heading">
       <Container className="mt-16 sm:mt-24">
-        <p className="eyebrow text-xs text-primary">Why Atleteka</p>
+        <p className="eyebrow text-xs text-primary">Why {brand.name}</p>
         <h2 id="why-heading" className="mt-2 text-2xl sm:text-3xl">Good clothes, simply sold.</h2>
         <ul className="mt-8 grid gap-px overflow-hidden border border-border bg-border sm:grid-cols-2 lg:grid-cols-4">
           {REASONS.map((reason) => <li key={reason.title} className="bg-background p-6">
