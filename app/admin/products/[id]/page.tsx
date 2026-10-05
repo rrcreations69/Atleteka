@@ -11,9 +11,8 @@ export default async function AdminProductPage({ params }: { params: Promise<{ i
   const product = await getAdminProduct((await params).id);
   if (!product) notFound();
   const categories = await listAdminCategories();
-  return <AdminShell title={product.name}
+  return <AdminShell back={{ href: "/admin/products", label: "All products" }} title={product.name}
     description={product.status === "active" ? <p><Link href={"/products/" + product.slug} className="underline underline-offset-4">View in shop</Link></p> : <p>Archived: hidden from the shop.</p>}>
-    <Link href="/admin/products" className="eyebrow -mt-4 inline-flex min-h-11 items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground"><span aria-hidden="true">←</span> All products</Link>
     <div className="grid gap-10 xl:grid-cols-2">
       <section aria-labelledby="details" className={adminPanel + " self-start"}>
         <h2 id="details" className="text-lg">Details</h2>

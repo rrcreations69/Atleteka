@@ -2,6 +2,7 @@
 
 import { ActionForm } from "@/components/admin/action-form";
 import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
 import { TextField } from "@/components/ui/text-field";
 import {
   createProduct, removeImage, saveCategory, saveProductCategories, saveVariant, setStock, updateImage, updateProduct, uploadImage,
@@ -49,7 +50,7 @@ type Variant = { id: string; title: string; sku: string; price: string; active: 
 export function VariantForm({ productId, variant }: { productId: string; variant?: Variant }) {
   const key = variant?.id ?? "new";
   return <ActionForm action={saveVariant} submitLabel={variant ? "Save option" : "Add option"} variant={variant ? "outline" : "default"}
-    className="rounded-lg border border-border p-4">
+    className={variant ? "border border-border p-4" : undefined}>
     {(errors) => <>
       <input type="hidden" name="productId" value={productId} />
       {variant && <input type="hidden" name="variantId" value={variant.id} />}
@@ -113,7 +114,7 @@ export function ImageEditForms({ productId, image }: { productId: string; image:
 export function CategoryForm({ category }: { category?: { id: string; name: string; slug: string; active: boolean } }) {
   const key = category?.id ?? "new";
   return <ActionForm action={saveCategory} submitLabel={category ? "Save category" : "Create category"} variant={category ? "outline" : "default"}
-    className="rounded-lg border border-border p-4">
+    className={category ? "border border-border p-4" : undefined}>
     {(errors) => <>
       {category && <input type="hidden" name="categoryId" value={category.id} />}
       <div className="grid gap-3 sm:grid-cols-2">
@@ -126,10 +127,13 @@ export function CategoryForm({ category }: { category?: { id: string; name: stri
 }
 
 export function StockForm({ variantId, current, label }: { variantId: string; current: number | null; label: string }) {
-  return <ActionForm action={setStock} submitLabel="Set stock" variant="outline" className="flex flex-wrap items-end gap-3 space-y-0">
+  const id = `stock-${variantId}`;
+  return <ActionForm action={setStock} submitLabel="Set stock" variant="outline" fieldsetClassName="flex items-end gap-2 space-y-0">
     <input type="hidden" name="variantId" value={variantId} />
     <input type="hidden" name="expected" value={String(current ?? 0)} />
-    <TextField id={`stock-${variantId}`} name="quantity" label={`New stock for ${label}`} inputMode="numeric" required
-      defaultValue={String(current ?? 0)} className="w-32" />
+    <div className="space-y-1.5">
+      <Label htmlFor={id}>New stock<span className="sr-only"> for {label}</span></Label>
+      <Input id={id} name="quantity" inputMode="numeric" required defaultValue={String(current ?? 0)} className="w-24" />
+    </div>
   </ActionForm>;
 }

@@ -2,10 +2,10 @@ import type { ReactNode } from "react";
 import { SectionShell } from "@/components/layout/section-shell";
 
 /** Admin page frame: the shared signed-in layout with admin navigation. */
-export function AdminShell({ title, description, actions, children }: {
-  title: string; description?: ReactNode; actions?: ReactNode; children: ReactNode;
+export function AdminShell({ title, description, back, actions, children }: {
+  title: string; description?: ReactNode; back?: { href: string; label: string }; actions?: ReactNode; children: ReactNode;
 }) {
-  return <SectionShell eyebrow="Admin" navLabel="Admin" title={title} description={description} actions={actions} links={[
+  return <SectionShell eyebrow="Admin" navLabel="Admin" title={title} description={description} actions={actions} back={back} links={[
     { href: "/admin", label: "Dashboard", exact: true },
     { href: "/admin/orders", label: "Orders" },
     { href: "/admin/products", label: "Products" },

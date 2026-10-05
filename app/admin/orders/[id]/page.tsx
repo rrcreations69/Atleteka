@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { notFound } from "next/navigation";
 import { AdminShell, adminPanel, adminWhen } from "@/components/admin/admin-nav";
 import { OrderStatusForm } from "@/components/admin/order-status-form";
@@ -19,10 +18,9 @@ export default async function AdminOrderPage({ params }: { params: Promise<{ id:
   const address = order.shipping_address;
   const history = [...order.order_status_history].sort((a, b) => a.changed_at.localeCompare(b.changed_at));
   const discounted = Number(order.discount_total) > 0;
-  return <AdminShell title={"Order " + order.id.slice(0, 8).toUpperCase()}
+  return <AdminShell back={{ href: "/admin/orders", label: "All orders" }} title={"Order " + order.id.slice(0, 8).toUpperCase()}
     description={<p>Placed {adminWhen(order.created_at)} · Payment: {order.payment_status === "paid" ? "Paid" : order.payment_status} (set only by the verified payment webhook)</p>}
     actions={<StatusBadge status={order.status} label={orderStatusLabel[order.status]} className="mb-1" />}>
-    <Link href="/admin/orders" className="eyebrow -mt-4 inline-flex min-h-11 items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground"><span aria-hidden="true">←</span> All orders</Link>
     {order.status === "needs_review" && <p role="status" className="border-l-2 border-destructive bg-card p-4 text-sm">
       Flagged at payment time: an item may have sold out or the coupon was over its limit. Stock was not deducted for this order.
       Confirm you can fulfil it (and adjust inventory), or refund it in PayMongo and cancel it.
