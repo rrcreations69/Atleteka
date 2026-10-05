@@ -10,7 +10,7 @@ What still stands between demo mode and a real launch (all need the user):
 1. Real products and photos (the 14 demo products are placeholders).
 2. Live PayMongo key, live webhook and its secret in Vercel Production.
 3. A verified Resend domain and EMAIL_FROM (confirmations currently reach one test address).
-4. Rotate the database password; enable Supabase leaked-password protection.
+4. ~~Rotate the database password~~ (done by the user 2026-10-05); enable Supabase leaked-password protection.
 5. ~~The deferred M03 password-reset check~~ passed on 2026-10-05 (M03_CHECKPOINT.md); M03 and M07 are Done in the workbook (user-approved 2026-10-05).
 6. Then close M08-M16 in PRD.xlsx and here.
 
