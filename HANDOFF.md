@@ -1,3 +1,5 @@
+> **2026-10-05:** start with docs/CURRENT.md "START HERE". Everything below is the M07-era handoff, kept for history.
+
 # M07 handoff
 
 Updated: 2026-09-30. **M15 (security review) is In Progress: review complete, two fixes deployed; the M03 password-reset check is deferred to M16 (email rate limit). M03 and M07-M15 stay In Progress until that check and the final QA pass (M16).** See CURRENT.md "M15 CHECKPOINT".

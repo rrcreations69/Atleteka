@@ -1,3 +1,27 @@
+# START HERE (session handoff, 2026-10-05 PHT)
+
+Read this section first; everything below it is history. Verify against the code and `git log` before acting.
+
+## Where things stand
+- **Production:** https://atleteka.vercel.app runs `main` (functions in Singapore, `vercel.json`). The local repo is the inner `Atleteka/` folder (GitHub rrcreations69/Atleteka). Work on a branch, open a PR, and merge only when the user says "merge #N".
+- **Merged and live (2026-10-02 to 10-05):** M08-M16 (#2-#10), sin1 region (#11), "Studio" modern minimal design and demo catalog (#13, D-DESIGN-02), navy and crimson palette (#14, D-DESIGN-03), landing-style home with scrollable featured hero (#15, D-DESIGN-04), UI/UX review fixes and add-to-cart confirmation panel (#16), header cart count badge (#17). Superseded: the warm design (#12, D-DESIGN-01).
+- **Demo mode:** production uses PayMongo TEST keys and the test webhook hook_e5HJPTAUgtKmM1aEQBx28Lz2 points at production (DECISIONS.md "Demo checkout on production"). Demo card 4343 4343 4343 4345, any future expiry, any CVC. Order emails only reach raymund.bermudes21@gmail.com (Resend test sender, M16-P01); other recipients are logged as `email_rejected` and acknowledged.
+- **Catalog:** 14 demo products and 28 generated transparent illustrations (scripts/demo-catalog: `node scripts/demo-catalog/generate-images.mjs`, then `node --env-file=.env.local scripts/demo-catalog/seed.mjs [--replace-images]`). Re-running the seed resets demo stock. Old fixtures and categories are inactive. Replace with real products and photos before launch.
+- **PRD status:** M03 and M07-M16 are still In Progress in the PRD (M03 reset check pending; launch items pending). D-DESIGN-01 to 04, the UI/UX review and the cart badge are recorded in DECISIONS.md but not yet in the PRD decision log (next free row: 15).
+
+## Open items (user's call; set aside items stay parked until the user raises them)
+1. Before launch: real products and photos; PayMongo live key, live webhook and its secret in Vercel Production; verified Resend domain and EMAIL_FROM (no domain yet, guest-checkout soft launch per M16-P01); rotate the database password; enable Supabase leaked-password protection.
+2. Set aside by the user: M03 password-reset retry; PayMongo live keys.
+3. Paperwork: PRD decision-log rows for D-DESIGN-01 to 04 and later UI decisions; close milestones in the PRD once launch items are done.
+
+## How to operate
+- **New branch preview:** set branch-scoped Preview variables (NEXT_PUBLIC_APP_URL = `https://atleteka-git-<branch-with-dashes>-rr-4c7a.vercel.app`, NEXT_PUBLIC_SUPABASE_URL, NEXT_PUBLIC_SUPABASE_ANON_KEY, SUPABASE_SERVICE_ROLE_KEY, PAYMONGO_SECRET_KEY, NEXT_PUBLIC_SENTRY_DSN) with one `vercel env add NAME preview <branch> --force --yes` per variable, values piped from .env.local, then `vercel redeploy <deployment-url> --target preview`.
+- **Permissions:** the outer folder's `.claude/settings.local.json` (user-added) allows `vercel.cmd env add/rm` and `gh.exe pr edit/merge`. Auto mode blocks other secret writes, credential reads and unreviewed merges; never work around a denial.
+- **Testing:** the user's Chrome via Claude in Chrome. In a background tab, mouse clicks often miss buttons and smooth scrolling does not animate; use `button.click()` through javascript_tool and instant scrolls. The in-app browser pane does not hydrate pages.
+- **Design rules:** Studio layout; palette ink #181A2F, navy #242E49, slate #37415C, crimson #B4182D (primary actions), wine #54162B (hover), apricot #FDA481 (dark surfaces only); Instrument Sans; 2 px corners; no text under 12 px; copy states only what the store does.
+
+---
+
 # Current milestone: M16 - QA & launch
 
 Updated: 2026-09-30. Status: **In Progress**. Branch feat/m16-qa-launch, stacked on feat/m15-security-review (PR #9). PR #10 opened against feat/m15-security-review. Authorized by the user ("start M16").
