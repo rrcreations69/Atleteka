@@ -3,7 +3,7 @@
 
 export const brand = {
   /** Store name: header wordmark, page titles, emails, PayMongo checkout, social sharing. */
-  name: "Atleteka",
+  name: "Athleteka",
   /**
    * Optional logo shown in the header and footer instead of the text wordmark. Put the file in /public
    * and set e.g. { src: "/logo.svg", width: 140, height: 32 } (pixel size as displayed). The footer sits

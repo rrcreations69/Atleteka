@@ -1,4 +1,4 @@
-# Atleteka
+# Athleteka
 
 PRD-driven single-store e-commerce application. **M05: Search & filters** is complete and verified within its scope. M00-M02 are verified; M03 has an unresolved browser-auth verification failure recorded in [M03_CHECKPOINT.md](docs/M03_CHECKPOINT.md). See [CURRENT.md](docs/CURRENT.md) for current acceptance results.
 
